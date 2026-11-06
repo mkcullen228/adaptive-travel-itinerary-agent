@@ -1,0 +1,14 @@
+# Python virtual environment
+.venv_agent/
+
+# Environment variables and secrets
+.env
+
+# Python cache
+__pycache__/
+
+# Pytest cache
+.pytest_cache/
+
+# Compiled Python files
+*.pyc
