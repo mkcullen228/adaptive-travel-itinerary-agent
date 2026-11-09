@@ -6,7 +6,19 @@ from datetime import timedelta
 
 
 def check_activity_overlaps(itinerary: Itinerary) -> ValidationResult:
-    """Check whether consecutive activities overlap."""
+    """Check whether scheduled activities overlap.
+
+    Sorts activities chronologically and compares consecutive activities
+    to identify overlapping time windows. Activities that end exactly
+    when the next activity begins are considered valid.
+
+    Args:
+        itinerary: The itinerary containing scheduled activities.
+
+    Returns:
+        ValidationResult: VALID if no overlaps are found; otherwise
+        INVALID with the identified overlap issues.
+    """
 
     # Sort activities by start_time
     activities = sorted(itinerary.activities, key=lambda u: u.start_time)
@@ -42,7 +54,22 @@ def get_selected_travel_estimate(
     itinerary: Itinerary,
     origin_activity_id: str,
     destination_activity_id: str) -> TravelEstimate | None:
-    
+    """Retrieve the travel estimate matching the selected mode.
+
+    Searches the itinerary's travel legs for the specified origin and
+    destination activities, then returns the estimate matching the
+    selected transportation mode.
+
+    Args:
+        itinerary: The itinerary containing travel legs and estimates.
+        origin_activity_id: ID of the activity where travel begins.
+        destination_activity_id: ID of the activity where travel ends.
+
+    Returns:
+        TravelEstimate | None: The matching estimate, or None if no
+        matching travel leg or selected-mode estimate exists.
+    """
+
     for leg in itinerary.travel_legs:
         if (origin_activity_id == leg.origin_activity_id
             and destination_activity_id == leg.destination_activity_id):
@@ -54,6 +81,23 @@ def get_selected_travel_estimate(
 
 
 def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
+    """Determine whether sufficient time exists between activities for travel.
+
+    Compares the selected travel estimate between consecutive activities
+    against the available time between the end of one activity and the
+    start of the next.
+
+    Missing travel estimates result in INCOMPLETE validation because
+    feasibility cannot be determined without the required information.
+
+    Args:
+        itinerary: The itinerary containing activities and travel legs.
+
+    Returns:
+        ValidationResult: INVALID if travel time is insufficient,
+        INCOMPLETE if required estimates are missing, or VALID if all
+        travel transitions are feasible.
+    """
 
     activities = sorted(itinerary.activities, key=lambda u: u.start_time)
     issues_lst = []
@@ -130,27 +174,19 @@ def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
     )
 
 
-def validate_itinerary(itinerary: Itinerary) -> ValidationResult:
-
-    result1 = check_travel_time_feasibility(itinerary)
-    result2 = check_activity_overlaps(itinerary)
-
-    issues = result1.issues + result2.issues
-
-    if result1.status == ValidationStatus.INVALID or result2.status == ValidationStatus.INVALID: 
-        status = ValidationStatus.INVALID
-    elif result1.status == ValidationStatus.INCOMPLETE or result2.status == ValidationStatus.INCOMPLETE: 
-        status = ValidationStatus.INCOMPLETE
-    else:
-        status = ValidationStatus.VALID
-  
-    return ValidationResult(
-        status=status,
-        issues=issues
-    ) 
-
-
 def check_travel_leg_integrity(itinerary: Itinerary) -> ValidationResult:
+    """Check the structural integrity of itinerary travel legs.
+
+    Identifies travel legs that reference nonexistent activities and
+    duplicate directed travel-leg pairs.
+
+    Args:
+        itinerary: The itinerary containing activities and travel legs.
+
+    Returns:
+        ValidationResult: INVALID if orphaned or duplicate travel legs
+        are found; otherwise VALID.
+    """
 
     issues_lst = []
 
@@ -206,8 +242,41 @@ def check_travel_leg_integrity(itinerary: Itinerary) -> ValidationResult:
         else ValidationStatus.VALID
     )
 
-    return ValidationResult(
-        status=status,
-        issues=issues_lst
-    )
+    return ValidationResult(status=status, issues=issues_lst)
 
+
+def validate_itinerary(itinerary: Itinerary) -> ValidationResult:
+    """Perform comprehensive validation of an itinerary.
+
+    Combines activity overlap, travel-time feasibility, and travel-leg
+    integrity checks into a single validation result.
+
+    INVALID takes precedence over INCOMPLETE, which takes precedence
+    over VALID, ensuring that all identified issues are retained while
+    the overall status reflects the most severe finding.
+
+    Args:
+        itinerary: The itinerary to validate.
+
+    Returns:
+        ValidationResult: Combined validation status and all identified
+        issues.
+    """
+
+    result1 = check_travel_time_feasibility(itinerary)
+    result2 = check_activity_overlaps(itinerary)
+    result3 = check_travel_leg_integrity(itinerary)
+
+    results = [result1, result2, result3]
+    issues = result1.issues + result2.issues + result3.issues
+    # for r in results:
+    #     issues.append(r.issues)
+
+    if any(r.status == ValidationStatus.INVALID for r in results): 
+        status = ValidationStatus.INVALID
+    elif any(r.status == ValidationStatus.INCOMPLETE for r in results): 
+        status = ValidationStatus.INCOMPLETE
+    else:
+        status = ValidationStatus.VALID
+  
+    return ValidationResult(status=status, issues=issues)

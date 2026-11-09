@@ -13,7 +13,7 @@ class IssueType(str, Enum):
     ACTIVITY_OVERLAP = "activity_overlap"
     MISSING_TRAVEL_ESTIMATE = "missing_travel_estimate"
     ORPHANED_TRAVEL_LEG = "orphaned_travel_leg"
-    DUPLICATE_TRAVEL_LEG = "duplicate_travel_leg"   
+    DUPLICATE_TRAVEL_LEG = "duplicate_travel_leg"
 
 
 class ValidationIssue(BaseModel):
