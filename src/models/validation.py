@@ -12,6 +12,8 @@ class IssueType(str, Enum):
     INSUFFICIENT_TRAVEL_TIME = "insufficient_travel_time"
     ACTIVITY_OVERLAP = "activity_overlap"
     MISSING_TRAVEL_ESTIMATE = "missing_travel_estimate"
+    ORPHANED_TRAVEL_LEG = "orphaned_travel_leg"
+    DUPLICATE_TRAVEL_LEG = "duplicate_travel_leg"   
 
 
 class ValidationIssue(BaseModel):

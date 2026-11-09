@@ -9,12 +9,12 @@ class TravelEstimate(BaseModel):
     source: str
 
 
-# todo: do not allow connection to self (model level validation)
 class TravelLeg(BaseModel):
     """"""
     origin_activity_id: str
     destination_activity_id: str
     estimates: List[TravelEstimate]
+    selected_mode: str
 
 
 # ex_nested = TravelLeg(

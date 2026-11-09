@@ -37,16 +37,17 @@ def test_travel_leg_supports_multiple_estimates():
         origin_activity_id="activity_001",
         destination_activity_id="activity_002",
         estimates=[
-        TravelEstimate(
-            mode="walking",
-            duration_minutes=12,
-            source="manual_test_data",
-            ), 
-        TravelEstimate(
-            mode="driving",
-            duration_minutes=8,
-            source="manual_test_data",
-            )]
+            TravelEstimate(
+                mode="walking",
+                duration_minutes=12,
+                source="manual_test_data",
+                ), 
+            TravelEstimate(
+                mode="driving",
+                duration_minutes=8,
+                source="manual_test_data",
+                )], 
+        selected_mode="walking"
         )
 
     assert len(t3.estimates) == 2
@@ -54,6 +55,8 @@ def test_travel_leg_supports_multiple_estimates():
     assert t3.estimates[0].duration_minutes == 12
     assert t3.estimates[1].mode == "driving"
     assert t3.estimates[1].duration_minutes == 8
+    assert t3.selected_mode == "walking"
+
 
 def test_travel_leg_supports_empty_estimates():
     # Create a travel leg with walking and driving estimates
@@ -61,7 +64,18 @@ def test_travel_leg_supports_empty_estimates():
     t3 = TravelLeg(
         origin_activity_id="activity_001",
         destination_activity_id="activity_002",
-        estimates=[]
+        estimates=[], 
+        selected_mode="walking"
         )
 
     assert len(t3.estimates) == 0
+    assert t3.selected_mode == "walking"
+
+
+def test_travel_leg_requires_selected_mode():
+    with pytest.raises(ValidationError):
+        TravelLeg(
+            origin_activity_id="activity_001",
+            destination_activity_id="activity_002",
+            estimates=[]
+        )
