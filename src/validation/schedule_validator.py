@@ -44,10 +44,7 @@ def check_activity_overlaps(itinerary: Itinerary) -> ValidationResult:
     # 5. Return a ValidationResult
     status = (ValidationStatus.INVALID if issues_lst else ValidationStatus.VALID)
 
-    return ValidationResult(
-        status=status,
-        issues=issues_lst
-    )
+    return ValidationResult(status=status, issues=issues_lst)
 
 
 def get_selected_travel_estimate(
@@ -80,6 +77,18 @@ def get_selected_travel_estimate(
     return None
 
 
+
+from datetime import timedelta
+from itertools import pairwise
+
+from src.models.validation import (
+    ValidationStatus,
+    IssueType,
+    ValidationIssue,
+    ValidationResult,
+)
+
+
 def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
     """Determine whether sufficient time exists between activities for travel.
 
@@ -98,31 +107,78 @@ def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
         INCOMPLETE if required estimates are missing, or VALID if all
         travel transitions are feasible.
     """
-
-    activities = sorted(itinerary.activities, key=lambda u: u.start_time)
     issues_lst = []
 
-    for current_act, next_act in pairwise(activities):
-
-        # Find the selected estimate using activity IDs
-        estimate = get_selected_travel_estimate(itinerary, current_act.activity_id, next_act.activity_id)
-
-        if estimate is None:
-            issues_lst
-        #   Append a ValidationIssue
-        #   Continue to the next pair
-
-        # Calculate arrival time using timedelta
-
-        # If arrival time exceeds next activity start:
-        #   Append a ValidationIssue
-
-    # Determine final status based on all issues
-
-    return ValidationResult(
-        status=status,
-        issues=issues_lst
+    # Sort activities chronologically
+    sorted_activities = sorted(
+        itinerary.activities,
+        key=lambda activity: activity.start_time
     )
+
+    # Compare each consecutive pair of activities
+    for current_act, next_act in pairwise(sorted_activities):
+
+        # Retrieve the travel estimate matching the selected mode
+        estimate = get_selected_travel_estimate(
+            itinerary,
+            current_act.activity_id,
+            next_act.activity_id
+        )
+
+        # Missing estimate means feasibility cannot be determined
+        if estimate is None:
+            validation_issue = ValidationIssue(
+                issue_type=IssueType.MISSING_TRAVEL_ESTIMATE,
+                description=(
+                    "Missing selected travel estimate between "
+                    "consecutive activities."
+                ),
+                activity_ids=[
+                    current_act.activity_id,
+                    next_act.activity_id
+                ]
+            )
+            issues_lst.append(validation_issue)
+            continue
+
+        # Calculate arrival time after completing the current activity
+        arrival_time = current_act.end_time + timedelta(
+            minutes=estimate.duration_minutes
+        )
+
+        # Check whether travel can be completed before the next activity
+        if arrival_time > next_act.start_time:
+            validation_issue = ValidationIssue(
+                issue_type=IssueType.INSUFFICIENT_TRAVEL_TIME,
+                description=(
+                    "Insufficient time to travel between consecutive "
+                    "activities using the selected transportation mode."
+                ),
+                activity_ids=[
+                    current_act.activity_id,
+                    next_act.activity_id
+                ]
+            )
+            issues_lst.append(validation_issue)
+
+    # Determine overall validation status
+    if any(
+        issue.issue_type == IssueType.INSUFFICIENT_TRAVEL_TIME
+        for issue in issues_lst
+    ):
+        status = ValidationStatus.INVALID
+
+    elif any(
+        issue.issue_type == IssueType.MISSING_TRAVEL_ESTIMATE
+        for issue in issues_lst
+    ):
+        status = ValidationStatus.INCOMPLETE
+
+    else:
+        status = ValidationStatus.VALID
+
+    return ValidationResult(status=status, issues=issues_lst)
+
 
 def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
 
