@@ -27,20 +27,20 @@ class ValidationResult(BaseModel):
     issues: List[ValidationIssue] = Field(default_factory=list)
 
 
-ex = ValidationResult(
-    status=ValidationStatus.INVALID,
-    issues=[
-        ValidationIssue(
-            issue_type=IssueType.INSUFFICIENT_TRAVEL_TIME,
-            description="Walking time exceeds the available gap between activities.",
-            activity_ids=["activity_001", "activity_002"]
-        ), 
-        ValidationIssue(
-            issue_type=IssueType.ACTIVITY_OVERLAP,
-            description="Activity starts before the required travel time has elapsed.",
-            activity_ids=["activity_002", "activity_003"]
-        )
-    ]
-)
+# ex = ValidationResult(
+#     status=ValidationStatus.INVALID,
+#     issues=[
+#         ValidationIssue(
+#             issue_type=IssueType.INSUFFICIENT_TRAVEL_TIME,
+#             description="Walking time exceeds the available gap between activities.",
+#             activity_ids=["activity_001", "activity_002"]
+#         ), 
+#         ValidationIssue(
+#             issue_type=IssueType.ACTIVITY_OVERLAP,
+#             description="Activity starts before the required travel time has elapsed.",
+#             activity_ids=["activity_002", "activity_003"]
+#         )
+#     ]
+# )
 
-print(ex)
+# print(ex)
