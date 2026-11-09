@@ -1,0 +1,23 @@
+[
+  {
+    "attraction_id": "nga",
+    "name": "National Gallery of Art",
+    "address": "6th Street and Constitution Avenue NW, Washington, DC 20565",
+    "latitude": 38.8913116,
+    "longitude": -77.0199045
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "nga_official",
+        "source_name": "National Gallery of Art",
+        "source_type": "official_website",
+        "url": "https://www.nga.gov/visit",
+        "retrieved_at": "2026-11-09T16:00:00",
+        "reliability": 0.95,
+        "verification_status": "verified"
+      }
+    ]
+  }
+]
