@@ -35,5 +35,5 @@ class SourceReference(BaseModel):
     retrieved_at: datetime
     reliability: float = Field(ge=0, le=1)
     verification_status: VerificationStatus
-    osm_type: str
-    osm_id: int
+    # osm_type: str
+    # osm_id: int
