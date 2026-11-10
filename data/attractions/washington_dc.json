@@ -4,7 +4,7 @@
     "name": "National Gallery of Art",
     "address": "6th Street and Constitution Avenue NW, Washington, DC 20565",
     "latitude": 38.8913116,
-    "longitude": -77.0199045
+    "longitude": -77.0199045,
     "category": "museum",
     "indoor": true,
     "typical_duration_minutes": 120,
