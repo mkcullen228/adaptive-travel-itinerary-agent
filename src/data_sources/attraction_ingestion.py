@@ -1,3 +1,9 @@
+import json
+from pathlib import Path
+
+from datetime import datetime, timezone
+from src.models.attraction import Attraction
+from src.models.source_reference import SourceReference, VerificationStatus
 from src.data_sources.nominatim_client import (
     collect_attraction_location, select_location_candidate, LocationMatchStatus)
 
@@ -6,64 +12,104 @@ attractions_to_process = [
     {
         "attraction_id": "nga",
         "name": "National Gallery of Art",
+        "address": "6th Street and Constitution Avenue NW, Washington, DC 20565",
         "location": "Washington DC",
-        "expected_types": ["museum"]
+        "expected_types": ["museum"],
+        "category": "museum",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
     {
         "attraction_id": "american_history",
         "name": "National Museum of American History",
+        "address" : "1300 Constitution Ave. NW, Washington, DC 20560",
         "location": "Washington DC",
-        "expected_types": ["museum"]
+        "expected_types": ["museum"], 
+        "category": "museum",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
     {
         "attraction_id": "air_space",
         "name": "National Air and Space Museum",
+        "address" : "650 Jefferson Drive SW, Washington, DC 20004",
         "location": "Washington DC",
-        "expected_types": ["museum"]
+        "expected_types": ["museum"], 
+        "category": "museum",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
     {
         "attraction_id": "holocaust_memorial",
         "name": "United States Holocaust Memorial Museum",
+        "address" : "100 Raoul Wallenberg Place, SW, Washington, DC 20024",
         "aliases": ["U.S. Holocaust Memorial Museum"],
         "location": "Washington DC",
-        "expected_types": ["museum"]
+        "expected_types": ["museum"], 
+        "category": "museum",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
     {
         "attraction_id": "natural_history",
         "name": "National Museum of Natural History",
+        "address" : "10th St. & Constitution Ave. NW, Washington, DC 20560",
         "location": "Washington DC",
-        "expected_types": ["museum"]
+        "expected_types": ["museum"], 
+        "category": "museum",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
        {
         "attraction_id": "lincoln_memorial",
         "name": "Lincoln Memorial",
+        "address" : "2 Lincoln Memorial Circle NW, Washington, DC 20037",
         "location": "Washington DC",
-        "expected_types": ["memorial", "park"]
+        "expected_types": ["memorial", "park"], 
+        "category": "memorial",
+        "indoor": False,
+        "typical_duration_minutes": 30  
     },
     {
         "attraction_id": "washington_monument",
         "name": "Washington Monument",
+        "address" : "2 15th St. NW, Washington, D.C.",
         "location": "Washington DC",
-        "expected_types": ["monument", "attraction"]
+        "expected_types": ["monument", "attraction"], 
+        "category": "monument",
+        "indoor": True,
+        "typical_duration_minutes": 60  
     },
     {
         "attraction_id": "wwii_memorial",
         "name": "World War II Memorial",
+        "address" : "1750 Independence Ave. SW, Washington, DC 20006",
         "location": "Washington DC",
-        "expected_types": ["monument", "attraction"]
+        "expected_types": ["monument", "attraction"], 
+        "category": "monument",
+        "indoor": False,
+        "typical_duration_minutes": 15  
     },
     {
         "attraction_id": "us_capitol",
         "name": "United States Capitol",
+        "address" : "First St SE, Washington, DC 20004",
         "location": "Washington DC",
-        "expected_types": ["government"]
+        "expected_types": ["government"], 
+        "category": "government",
+        "indoor": True,
+        "typical_duration_minutes": 120  
     },
     {
         "attraction_id": "national_zoo",
         "name": "Smithsonian National Zoological Park",
+        "address" : "3001 Connecticut Ave. NW, Washington, D.C. 20008",
         "aliases": ["National Zoological Park"],
         "location": "Washington DC",
-        "expected_types": ["zoo"]
+        "expected_types": ["zoo"], 
+        "category": "zoo",
+        "indoor": False,
+        "typical_duration_minutes": 180  
     }
 ]
 
@@ -100,7 +146,7 @@ def process_attractions(attractions):
         )
 
         results.append({
-            "attraction_id": attraction["attraction_id"],
+            "attraction": attraction,
             "status": evaluation["status"],
             "selected_candidate": evaluation["selected_candidate"],
             "candidate_evaluations": evaluation["candidate_evaluations"]
@@ -108,43 +154,62 @@ def process_attractions(attractions):
     return results
 
 
+def convert_to_attraction_records(results):
+    attraction_records = []
+    review_records = []
 
-# Scratch 
-results = process_attractions(attractions_to_process)
+    for result in results:
+        if result["status"] != LocationMatchStatus.UNIQUE_VALID_MATCH:
+            review_records.append(result)
+            continue
+        
+        attraction = result["attraction"]
+        candidate = result["selected_candidate"]
+        
+        osm_type = candidate["osm_type"]
+        osm_id = candidate["osm_id"]
 
-for result in results:
-    print(
-        result["attraction_id"],
-        result["status"].value
-    )
+        source_reference = SourceReference(
+            source_id=f"osm_{osm_type}_{osm_id}",
+            source_name="OpenStreetMap",
+            source_type="openstreetmap",
+            url=f"https://www.openstreetmap.org/{osm_type}/{osm_id}",
+            retrieved_at=datetime.now(timezone.utc),
+            reliability=0.85,
+            verification_status=VerificationStatus.VERIFIED
+        )
+
+        attraction_record = Attraction(
+            attraction_id=attraction["attraction_id"],
+            name=attraction["name"],
+            address=attraction["address"],
+            latitude=float(candidate["lat"]),
+            longitude=float(candidate["lon"]),
+            category=attraction["category"],
+            indoor=attraction["indoor"],
+            typical_duration_minutes=attraction["typical_duration_minutes"],
+            source_references=[source_reference]
+        )
+
+        attraction_records.append(attraction_record)
+
+    return attraction_records, review_records
 
 
-# for result in results:
-#     if result["attraction_id"] == "national_zoo":
-#         for evaluation in result["candidate_evaluations"]:
-#             print("Candidate:", evaluation["candidate"].get("display_name"))
-#             print("Category:", evaluation["candidate"].get("category"))
-#             print("Type:", evaluation["candidate"].get("type"))
-#             print("Failed checks:", evaluation["failure_reasons"])
+if __name__ == "__main__":
+    results = process_attractions(attractions_to_process)
+    records, review = convert_to_attraction_records(results)
 
+    print(f"Successfully converted: {len(records)}")
+    print(f"Requiring review: {len(review)}")
 
-### Scratch 
-# attraction_name = "National Museum of American History"
-# attraction_location = "Washington DC"
-# expected_type = "museum"
-# min_lat = 38.80
-# max_lat = 38.995
-# min_lon = -77.12
-# max_lon = -76.91
+    output_path = Path("data/attractions/washington_dc.json")
 
-# results = collect_attraction_location(attraction_name, attraction_location)
-# candidates = select_location_candidate(results, attraction_name, attraction_location, expected_type, 
-#                               min_lat, max_lat, min_lon, max_lon)
-# # print(candidates)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
-# if candidates["status"] == LocationMatchStatus.UNIQUE_VALID_MATCH:
-#     print("Unique candidate found:")
-#     print(candidates["selected_candidate"])
-# else:
-#     print("Manual review required:")
-#     print(candidates)
+    with output_path.open("w", encoding="utf-8") as file:
+        json.dump(
+            [record.model_dump(mode="json") for record in records],
+            file,
+            indent=2
+        )
