@@ -1,0 +1,212 @@
+[
+  {
+    "attraction_id": "nga",
+    "name": "National Gallery of Art",
+    "address": "6th Street and Constitution Avenue NW, Washington, DC 20565",
+    "latitude": 38.8913116,
+    "longitude": -77.0199045,
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_way_66418944",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/66418944",
+        "retrieved_at": "2026-11-10T23:11:48.647171Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "american_history",
+    "name": "National Museum of American History",
+    "address": "1300 Constitution Ave. NW, Washington, DC 20560",
+    "latitude": 38.8912397,
+    "longitude": -77.0300205,
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_way_445808462",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/445808462",
+        "retrieved_at": "2026-11-10T23:11:48.647317Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "air_space",
+    "name": "National Air and Space Museum",
+    "address": "650 Jefferson Drive SW, Washington, DC 20004",
+    "latitude": 38.8881349,
+    "longitude": -77.0198154,
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_relation_16159112",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/relation/16159112",
+        "retrieved_at": "2026-11-10T23:11:48.647333Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "holocaust_memorial",
+    "name": "United States Holocaust Memorial Museum",
+    "address": "100 Raoul Wallenberg Place, SW, Washington, DC 20024",
+    "latitude": 38.8866384,
+    "longitude": -77.0327502,
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_way_66418706",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/66418706",
+        "retrieved_at": "2026-11-10T23:11:48.647343Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "natural_history",
+    "name": "National Museum of Natural History",
+    "address": "10th St. & Constitution Ave. NW, Washington, DC 20560",
+    "latitude": 38.891245,
+    "longitude": -77.0259701,
+    "category": "museum",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_way_66418787",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/66418787",
+        "retrieved_at": "2026-11-10T23:11:48.647352Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "lincoln_memorial",
+    "name": "Lincoln Memorial",
+    "address": "2 Lincoln Memorial Circle NW, Washington, DC 20037",
+    "latitude": 38.8892648,
+    "longitude": -77.0502109,
+    "category": "memorial",
+    "indoor": false,
+    "typical_duration_minutes": 30,
+    "source_references": [
+      {
+        "source_id": "osm_way_1332068226",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/1332068226",
+        "retrieved_at": "2026-11-10T23:11:48.647360Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "washington_monument",
+    "name": "Washington Monument",
+    "address": "2 15th St. NW, Washington, D.C.",
+    "latitude": 38.8894754,
+    "longitude": -77.0352426,
+    "category": "monument",
+    "indoor": true,
+    "typical_duration_minutes": 60,
+    "source_references": [
+      {
+        "source_id": "osm_way_766761337",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/766761337",
+        "retrieved_at": "2026-11-10T23:11:48.647368Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "wwii_memorial",
+    "name": "World War II Memorial",
+    "address": "1750 Independence Ave. SW, Washington, DC 20006",
+    "latitude": 38.8893951,
+    "longitude": -77.040308,
+    "category": "monument",
+    "indoor": false,
+    "typical_duration_minutes": 15,
+    "source_references": [
+      {
+        "source_id": "osm_way_66418767",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/66418767",
+        "retrieved_at": "2026-11-10T23:11:48.647375Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "us_capitol",
+    "name": "United States Capitol",
+    "address": "First St SE, Washington, DC 20004",
+    "latitude": 38.889813,
+    "longitude": -77.0090208,
+    "category": "government",
+    "indoor": true,
+    "typical_duration_minutes": 120,
+    "source_references": [
+      {
+        "source_id": "osm_way_66418809",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/way/66418809",
+        "retrieved_at": "2026-11-10T23:11:48.647382Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  },
+  {
+    "attraction_id": "national_zoo",
+    "name": "Smithsonian National Zoological Park",
+    "address": "3001 Connecticut Ave. NW, Washington, D.C. 20008",
+    "latitude": 38.9285936,
+    "longitude": -77.0485378,
+    "category": "zoo",
+    "indoor": false,
+    "typical_duration_minutes": 180,
+    "source_references": [
+      {
+        "source_id": "osm_relation_10511120",
+        "source_name": "OpenStreetMap",
+        "source_type": "openstreetmap",
+        "url": "https://www.openstreetmap.org/relation/10511120",
+        "retrieved_at": "2026-11-10T23:11:48.647388Z",
+        "reliability": 0.85,
+        "verification_status": "verified"
+      }
+    ]
+  }
+]

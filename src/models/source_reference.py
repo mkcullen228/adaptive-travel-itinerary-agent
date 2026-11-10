@@ -24,6 +24,8 @@ class SourceReference(BaseModel):
     retrieved_at: datetime - When the information was retrieved
     reliability: float - Reliability score from 0 to 1
     verification_status: enum - Whether the information has been verified
+    osm_type: str
+    osm_id: int
     """
 
     source_id: str
@@ -33,3 +35,5 @@ class SourceReference(BaseModel):
     retrieved_at: datetime
     reliability: float = Field(ge=0, le=1)
     verification_status: VerificationStatus
+    # osm_type: str
+    # osm_id: int
