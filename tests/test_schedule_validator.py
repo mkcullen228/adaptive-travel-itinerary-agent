@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime, date
 
 from src.models.activity import Activity
@@ -114,8 +115,31 @@ def test_activities_starting_at_same_time():
     }
     assert r.issues[0].issue_type == "activity_overlap"
 
+@pytest.fixture
+def valid_travel_walking_estimate_data():
+    return {
+        "mode": "walking", 
+        "duration_minutes": 12,
+        "duration_seconds": 711.1,
+        "distance_meters": 367,
+        "source": "OpenRouteService",
+    }
 
-def test_selected_travel_estimate():
+@pytest.fixture
+def valid_travel_driving_estimate_data():
+    return {
+        "mode": "driving", 
+        "duration_minutes": 10,
+        "duration_seconds": 542,
+        "distance_meters": 367.3,
+        "source": "OpenRouteService",
+    }
+
+
+def test_selected_travel_estimate(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_walking_estimate_data)
+    
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -139,17 +163,7 @@ def test_selected_travel_estimate():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=12,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td], 
             selected_mode="walking"
             )]
         )
@@ -165,7 +179,9 @@ def test_selected_travel_estimate():
     assert result.duration_minutes == 12
 
 
-def test_selected_travel_estimate_missing_mode():
+def test_selected_travel_estimate_missing_mode(valid_travel_driving_estimate_data):
+    te = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -189,12 +205,7 @@ def test_selected_travel_estimate_missing_mode():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[te], 
             selected_mode="walking"
             )]
         )
@@ -240,7 +251,10 @@ def test_selected_travel_leg_not_found():
     assert result is None
 
 
-def test_sufficient_travel_time():
+def test_sufficient_travel_time(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -264,17 +278,7 @@ def test_sufficient_travel_time():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=12,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td], 
             selected_mode="walking"
             )]
         )
@@ -284,7 +288,10 @@ def test_sufficient_travel_time():
     assert len(result.issues) == 0
 
 
-def test_insufficient_travel_time():
+def test_insufficient_travel_time(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -294,7 +301,7 @@ def test_insufficient_travel_time():
                 activity_id="activity_002",
                 name="Smithsonian's National Air and Space Museum",
                 location="Washington, DC",
-                start_time=datetime(2026, 11, 7, 11, 42),
+                start_time=datetime(2026, 11, 7, 11, 40),
                 duration_minutes=60,
             ),
             Activity(
@@ -308,17 +315,7 @@ def test_insufficient_travel_time():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td], 
             selected_mode="walking"
             )]
         )
@@ -328,7 +325,9 @@ def test_insufficient_travel_time():
     assert result.issues[0].issue_type == IssueType.INSUFFICIENT_TRAVEL_TIME
 
 
-def test_missing_selected_travel_estimate():
+def test_missing_selected_travel_estimate(valid_travel_driving_estimate_data):
+    te = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -352,12 +351,7 @@ def test_missing_selected_travel_estimate():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[te], 
             selected_mode="walking"
             )]
         )
@@ -380,7 +374,10 @@ def test_no_activities_to_validate():
     assert result.status == ValidationStatus.VALID
 
 
-def test_validate_itinerary_valid():
+def test_validate_itinerary_valid(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -404,17 +401,7 @@ def test_validate_itinerary_valid():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=12,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td], 
             selected_mode="walking"
             )]
         )
@@ -424,7 +411,10 @@ def test_validate_itinerary_valid():
     assert len(result.issues) == 0
 
 
-def test_validate_itinerary_invalid():
+def test_validate_itinerary_invalid(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -434,7 +424,7 @@ def test_validate_itinerary_invalid():
                 activity_id="activity_002",
                 name="Smithsonian's National Air and Space Museum",
                 location="Washington, DC",
-                start_time=datetime(2026, 11, 7, 11, 42),
+                start_time=datetime(2026, 11, 7, 11, 40),
                 duration_minutes=60,
             ),
             Activity(
@@ -448,17 +438,7 @@ def test_validate_itinerary_invalid():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td], 
             selected_mode="walking"
             )]
         )
@@ -469,7 +449,9 @@ def test_validate_itinerary_invalid():
     assert len(result.issues) == 1
 
 
-def test_validate_itinerary_incomplete():
+def test_validate_itinerary_incomplete(valid_travel_driving_estimate_data):
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -493,12 +475,7 @@ def test_validate_itinerary_incomplete():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[td], 
             selected_mode="walking"
             )]
         )
@@ -509,7 +486,9 @@ def test_validate_itinerary_incomplete():
     assert len(result.issues) == 1
 
 
-def test_validate_itinerary_invalid_with_multiple_issues():
+def test_validate_itinerary_invalid_with_multiple_issues(valid_travel_driving_estimate_data):
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+    
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -541,23 +520,13 @@ def test_validate_itinerary_invalid_with_multiple_issues():
             TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[td], 
             selected_mode="walking"
             ), 
             TravelLeg(
             origin_activity_id="activity_002",
             destination_activity_id="activity_003",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=12,
-                    source="manual_test_data",
-                    )], 
+            estimates=[td], 
             selected_mode="walking"
             )]
         )
@@ -570,7 +539,9 @@ def test_validate_itinerary_invalid_with_multiple_issues():
     assert len(result.issues) == 3
 
 
-def test_validate_itinerary_duplicate_travel_leg():
+def test_validate_itinerary_duplicate_travel_leg(valid_travel_walking_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -595,23 +566,13 @@ def test_validate_itinerary_duplicate_travel_leg():
             TravelLeg(
                 origin_activity_id="activity_001",
                 destination_activity_id="activity_002",
-                estimates=[
-                    TravelEstimate(
-                        mode="walking",
-                        duration_minutes=8,
-                        source="manual_test_data",
-                        )], 
+                estimates=[tw], 
                 selected_mode="walking"
             ), 
             TravelLeg(
                 origin_activity_id="activity_001",
                 destination_activity_id="activity_002",
-                estimates=[
-                    TravelEstimate(
-                        mode="walking",
-                        duration_minutes=8,
-                        source="manual_test_data",
-                        )], 
+                estimates=[tw], 
                 selected_mode="walking"
             ), 
             ]
@@ -623,7 +584,10 @@ def test_validate_itinerary_duplicate_travel_leg():
     assert len(result.issues) == 1
 
 
-def test_validate_itinerary_orphaned_travel_leg():
+def test_validate_itinerary_orphaned_travel_leg(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -647,17 +611,7 @@ def test_validate_itinerary_orphaned_travel_leg():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_002",
             destination_activity_id="activity_003",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw, td],
             selected_mode="walking"
             )]
             )
@@ -669,7 +623,10 @@ def test_validate_itinerary_orphaned_travel_leg():
     assert IssueType.ORPHANED_TRAVEL_LEG in issue_types
 
 
-def test_check_travel_leg_integrity_valid():
+def test_check_travel_leg_integrity_valid(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -693,17 +650,7 @@ def test_check_travel_leg_integrity_valid():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[td, tw], 
             selected_mode="walking"
             )]
         )
@@ -713,7 +660,10 @@ def test_check_travel_leg_integrity_valid():
     assert len(result.issues) == 0
 
 
-def test_check_travel_leg_integrity_nonexistentleg_invalid():
+def test_check_travel_leg_integrity_nonexistentleg_invalid(valid_travel_walking_estimate_data, valid_travel_driving_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+    td = TravelEstimate(**valid_travel_driving_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -737,17 +687,7 @@ def test_check_travel_leg_integrity_nonexistentleg_invalid():
         travel_legs = [TravelLeg(
             origin_activity_id="activity_002",
             destination_activity_id="activity_003",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[td, tw], 
             selected_mode="walking"
             )]
         )
@@ -758,7 +698,9 @@ def test_check_travel_leg_integrity_nonexistentleg_invalid():
     assert len(result.issues) == 1
 
 
-def test_check_travel_leg_integrity_duplicateleg_invalid():
+def test_check_travel_leg_integrity_duplicateleg_invalid(valid_travel_walking_estimate_data):
+    tw = TravelEstimate(**valid_travel_walking_estimate_data)
+
     itinerary = Itinerary(
         itinerary_id="Fun Day Out",
         destination="Washington, DC", 
@@ -783,28 +725,13 @@ def test_check_travel_leg_integrity_duplicateleg_invalid():
             TravelLeg(
             origin_activity_id="activity_001",
             destination_activity_id="activity_002",
-            estimates=[
-                TravelEstimate(
-                    mode="walking",
-                    duration_minutes=15,
-                    source="manual_test_data",
-                    ), 
-                TravelEstimate(
-                    mode="driving",
-                    duration_minutes=8,
-                    source="manual_test_data",
-                    )], 
+            estimates=[tw], 
             selected_mode="walking"
             ), 
             TravelLeg(
                 origin_activity_id="activity_001",
                 destination_activity_id="activity_002",
-                estimates=[
-                    TravelEstimate(
-                        mode="walking",
-                        duration_minutes=15,
-                        source="manual_test_data",
-                        )], 
+                estimates=[tw], 
                 selected_mode="walking")
                 ]
         )

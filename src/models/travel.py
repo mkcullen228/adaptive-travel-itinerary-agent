@@ -16,6 +16,8 @@ class TravelEstimate(BaseModel):
     """
     mode: str
     duration_minutes: int = Field(gt=0)
+    duration_seconds: float = Field(gt=0)
+    distance_meters: float = Field(gt=0)
     source: str
 
 

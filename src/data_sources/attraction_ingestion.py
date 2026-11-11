@@ -10,7 +10,7 @@ from src.data_sources.nominatim_client import (
 
 attractions_to_process = [
     {
-        "attraction_id": "nga",
+        "attraction_id": "national_gallery",
         "name": "National Gallery of Art",
         "address": "6th Street and Constitution Avenue NW, Washington, DC 20565",
         "location": "Washington DC",
