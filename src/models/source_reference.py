@@ -17,6 +17,7 @@ class SourceReference(BaseModel):
     Tracks the source identity, retrieval timestamp, reliability score,
     and verification status of supporting information.
 
+
     source_id: str - Unique identifier for the source
     source_name: str - Name of the organization or source
     source_type: str - Government, official venue, API, etc.
@@ -24,8 +25,6 @@ class SourceReference(BaseModel):
     retrieved_at: datetime - When the information was retrieved
     reliability: float - Reliability score from 0 to 1
     verification_status: enum - Whether the information has been verified
-    osm_type: str
-    osm_id: int
     """
 
     source_id: str
@@ -35,5 +34,3 @@ class SourceReference(BaseModel):
     retrieved_at: datetime
     reliability: float = Field(ge=0, le=1)
     verification_status: VerificationStatus
-    # osm_type: str
-    # osm_id: int

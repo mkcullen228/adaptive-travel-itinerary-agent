@@ -105,3 +105,33 @@ def test_travel_leg_requires_selected_mode():
             destination_activity_id="activity_002",
             estimates=[]
         )
+
+
+def test_travel_leg_id():
+    leg = TravelLeg(
+        origin_activity_id="natural_history",
+        destination_activity_id="wwii_memorial",
+        estimates=[],
+        selected_mode="walking"
+    )
+
+    assert leg.travel_leg_id == "natural_history_wwii_memorial"
+
+
+def test_selected_mode_without_matching_estimate():
+    leg = TravelLeg(
+        origin_activity_id="activity_001",
+        destination_activity_id="activity_002",
+        estimates=[
+            TravelEstimate(
+                mode="walking",
+                duration_minutes=12,
+                duration_seconds=711,
+                distance_meters=367,
+                source="OpenRouteService"
+            )
+        ],
+        selected_mode="driving"
+    )
+
+    assert leg.selected_mode == "driving"
