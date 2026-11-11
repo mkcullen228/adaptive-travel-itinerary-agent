@@ -1,0 +1,110 @@
+{
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+        {
+            "activity_id": "national_gallery",
+            "name": "National Gallery of Art",
+            "location": "6th Street and Constitution Avenue NW, Washington, DC",
+            "start_time": "2026-11-07T09:00:00",
+            "duration_minutes": 90,
+            "mandatory": false,
+            "indoor": true
+        },
+        {
+            "activity_id": "american_history",
+            "name": "National Museum of American History",
+            "location": "1300 Constitution Ave. NW, Washington, DC",
+            "start_time": "2026-11-07T10:50:00",
+            "duration_minutes": 90,
+            "mandatory": false,
+            "indoor": true
+        },
+        {
+            "activity_id": "natural_history",
+            "name": "National Museum of Natural History",
+            "location": "10th St. & Constitution Ave. NW, Washington, DC",
+            "start_time": "2026-11-07T13:20:00",
+            "duration_minutes": 90,
+            "mandatory": true,
+            "indoor": true
+        },
+        {
+            "activity_id": "wwii_memorial",
+            "name": "World War II Memorial",
+            "location": "1750 Independence Ave. SW, Washington, DC",
+            "start_time": "2026-11-07T15:10:00",
+            "duration_minutes": 30,
+            "mandatory": false,
+            "indoor": false
+        },
+        {
+            "activity_id": "lincoln_memorial",
+            "name": "Lincoln Memorial",
+            "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+            "start_time": "2026-11-07T15:50:00",
+            "duration_minutes": 30,
+            "mandatory": false,
+            "indoor": false
+        }
+    ],
+    "travel_legs": [
+        {
+            "origin_activity_id": "national_gallery",
+            "destination_activity_id": "american_history",
+            "estimates": [
+                {
+                    "mode": "walking",
+                    "duration_minutes": 12,
+                    "duration_seconds": 683.5,
+                    "distance_meters": 949.3,
+                    "source": "OpenRouteService"
+                }
+            ],
+            "selected_mode": "walking"
+        },
+        {
+            "origin_activity_id": "american_history",
+            "destination_activity_id": "natural_history",
+            "estimates": [
+                {
+                    "mode": "walking",
+                    "duration_minutes": 5,
+                    "duration_seconds": 299.5,
+                    "distance_meters": 416.0,
+                    "source": "OpenRouteService"
+                }
+            ],
+            "selected_mode": "walking"
+        },
+        {
+            "origin_activity_id": "natural_history",
+            "destination_activity_id": "wwii_memorial",
+            "estimates": [
+                {
+                    "mode": "walking",
+                    "duration_minutes": 17,
+                    "duration_seconds": 985.9,
+                    "distance_meters": 1369.3,
+                    "source": "OpenRouteService"
+                }
+            ],
+            "selected_mode": "walking"
+        },
+        {
+            "origin_activity_id": "wwii_memorial",
+            "destination_activity_id": "lincoln_memorial",
+            "estimates": [
+                {
+                    "mode": "walking",
+                    "duration_minutes": 12,
+                    "duration_seconds": 694.1,
+                    "distance_meters": 964.0,
+                    "source": "OpenRouteService"
+                }
+            ],
+            "selected_mode": "walking"
+        }
+    ]
+}

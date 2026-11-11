@@ -16,6 +16,8 @@ class TravelEstimate(BaseModel):
     """
     mode: str
     duration_minutes: int = Field(gt=0)
+    duration_seconds: float = Field(gt=0)
+    distance_meters: float = Field(gt=0)
     source: str
 
 
@@ -48,3 +50,8 @@ class TravelLeg(BaseModel):
     destination_activity_id: str
     estimates: List[TravelEstimate]
     selected_mode: str
+
+    @property
+    def travel_leg_id(self) -> str:
+        """Generate a stable ID from the origin and destination activity IDs."""
+        return f"{self.origin_activity_id}_{self.destination_activity_id}"
