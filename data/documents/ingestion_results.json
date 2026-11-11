@@ -1,0 +1,42 @@
+[
+    {
+        "source_id": "natural_history_visitor_info",
+        "url": "https://naturalhistory.si.edu/visit",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T19:25:57.808287Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "smithsonian_accessibility",
+        "url": "https://access.si.edu/",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T19:25:57.927946Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "american_history_visitor_info",
+        "url": "https://americanhistory.si.edu/visit",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T19:25:58.004699Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "lincoln_memorial_visitor_info",
+        "url": "https://www.nps.gov/linc/planyourvisit/index.htm",
+        "retrieval_status": "success",
+        "http_status_code": 200,
+        "extraction_status": "failed",
+        "retrieved_at": "2026-11-11T19:25:58.106074Z",
+        "error_message": "Extracted content did not meet minimum quality requirements.",
+        "content": null
+    }
+]

@@ -1,0 +1,36 @@
+{
+    "sources": [
+        {
+            "source_id": "natural_history_visitor_info",
+            "attraction_id": "natural_history",
+            "source_name": "National Museum of Natural History",
+            "url": "https://naturalhistory.si.edu/visit",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
+        }, 
+        {
+            "source_id": "smithsonian_accessibility",
+            "attraction_id": "american_history",
+            "source_name": "Smithsonian Office of Visitor Accessibility",
+            "url": "https://access.si.edu/",
+            "document_type": "visitor_accessibility",
+            "refresh_frequency_days": 30
+        },
+        {
+            "source_id": "american_history_visitor_info",
+            "attraction_id": "american_history",
+            "source_name": "National Museum of American History",
+            "url": "https://americanhistory.si.edu/visit",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
+        }, 
+        {
+            "source_id": "lincoln_memorial_visitor_info",
+            "attraction_id": "lincoln_memorial",
+            "source_name": "National Park Service - Lincoln Memorial",
+            "url": "https://www.nps.gov/linc/planyourvisit/index.htm",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
+        }
+    ]
+}
