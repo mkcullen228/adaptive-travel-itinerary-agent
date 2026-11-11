@@ -31,6 +31,30 @@
             "url": "https://www.nps.gov/linc/planyourvisit/index.htm",
             "document_type": "visitor_information",
             "refresh_frequency_days": 7
+        }, 
+        {
+            "source_id": "lincoln_memorial_visitor_info",
+            "attraction_id": "lincoln_memorial",
+            "source_name": "National Park Service - Lincoln Memorial",
+            "url": "https://www.nps.gov/linc/planyourvisit/index.htm?utm_source=chatgpt.com",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
+        },
+        {
+            "source_id": "washington_monument_visitor_info",
+            "attraction_id": "Washington Monument",
+            "source_name": "National Park Service - Washington Monument",
+            "url": "https://www.nps.gov/wamo/planyourvisit/index.htm?utm_source=chatgpt.com",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
+        }, 
+        {
+            "source_id": "wwii_memorial_visitor_info",
+            "attraction_id": "World War II Memorial",
+            "source_name": "National Park Service - World War II Memorial",
+            "url": "https://www.nps.gov/wwii/planyourvisit/index.htm?utm_source=chatgpt.com",
+            "document_type": "visitor_information",
+            "refresh_frequency_days": 7
         }
     ]
 }
