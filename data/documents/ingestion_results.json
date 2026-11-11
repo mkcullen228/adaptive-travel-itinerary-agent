@@ -1,0 +1,72 @@
+[
+    {
+        "source_id": "natural_history_visitor_info",
+        "url": "https://naturalhistory.si.edu/visit",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T20:18:05.072828Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "smithsonian_accessibility",
+        "url": "https://access.si.edu/",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T20:18:05.157264Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "american_history_visitor_info",
+        "url": "https://americanhistory.si.edu/visit",
+        "retrieval_status": "failed",
+        "http_status_code": 403,
+        "extraction_status": null,
+        "retrieved_at": "2026-11-11T20:18:05.241051Z",
+        "error_message": "HTTP error 403",
+        "content": null
+    },
+    {
+        "source_id": "lincoln_memorial_visitor_info",
+        "url": "https://www.nps.gov/linc/planyourvisit/index.htm",
+        "retrieval_status": "success",
+        "http_status_code": 200,
+        "extraction_status": "failed",
+        "retrieved_at": "2026-11-11T20:18:05.314547Z",
+        "error_message": "Extracted content did not meet minimum quality requirements.",
+        "content": null
+    },
+    {
+        "source_id": "lincoln_memorial_visitor_info",
+        "url": "https://www.nps.gov/linc/planyourvisit/index.htm?utm_source=chatgpt.com",
+        "retrieval_status": "success",
+        "http_status_code": 200,
+        "extraction_status": "failed",
+        "retrieved_at": "2026-11-11T20:18:05.562360Z",
+        "error_message": "Extracted content did not meet minimum quality requirements.",
+        "content": null
+    },
+    {
+        "source_id": "washington_monument_visitor_info",
+        "url": "https://www.nps.gov/wamo/planyourvisit/index.htm?utm_source=chatgpt.com",
+        "retrieval_status": "success",
+        "http_status_code": 200,
+        "extraction_status": "success",
+        "retrieved_at": "2026-11-11T20:18:05.637606Z",
+        "error_message": null,
+        "content": "| The Washington Monument stands at the center of the National Mall as a tribute to George Washington, commander of the Continental Army and the first President of the United States. Rising more than 555 feet above Washington, DC, the monument offers panoramic views of the nation\u2019s capital and remains one of the most recognizable landmarks in the country. Whether you are visiting for the first time or returning to experience the views again, planning ahead can help make your visit smooth and enjoyable. Location The Washington Monument is located on the National Mall in Washington, DC. Address: 2 15th Street NW Washington, DC 20024 The monument grounds are open daily. Timed-entry tickets are required to ride the elevator to the observation level. Hours of Operation The Washington Monument is generally open daily, except for December 25 and during occasional maintenance or weather-related closures. Operating hours and elevator ticket availability may vary seasonally. Check the official National Park Service website for current information before your visit. Timed Entry Tickets Visitors must have a timed-entry ticket to enter the monument. Advance tickets are available online through Recreation.gov and are typically released 30 days in advance of the visit date. Additional, same-day tickets are distributed on site starting at 8:45 every morning. Visitors should arrive at the screening area at least 15 minutes before their scheduled entry time. Security Screening All visitors must pass through security screening before entering the monument. To help speed entry: Food, beverages, and large backpacks are not permitted inside the monument. Accessibility The Washington Monument is accessible to visitors with disabilities. Visitors requiring additional accommodations are encouraged to contact the National Park Service in advance. Getting Here Metrorail The easiest way to visit the Washington Monument is by public transportation. Nearby Metro stations include: Parking Parking near the National Mall is limited and often fills quickly, especially during spring and summer. Visitors are encouraged to use public transportation, rideshare services, biking, or walking whenever possible. Biking and Walking Bike racks are available near the monument grounds. The National Mall is also connected to regional trails and sidewalks that make walking between memorials and museums easy. What to Expect During Your Visit A typical visit to the Washington Monument lasts about 45 minutes to one hour. After passing through security, visitors ride an elevator to the observation level, where windows on all sides provide views of: Interpretive displays inside the monument share the history of its construction, preservation, and significance. Weather and Seasonal Tips The monument grounds are exposed to the elements, so dress appropriately for the weather. Spring and fall are especially popular times to visit due to milder weather and seasonal scenery. Nearby Attractions The Washington Monument is centrally located near many of Washington, DC\u2019s most visited sites, including: Visitor Tips Stay Connected For current operating hours, alerts, ticket information, and updates, visit the National Park Service website and follow National Mall and Memorial Parks on social media. | \nLast updated: May 17, 2026"
+    },
+    {
+        "source_id": "wwii_memorial_visitor_info",
+        "url": "https://www.nps.gov/wwii/planyourvisit/index.htm?utm_source=chatgpt.com",
+        "retrieval_status": "success",
+        "http_status_code": 200,
+        "extraction_status": "success",
+        "retrieved_at": "2026-11-11T20:18:05.721611Z",
+        "error_message": null,
+        "content": "| Welcome to the World War II Memorial The World War II Memorial was dedicated on May 29, 2004 to honor the 16 million who served in the armed forces of the U.S. during World War II, the more than 400,000 who died, and the millions who supported the war effort from home.The memorial is located adjacent to the Washington Monument, in the heart of the National Mall. The World War II Memorial is a unit of National Mall and Memorial Parks. Hours and Seasons National Mall and Memorial Parks is open 24 hours a day. The early evening and morning hours are beautiful and tranquil times to visit. The World War II Memorial fountains are turned off for winter from approximately December through March. Please visit the Operating Hours and Seasons for more information on staffing and visitor center hours. Things To Do Use the links below to discover more about visiting the iconic monuments and memorials protected by National Mall and Memorial Parks.But don't stop there! Visit our Things to Do and Calendar of Events pages to discover a wide of array of activities from paddle boats and bike tours to nighttime walks with a park ranger. Nearby Attractions | \nLast updated: March 31, 2020"
+    }
+]

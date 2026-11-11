@@ -98,6 +98,7 @@ def test_calculate_completeness_invalid_empty_required():
     with pytest.raises(ValueError):
         calculate_completeness_score(required_fields, available_fields)
 
+
 def test_valid_assess_data_quality():
     reliability = 0.85
     received_at = datetime.now(timezone.utc)
