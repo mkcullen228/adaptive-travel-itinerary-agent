@@ -8,6 +8,7 @@ def extract_required_metadata(header: str) -> dict:
 
     required_fields = {
         "source_id": r"# Source: (.+)",
+        "subject": r"Subject: (.+)",
         "url": r"URL: (.+)",
         "retrieved_at": r"Retrieved at: (.+)",
     }

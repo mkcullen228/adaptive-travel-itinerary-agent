@@ -1,5 +1,6 @@
 import json
 import argparse
+from pprint import pprint
 from pathlib import Path
 
 from src.data_sources.embedding_client import embed_query
@@ -53,6 +54,8 @@ def evaluate_query(collection, test_case: dict) -> dict:
         query_embedding,
         n_results=K,
     )
+
+    pprint(retrieval_results)
 
     retrieved_chunk_ids = retrieval_results["ids"][0]
 

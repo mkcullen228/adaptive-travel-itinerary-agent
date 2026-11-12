@@ -53,25 +53,26 @@ def test_loader_raises_error_for_missing_file():
 
 def test_valid_metadata_is_extracted():
     header = """
-# Source: Washington Monument
-URL: https://www.nps.gov/wamo/index.htm
-Retrieved at: 2026-11-10T23:11:48+00:00
-"""
+        # Source: Washington Monument
+        Subject: Washington Monument
+        URL: https://www.nps.gov/wamo/index.htm
+        Retrieved at: 2026-11-10T23:11:48+00:00
+    """
 
     metadata = extract_required_metadata(header)
 
     assert metadata["source_id"] == "Washington Monument"
     assert metadata["url"] == "https://www.nps.gov/wamo/index.htm"
-    assert metadata["retrieved_at"].isoformat() == (
-        "2026-11-10T23:11:48+00:00"
-    )
+    assert metadata["retrieved_at"].isoformat() == ("2026-11-10T23:11:48+00:00")
+    assert metadata["subject"] == "Washington Monument"
 
 
 def test_missing_url_raises_value_error():
     header = """
-# Source: Washington Monument
-Retrieved at: 2026-11-10T23:11:48+00:00
-"""
+    # Source: Washington Monument
+    Subject: Washington Monument
+    Retrieved at: 2026-11-10T23:11:48+00:00
+    """
 
     with pytest.raises(
         ValueError,
@@ -82,13 +83,26 @@ Retrieved at: 2026-11-10T23:11:48+00:00
 
 def test_invalid_retrieved_at_raises_value_error():
     header = """
-# Source: Washington Monument
-URL: https://www.nps.gov/wamo/index.htm
-Retrieved at: not-a-valid-date
-"""
+        # Source: Washington Monument
+        Subject: Washington Monument
+        URL: https://www.nps.gov/wamo/index.htm
+        Retrieved at: not-a-valid-date
+    """
 
     with pytest.raises(
         ValueError,
         match="Invalid retrieved_at metadata"
     ):
+        extract_required_metadata(header)
+
+def test_invalid_subject_raises_value_error():
+    header = """
+    # Source: Washington Monument
+    URL: https://www.nps.gov/wamo/index.htm
+    Retrieved at: not-a-valid-date
+    """
+
+    with pytest.raises(
+        ValueError,
+        match="Missing required document metadata: subject"):
         extract_required_metadata(header)
