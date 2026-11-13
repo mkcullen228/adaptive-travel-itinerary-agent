@@ -1,5 +1,3 @@
-# import pytest
-
 from src.data_sources.nominatim_client import (coordinates_valid, validate_location_candidate, 
                                                select_location_candidate, LocationMatchStatus, 
                                                coordinates_within_expected_area)
