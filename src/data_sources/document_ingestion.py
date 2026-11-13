@@ -124,12 +124,13 @@ def save_document(result: DocumentIngestionResult) -> None:
 
     document_content = (
         f"# Source: {result.source_id}\n\n"
+        f"Subject: {result.subject}\n\n"
         f"URL: {result.url}\n\n"
         f"Retrieved at: {result.retrieved_at.isoformat()}\n\n"
+        f"Reliability: {result.reliability}\n\n"
         f"---\n\n"
         f"{result.content}\n"
     )
-
     document_path.write_text(document_content, encoding="utf-8")
 
 

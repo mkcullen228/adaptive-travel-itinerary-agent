@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 from src.data_sources.document_ingestion import (
     extract_webpage_content, load_source_registry, 
     ingest_registered_sources, validate_extracted_content)
+from src.data_sources.document_loader import load_markdown_document
 from src.models.document import IngestionStatus, DocumentIngestionResult
 
 
@@ -156,7 +157,9 @@ def test_save_document_overwrites_existing_file(tmp_path, monkeypatch):
         http_status_code=200,
         extraction_status=IngestionStatus.SUCCESS,
         retrieved_at=datetime.now(timezone.utc),
-        content="Updated visitor information"
+        content="Updated visitor information", 
+        subject="National Museum of Natural History - Visitor Information",
+        reliability=0.95,
     )
 
     document_path = (
@@ -172,6 +175,14 @@ def test_save_document_overwrites_existing_file(tmp_path, monkeypatch):
 
     assert "Updated visitor information" in saved_content
     assert "Old visitor information" not in saved_content
+
+    metadata, content = load_markdown_document(document_path)
+
+    assert metadata["source_id"] == "natural_history_visitor_info"
+    assert metadata["subject"] == "National Museum of Natural History - Visitor Information"
+    assert metadata["reliability"] == 0.95
+    assert metadata["url"] == "https://example.com/visit"
+    assert content == "Updated visitor information"
 
 
 def test_save_document_preserves_file_after_failure(tmp_path, monkeypatch):
@@ -275,3 +286,77 @@ def test_content_validation_rejects_irrelevant_content():
     content = " ".join(["General information about our organization."] * 30)
 
     assert validate_extracted_content(content) is False
+
+
+def test_save_document_includes_required_metadata(tmp_path, monkeypatch):
+    import src.data_sources.document_ingestion as ingestion
+
+    monkeypatch.setattr(
+        ingestion.Path,
+        "resolve",
+        lambda self: tmp_path / "src" / "data_sources" / "document_ingestion.py"
+    )
+
+    result = DocumentIngestionResult(
+        source_id="natural_history_visitor_info",
+        url="https://example.com/visit",
+        retrieval_status=IngestionStatus.SUCCESS,
+        http_status_code=200,
+        extraction_status=IngestionStatus.SUCCESS,
+        retrieved_at=datetime.now(timezone.utc),
+        content="Visitor information",
+        subject="Natural History Museum Visitor Information",
+        reliability=0.95
+    )
+
+    ingestion.save_document(result)
+
+    document_path = (
+        tmp_path / "data" / "documents" / "venue_guides"
+        / "natural_history_visitor_info.md"
+    )
+
+    saved_content = document_path.read_text(encoding="utf-8")
+
+    assert "Subject: Natural History Museum Visitor Information" in saved_content
+    assert "Reliability: 0.95" in saved_content
+    assert "Retrieved at:" in saved_content
+
+
+def test_save_document_preserves_metadata(tmp_path, monkeypatch):
+    import src.data_sources.document_ingestion as ingestion
+    from src.data_sources.document_chunking import load_and_chunk_document
+
+    monkeypatch.setattr(
+        ingestion.Path,
+        "resolve",
+        lambda self: tmp_path / "src" / "data_sources" / "document_ingestion.py"
+    )
+
+    result = DocumentIngestionResult(
+        source_id="nps_washington_monument",
+        url="https://www.nps.gov/wamo/index.htm",
+        retrieval_status=IngestionStatus.SUCCESS,
+        http_status_code=200,
+        extraction_status=IngestionStatus.SUCCESS,
+        retrieved_at=datetime.now(timezone.utc),
+        content="Visitor information",
+        subject="National Park Service - Washington Monument",
+        reliability=0.95
+    )
+
+    ingestion.save_document(result)
+
+    document_path = (
+        tmp_path / "data" / "documents" / "venue_guides"
+        / "nps_washington_monument.md"
+    )
+
+    chunks = load_and_chunk_document(document_path)
+
+    assert len(chunks) == 1
+    assert chunks[0].metadata["source_id"] == "nps_washington_monument"
+    assert chunks[0].metadata["subject"] == "National Park Service - Washington Monument"
+    assert chunks[0].metadata["url"] == "https://www.nps.gov/wamo/index.htm"
+    assert "retrieved_at" in chunks[0].metadata
+    assert chunks[0].metadata["reliability"] == 0.95

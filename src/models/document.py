@@ -22,5 +22,6 @@ class DocumentIngestionResult(BaseModel):
 
     # Venue source metadata
     venue_id: str | None = None
+    subject: str | None = None
     reliability: float | None = Field(default=None, ge=0, le=1)
     verification_status: VerificationStatus | None = None

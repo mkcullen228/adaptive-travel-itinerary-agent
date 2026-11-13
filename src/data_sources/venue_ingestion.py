@@ -33,6 +33,7 @@ def ingest_venue_sources(venue_id: str) -> list[DocumentIngestionResult]:
 
         result_data.update({
             "venue_id": venue_id,
+            "subject": source.source_name,
             "reliability": source.reliability,
             "verification_status": source.verification_status
         })
