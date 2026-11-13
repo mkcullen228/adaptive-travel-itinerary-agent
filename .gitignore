@@ -13,6 +13,9 @@ __pycache__/
 # Compiled Python files
 *.pyc
 
+# vector_store chromaDB
+data/vector_store/
+
 .DS_Store
 .DS_Store?
 ._.DS_Store

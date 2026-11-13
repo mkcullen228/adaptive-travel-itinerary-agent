@@ -1,0 +1,70 @@
+[
+  {
+    "query_id": "R-01",
+    "query": "Do I need to reserve a ticket before visiting the observation deck?",
+    "expected_source_ids": [
+        "washington_monument_visitor_info"
+    ],
+    "expected_content": [
+        "advance ticket reservations",
+        "same-day ticket availability"
+    ],
+    "relevant_chunk_ids": [
+        "washington_monument_visitor_info_1",
+        "washington_monument_visitor_info_2",
+        "washington_monument_visitor_info_3"
+    ]
+  },
+  {
+    "query_id": "R-02",
+    "query": "Can I visit the Washington Monument when it is raining or during bad weather?",
+    "expected_source_ids": [
+        "washington_monument_visitor_info"
+    ],
+    "expected_content": [
+        "weather-related closures",
+        "weather conditions affecting visitor access"
+    ],
+    "relevant_chunk_ids": [
+        "washington_monument_visitor_info_2",
+        "washington_monument_visitor_info_6"
+    ]
+  },
+  {
+    "query_id": "R-03",
+    "query": "When can visitors see the fountains at the World War II Memorial?",
+    "expected_source_ids": [
+        "wwii_memorial_visitor_info"
+    ],
+    "expected_content": [
+        "fountains turned off during winter",
+        "seasonal fountain operation"
+    ],
+    "relevant_chunk_ids": [
+        "wwii_memorial_visitor_info_1"
+    ]
+  }, 
+  {
+    "query_id": "R-04",
+    "query": "What are the Washington Monument's operating hours, and how far in advance can I get tickets?",
+    "expected_source_ids": [
+        "washington_monument_visitor_info"
+    ],
+    "expected_content": [
+        "operating hours and seasonal closures",
+        "advance ticket release timing"
+    ],
+    "relevant_chunk_ids": [
+        "washington_monument_visitor_info_2",
+        "washington_monument_visitor_info_3"
+    ]
+  }, 
+  {
+    "query_id": "R-05",
+    "query": "Does the Washington Monument have wheelchair-accessible restrooms?",
+    "expected_source_ids": [],
+    "expected_content": [],
+    "relevant_chunk_ids": [],
+    "expected_answerable": false
+}
+]

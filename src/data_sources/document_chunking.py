@@ -29,7 +29,8 @@ def chunk_document(content: str, metadata: dict) -> list[Document]:
             page_content=chunk,
             metadata={
                 **metadata,
-                "chunk_index": index
+                "chunk_index": index, 
+                "chunking_config": "recursive_v1"
             }
         )
 

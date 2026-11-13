@@ -3,6 +3,58 @@ from pathlib import Path
 from datetime import datetime
 
 
+def extract_required_metadata(header: str) -> dict:
+    """Extract and validate required document metadata."""
+
+    required_fields = {
+        "source_id": r"# Source: (.+)",
+        "subject": r"Subject: (.+)",
+        "url": r"URL: (.+)",
+        "retrieved_at": r"Retrieved at: (.+)",
+        "reliability": r"Reliability: (.+)",
+    }
+
+    metadata = {}
+
+    for field, pattern in required_fields.items():
+        match = re.search(pattern, header)
+
+        if not match:
+            raise ValueError(
+                f"Missing required document metadata: {field}"
+            )
+
+        metadata[field] = match.group(1).strip()
+
+    # Clean Markdown link formatting from URLs.
+    url = metadata["url"]
+    if url.startswith("[") and "](" in url:
+        metadata["url"] = url.split("](", maxsplit=1)[1].rstrip(")")
+
+    try:
+        metadata["retrieved_at"] = datetime.fromisoformat(
+            metadata["retrieved_at"]
+        )
+    except ValueError as error:
+        raise ValueError(
+            "Invalid retrieved_at metadata. Expected an ISO-formatted datetime."
+        ) from error
+
+    try:
+        metadata["reliability"] = float(metadata["reliability"])
+    except ValueError as error:
+        raise ValueError(
+            "Invalid reliability metadata. Expected a numeric value between 0 and 1."
+        ) from error
+
+    if not 0 <= metadata["reliability"] <= 1:
+        raise ValueError(
+            "Invalid reliability metadata. Expected a value between 0 and 1."
+        )
+
+    return metadata
+
+
 def load_markdown_document(file_path: Path) -> tuple[dict, str]:
     """Load a Markdown document and separate its metadata from its content."""
 
@@ -10,28 +62,9 @@ def load_markdown_document(file_path: Path) -> tuple[dict, str]:
 
     header, content = text.split("---", maxsplit=1)
 
-    source_match = re.search(r"# Source: (.+)", header)
-    
-    url_match = re.search(r"URL: (.+)", header)
-    url = url_match.group(1).strip()
+    metadata = extract_required_metadata(header)
 
-    # Remove Markdown link formatting, if present.
-    if url.startswith("[") and "](" in url:
-        url = url.split("](", maxsplit=1)[1].rstrip(")")
-
-    retrieved_match = re.search(r"Retrieved at: (.+)", header)
-
-    metadata = {
-        "source_id": source_match.group(1).strip(),
-        "url": url,
-        "retrieved_at": datetime.fromisoformat(
-            retrieved_match.group(1).strip()
-        ),
-    }
-
-    content = content.strip()
-
-    return metadata, content
+    return metadata, content.strip()
 
 
 if __name__ == "__main__":

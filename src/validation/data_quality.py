@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from src.models.data_quality import DataQualityAssessment
 
+
 def calculate_freshness_score(retrieved_at: datetime) -> float:
     """Calculate a freshness score based on the age of retrieved information.
     
