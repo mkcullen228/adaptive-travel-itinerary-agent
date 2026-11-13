@@ -1,5 +1,7 @@
+import pytest
 from datetime import datetime, timezone
-
+from pydantic import ValidationError
+from src.models.source_reference import VerificationStatus
 from src.models.document import (
     DocumentIngestionResult,
     IngestionStatus
@@ -34,3 +36,40 @@ def test_failed_document_retrieval():
     assert result.retrieval_status == IngestionStatus.FAILED
     assert result.extraction_status is None
     assert result.content is None
+
+
+def test_venue_metadata_populated():
+    result = DocumentIngestionResult(
+        source_id="natural_history_visitor_info",
+        url="https://example.com/visit",
+        retrieval_status=IngestionStatus.FAILED,
+        http_status_code=403,
+        retrieved_at=datetime.now(timezone.utc),
+        error_message="HTTP 403 Forbidden",
+        venue_id="natural_history",
+        reliability=0.9,
+        verification_status=VerificationStatus.UNVERIFIED
+    )
+
+    assert result.retrieval_status == IngestionStatus.FAILED
+    assert result.extraction_status is None
+    assert result.content is None
+    assert result.venue_id == "natural_history"
+    assert result.reliability == 0.9
+    assert result.verification_status == VerificationStatus.UNVERIFIED
+
+
+def test_document_failed_reliability():
+    with pytest.raises(ValidationError):
+        DocumentIngestionResult(
+            source_id="natural_history_visitor_info",
+            url="https://example.com/visit",
+            retrieval_status=IngestionStatus.FAILED,
+            http_status_code=403,
+            retrieved_at=datetime.now(timezone.utc),
+            error_message="HTTP 403 Forbidden",
+            venue_id="natural_history",
+            reliability=1.1,
+            verification_status=VerificationStatus.UNVERIFIED
+        )
+    

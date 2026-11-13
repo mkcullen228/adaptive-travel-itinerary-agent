@@ -1,0 +1,30 @@
+[
+  {
+    "venue_id": "national_gallery",
+    "venue_name": "National Gallery of Art",
+    "sources": [
+      {
+        "source_id": "nga_visitor_info",
+        "source_name": "National Gallery of Art - Visitor Information",
+        "source_type": "official_website",
+        "url": "https://www.nga.gov/",
+        "reliability": 0.95,
+        "verification_status": "unverified"
+      }
+    ]
+  },
+  {
+    "venue_id": "washington_monument",
+    "venue_name": "Washington Monument",
+    "sources": [
+      {
+        "source_id": "nps_washington_monument",
+        "source_name": "National Park Service - Washington Monument",
+        "source_type": "official_website",
+        "url": "https://www.nps.gov/wamo/index.htm",
+        "reliability": 0.95,
+        "verification_status": "verified"
+      }
+    ]
+  }
+]
