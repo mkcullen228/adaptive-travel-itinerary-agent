@@ -1,6 +1,7 @@
 from src.models.itinerary import Itinerary
 from src.models.validation import (ValidationResult, ValidationIssue, 
                                    ValidationStatus, IssueType)
+from src.models.travel import TravelEstimate
 from itertools import pairwise
 from datetime import timedelta
 
@@ -178,56 +179,6 @@ def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
         status = ValidationStatus.VALID
 
     return ValidationResult(status=status, issues=issues_lst)
-
-
-def check_travel_time_feasibility(itinerary: Itinerary) -> ValidationResult:
-
-    # Sort activities chronologically.
-    activities = sorted(itinerary.activities, key=lambda u: u.start_time)
-
-    # Iterate through consecutive activity pairs.
-    issues_lst = []
-    for current_act, next_act in pairwise(activities):
-        # Use get_selected_travel_estimate() to find the relevant travel estimate.
-        estimate = get_selected_travel_estimate(itinerary, current_act.activity_id, next_act.activity_id)
-
-        # If no estimate exists, create a MISSING_TRAVEL_ESTIMATE issue.
-        if estimate is None:
-            validation_issue = ValidationIssue(
-                issue_type=IssueType.MISSING_TRAVEL_ESTIMATE,
-                description="No travel estimate exists for the selected mode.",
-                activity_ids=[
-                    current_act.activity_id,
-                    next_act.activity_id
-                ]
-            )
-            issues_lst.append(validation_issue)
-        else:
-            # If an estimate exists, calculate whether there is enough time to travel.
-            arrival_time = current_act.end_time + timedelta(minutes=estimate.duration_minutes)
-            if arrival_time > next_act.start_time:
-                # If there isn't enough time, create an INSUFFICIENT_TRAVEL_TIME issue.
-                validation_issue = ValidationIssue(
-                    issue_type=IssueType.INSUFFICIENT_TRAVEL_TIME,
-                    description="Not enough travel time between activities",
-                    activity_ids=[
-                        current_act.activity_id,
-                        next_act.activity_id
-                    ]
-                )
-                issues_lst.append(validation_issue)
-
-    if any(issue.issue_type == IssueType.INSUFFICIENT_TRAVEL_TIME for issue in issues_lst):
-        status = ValidationStatus.INVALID
-    elif any(issue.issue_type == IssueType.MISSING_TRAVEL_ESTIMATE for issue in issues_lst):
-        status = ValidationStatus.INCOMPLETE
-    else:
-        status = ValidationStatus.VALID
-    
-    return ValidationResult(
-        status=status,
-        issues=issues_lst
-    )
 
 
 def check_travel_leg_integrity(itinerary: Itinerary) -> ValidationResult:
