@@ -2,9 +2,7 @@ import pytest
 from datetime import datetime, timezone
 from pydantic import ValidationError
 
-from src.data_sources.retrieval_adapter import (
-    convert_search_results_to_evidence,
-)
+from src.data_sources.retrieval_adapter import (convert_search_results_to_evidence)
 
 
 def create_mock_results():
