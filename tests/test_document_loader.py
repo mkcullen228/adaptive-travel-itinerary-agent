@@ -57,6 +57,7 @@ def test_valid_metadata_is_extracted():
         Subject: Washington Monument
         URL: https://www.nps.gov/wamo/index.htm
         Retrieved at: 2026-11-10T23:11:48+00:00
+        Reliability: 0.85
     """
 
     metadata = extract_required_metadata(header)
@@ -65,6 +66,7 @@ def test_valid_metadata_is_extracted():
     assert metadata["url"] == "https://www.nps.gov/wamo/index.htm"
     assert metadata["retrieved_at"].isoformat() == ("2026-11-10T23:11:48+00:00")
     assert metadata["subject"] == "Washington Monument"
+    assert metadata["reliability"] == 0.85
 
 
 def test_missing_url_raises_value_error():
@@ -72,6 +74,7 @@ def test_missing_url_raises_value_error():
     # Source: Washington Monument
     Subject: Washington Monument
     Retrieved at: 2026-11-10T23:11:48+00:00
+    Reliability: 1
     """
 
     with pytest.raises(
@@ -87,6 +90,7 @@ def test_invalid_retrieved_at_raises_value_error():
         Subject: Washington Monument
         URL: https://www.nps.gov/wamo/index.htm
         Retrieved at: not-a-valid-date
+        Reliability: 0.85
     """
 
     with pytest.raises(
@@ -100,6 +104,7 @@ def test_invalid_subject_raises_value_error():
     # Source: Washington Monument
     URL: https://www.nps.gov/wamo/index.htm
     Retrieved at: not-a-valid-date
+    Reliability: 0.85
     """
 
     with pytest.raises(

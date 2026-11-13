@@ -13,7 +13,9 @@ def test_valid_retrieved_evidence():
         source_id="washington_monument",
         source_url="https://www.nps.gov/wamo/index.htm",
         retrieved_at=datetime(2026, 11, 10, tzinfo=timezone.utc),
-        similarity_distance=0.25
+        similarity_distance=0.25,
+        reliability=0.85,
+        freshness_score=0.65
     )
     print(evidence)
     assert evidence.chunk_id == "washington_monument_1"
@@ -29,7 +31,9 @@ def test_negative_similarity_distance_is_rejected():
             source_id="washington_monument",
             source_url="https://www.nps.gov/wamo/index.htm",
             retrieved_at=datetime.now(timezone.utc),
-            similarity_distance=-0.1
+            similarity_distance=-0.1,
+            reliability=0.85,
+            freshness_score=0.65
         )
 
 
@@ -41,7 +45,9 @@ def test_missing_source_id_is_rejected():
             subject="Washington Monument",
             source_url="https://www.nps.gov/wamo/index.htm",
             retrieved_at=datetime.now(timezone.utc),
-            similarity_distance=0.25
+            similarity_distance=0.25, 
+            reliability=0.85,
+            freshness_score=0.65
         )
 
 
@@ -55,7 +61,9 @@ def test_similarity_distance_is_preserved():
         source_id="washington_monument",
         source_url="https://www.nps.gov/wamo/index.htm",
         retrieved_at=datetime.now(timezone.utc),
-        similarity_distance=original_distance
+        similarity_distance=original_distance, 
+        reliability=0.85,
+        freshness_score=0.65
     )
 
     assert evidence.similarity_distance == original_distance

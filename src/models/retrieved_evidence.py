@@ -10,3 +10,5 @@ class RetrievedEvidence(BaseModel):
     source_url: HttpUrl
     retrieved_at: datetime
     similarity_distance: float = Field(ge=0)
+    reliability: float = Field(ge=0, le=1)
+    freshness_score: float = Field(ge=0, le=1)

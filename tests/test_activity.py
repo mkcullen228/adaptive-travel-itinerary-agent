@@ -23,9 +23,6 @@ def test_valid_activity():
 
 
 def test_activity_end_time():
-    # Create an activity starting at 10:00
-    # Duration is 90 minutes
-    # Assert end time is 11:30
     t = Activity(
         activity_id="activity_001",
         name="Activity Name",

@@ -1,6 +1,6 @@
 import re
 
-from src.models.evidence import EvidenceAssessment
+from src.models.evidence import EvidenceAssessment, EvidenceRelevance, EvidenceCoverage
 from src.models.retrieved_evidence import RetrievedEvidence
 
 
@@ -82,6 +82,8 @@ def assess_claim_evidence(
     return EvidenceAssessment(
         claim=claim,
         status=status,
+        relevance=assess_evidence_relevance(claim, evidence),
+        coverage=assess_evidence_coverage(supported_statements, unsupported_statements,),
         supporting_source_ids=sorted(supporting_sources),
         conflicting_source_ids=sorted(conflicting_sources),
         explanation=(
@@ -89,7 +91,7 @@ def assess_claim_evidence(
             f"Unsupported statements: {unsupported_statements}. "
             f"Conflicting evidence: {conflict_details}."
         ),
-    )
+)
 
 
 def split_claim_into_statements(claim: str) -> list[str]:
@@ -162,3 +164,58 @@ def describe_conflicting_evidence(
             )
 
     return conflicts
+
+
+def extract_meaningful_terms(text: str) -> set[str]:
+    stop_words = {
+        "the", "is", "and", "or", "has", "have",
+        "a", "an", "to", "of", "for", "with",
+        "does", "do", "are", "was", "were"
+    }
+
+    terms = {
+        word.lower().strip(".,?!:")
+        for word in text.split()
+    }
+
+    return terms - stop_words
+
+
+def assess_evidence_relevance(
+    claim: str,
+    evidence: list[RetrievedEvidence],
+) -> EvidenceRelevance:
+
+    claim_terms = extract_meaningful_terms(claim)
+
+    if not evidence:
+        return EvidenceRelevance.IRRELEVANT
+
+    evidence_terms = set()
+
+    for item in evidence:
+        evidence_terms.update(extract_meaningful_terms(item.content))
+
+    matching_terms = claim_terms.intersection(evidence_terms)
+
+    if not matching_terms:
+        return EvidenceRelevance.IRRELEVANT
+
+    if len(matching_terms) / len(claim_terms) >= 0.5:
+        return EvidenceRelevance.RELEVANT
+
+    return EvidenceRelevance.PARTIALLY_RELEVANT
+
+
+def assess_evidence_coverage(
+    supported_statements: list[str],
+    unsupported_statements: list[str],
+) -> EvidenceCoverage:
+
+    if not supported_statements:
+        return EvidenceCoverage.NONE
+
+    if not unsupported_statements:
+        return EvidenceCoverage.COMPLETE
+
+    return EvidenceCoverage.PARTIAL

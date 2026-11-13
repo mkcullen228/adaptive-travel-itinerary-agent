@@ -11,9 +11,25 @@ class EvidenceStatus(str, Enum):
     CONFLICTING = "conflicting"
 
 
+class EvidenceRelevance(str, Enum):
+    RELEVANT = "relevant"
+    PARTIALLY_RELEVANT = "partially_relevant"
+    IRRELEVANT = "irrelevant"
+
+
+class EvidenceCoverage(str, Enum):
+    COMPLETE = "complete"
+    PARTIAL = "partial"
+    NONE = "none"
+
+
 class EvidenceAssessment(BaseModel):
     claim: str
     status: EvidenceStatus
+    relevance: EvidenceRelevance
+    coverage: EvidenceCoverage
+    source_quality_assessed: bool = False
+    consistency_assessed: bool = False
     supporting_source_ids: List[str] = Field(default_factory=list)
     conflicting_source_ids: List[str] = Field(default_factory=list)
     explanation: str

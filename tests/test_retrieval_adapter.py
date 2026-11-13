@@ -16,8 +16,11 @@ def create_mock_results():
             "subject": "Washington Monument",
             "url": "https://www.nps.gov/wamo/index.htm",
             "retrieved_at": "2026-11-11T20:18:05.637606+00:00",
+            "reliability": 0.85,
+            "freshness_score": 0.65,
         }]],
         "distances": [[0.3847]],
+        
     }
 
 
@@ -70,3 +73,25 @@ def test_rejects_mismatched_result_lengths():
 
     with pytest.raises(ValueError, match="mismatched list lengths"):
         convert_search_results_to_evidence(results)
+
+
+def test_preserves_reliability_and_calculates_freshness(monkeypatch):
+    results = create_mock_results()
+
+    expected_retrieved_at = datetime(
+        2026, 11, 11, 20, 18, 5, 637606, tzinfo=timezone.utc
+    )
+
+    def mock_freshness_score(retrieved_at):
+        assert retrieved_at == expected_retrieved_at
+        return 0.75
+
+    monkeypatch.setattr(
+        "src.data_sources.retrieval_adapter.calculate_freshness_score",
+        mock_freshness_score,
+    )
+
+    evidence = convert_search_results_to_evidence(results)
+
+    assert evidence[0].reliability == 0.85
+    assert evidence[0].freshness_score == 0.75

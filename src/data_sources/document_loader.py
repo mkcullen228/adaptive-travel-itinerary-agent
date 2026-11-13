@@ -11,6 +11,7 @@ def extract_required_metadata(header: str) -> dict:
         "subject": r"Subject: (.+)",
         "url": r"URL: (.+)",
         "retrieved_at": r"Retrieved at: (.+)",
+        "reliability": r"Reliability: (.+)",
     }
 
     metadata = {}
@@ -38,6 +39,18 @@ def extract_required_metadata(header: str) -> dict:
         raise ValueError(
             "Invalid retrieved_at metadata. Expected an ISO-formatted datetime."
         ) from error
+
+    try:
+        metadata["reliability"] = float(metadata["reliability"])
+    except ValueError as error:
+        raise ValueError(
+            "Invalid reliability metadata. Expected a numeric value between 0 and 1."
+        ) from error
+
+    if not 0 <= metadata["reliability"] <= 1:
+        raise ValueError(
+            "Invalid reliability metadata. Expected a value between 0 and 1."
+        )
 
     return metadata
 
