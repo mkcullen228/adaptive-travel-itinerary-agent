@@ -3,6 +3,7 @@ from datetime import datetime, date
 from typing import List
 from src.models.activity import Activity
 from src.models.travel import TravelLeg
+from src.models.routing_failure import RoutingFailure
 
 
 class Itinerary(BaseModel):
@@ -41,3 +42,4 @@ class Itinerary(BaseModel):
     itinerary_date: date
     activities: List[Activity]
     travel_legs: List[TravelLeg] = Field(default_factory=list)
+    routing_failures: List[RoutingFailure] = Field(default_factory=list)
