@@ -63,7 +63,7 @@ def get_nws_location(latitude: float, longitude: float) -> NWSLocation:
     return NWSLocation(
         latitude=latitude,
         longitude=longitude,
-        forecast_office=grid_id if not forecast_office else forecast_office,
+        forecast_office=forecast_office,
         grid_x=grid_x,
         grid_y=grid_y,
         forecast_hourly_url=properties["forecastHourly"],

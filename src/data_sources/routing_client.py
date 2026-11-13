@@ -1,10 +1,10 @@
 import os
+import math
 import requests
 from dotenv import load_dotenv
 
 
 load_dotenv()
-
 
 def get_walking_route(
     origin_coordinates: tuple[float, float],
@@ -18,6 +18,26 @@ def get_walking_route(
 
     if not api_key:
         raise ValueError("OpenRouteService API key not found.")
+
+    if (
+        not isinstance(origin_coordinates, (tuple, list))
+        or len(origin_coordinates) != 2
+        or not isinstance(destination_coordinates, (tuple, list))
+        or len(destination_coordinates) != 2
+    ):
+        raise ValueError("Invalid coordinates: expected (longitude, latitude).")
+
+    for longitude, latitude in (origin_coordinates, destination_coordinates):
+        if (
+            not isinstance(longitude, (int, float))
+            or not isinstance(latitude, (int, float))
+            or not math.isfinite(longitude)
+            or not math.isfinite(latitude)
+            or not -180 <= longitude <= 180
+            or not -90 <= latitude <= 90
+        ):
+            raise ValueError("Invalid coordinates: longitude or latitude is out of range.")
+
 
     url = "https://api.heigit.org/openrouteservice/v2/directions/foot-walking"
 
@@ -48,9 +68,23 @@ def get_walking_route(
         route_data = response.json()
         summary = route_data["routes"][0]["summary"]
 
+        duration = summary["duration"]
+        distance = summary["distance"]
+
+        if (
+            not isinstance(duration, (int, float))
+            or not isinstance(distance, (int, float))
+            or not math.isfinite(duration)
+            or not math.isfinite(distance)
+            or duration <= 0
+            or distance <= 0
+        ):
+            raise RuntimeError("Invalid route estimate returned by OpenRouteService.")
+
+
         return {
-            "duration_seconds": summary["duration"],
-            "distance_meters": summary["distance"]
+            "duration_seconds": duration,
+            "distance_meters": distance
         }
 
     except requests.exceptions.HTTPError as error:
@@ -67,4 +101,3 @@ def get_walking_route(
         raise RuntimeError(
             "Unexpected response format from OpenRouteService."
         ) from error
-
