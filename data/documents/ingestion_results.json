@@ -5,12 +5,12 @@
         "retrieval_status": "success",
         "http_status_code": 200,
         "extraction_status": "success",
-        "retrieved_at": "2026-11-14T00:22:20.097186Z",
+        "retrieved_at": "2026-11-14T02:01:07.803447Z",
         "error_message": null,
         "content": "Last updated: May 17, 2026\nGeorge Washington was perhaps the one indispensable man among the founders.\nYou can't get to the top of the Washington Monument without a ticket. Learn how to get them here!\nA timeline shows how the plans to memorialize America's first president were realized over more than half a century.\nFrom concept to construction to completion, the Washington Monument has been a focal point of the nation's capital for more than 150 years.",
         "venue_id": "washington_monument",
         "subject": "National Park Service - Washington Monument",
         "reliability": 0.95,
-        "verification_status": "verified"
+        "verification_status": "unverified"
     }
 ]

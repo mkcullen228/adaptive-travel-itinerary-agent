@@ -129,6 +129,7 @@ def save_document(result: DocumentIngestionResult) -> None:
         f"URL: {result.url}\n\n"
         f"Retrieved at: {result.retrieved_at.isoformat()}\n\n"
         f"Reliability: {result.reliability}\n\n"
+        f"Verification status: {result.verification_status.value if result.verification_status else 'unverified'}\n\n"
         f"---\n\n"
         f"{result.content}\n"
     )

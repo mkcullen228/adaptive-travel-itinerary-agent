@@ -42,6 +42,7 @@ def convert_search_results_to_evidence(
             similarity_distance=distance,
             reliability=metadata["reliability"],
             freshness_score=freshness_score,
+            verification_status=metadata["verification_status"]
         )
 
         evidence_items.append(evidence)

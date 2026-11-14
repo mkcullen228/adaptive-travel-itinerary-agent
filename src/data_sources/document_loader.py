@@ -13,8 +13,10 @@ def extract_required_metadata(header: str) -> dict:
         "retrieved_at": r"Retrieved at: (.+)",
         "reliability": r"Reliability: (.+)",
     }
+    
     optional_fields = {
         "venue_id": r"Venue ID: (.+)",
+        "verification_status": r"Verification status: (.+)",
     }
 
     metadata = {}

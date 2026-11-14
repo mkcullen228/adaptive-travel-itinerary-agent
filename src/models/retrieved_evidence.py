@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, Field, HttpUrl
+from src.models.source_reference import VerificationStatus
 
 
 class RetrievedEvidence(BaseModel):
@@ -12,3 +13,4 @@ class RetrievedEvidence(BaseModel):
     similarity_distance: float = Field(ge=0)
     reliability: float = Field(ge=0, le=1)
     freshness_score: float = Field(ge=0, le=1)
+    verification_status: VerificationStatus

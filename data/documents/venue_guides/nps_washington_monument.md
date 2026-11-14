@@ -6,9 +6,11 @@ Subject: National Park Service - Washington Monument
 
 URL: https://www.nps.gov/wamo/index.htm
 
-Retrieved at: 2026-11-14T00:22:20.097186+00:00
+Retrieved at: 2026-11-14T02:01:07.803447+00:00
 
 Reliability: 0.95
+
+Verification status: unverified
 
 ---
 
