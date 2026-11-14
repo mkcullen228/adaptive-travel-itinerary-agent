@@ -124,6 +124,7 @@ def save_document(result: DocumentIngestionResult) -> None:
 
     document_content = (
         f"# Source: {result.source_id}\n\n"
+        f"Venue ID: {result.venue_id}\n\n"
         f"Subject: {result.subject}\n\n"
         f"URL: {result.url}\n\n"
         f"Retrieved at: {result.retrieved_at.isoformat()}\n\n"

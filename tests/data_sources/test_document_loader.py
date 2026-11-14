@@ -58,6 +58,7 @@ def test_valid_metadata_is_extracted():
         URL: https://www.nps.gov/wamo/index.htm
         Retrieved at: 2026-11-10T23:11:48+00:00
         Reliability: 0.85
+        Venue ID: washington_monument
     """
 
     metadata = extract_required_metadata(header)
@@ -67,6 +68,7 @@ def test_valid_metadata_is_extracted():
     assert metadata["retrieved_at"].isoformat() == ("2026-11-10T23:11:48+00:00")
     assert metadata["subject"] == "Washington Monument"
     assert metadata["reliability"] == 0.85
+    assert metadata["venue_id"] == "washington_monument"
 
 
 def test_missing_url_raises_value_error():

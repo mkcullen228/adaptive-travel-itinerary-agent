@@ -57,6 +57,14 @@ def store_documents(collection, documents: list, embeddings) -> None:
     )
 
 
+def delete_source_documents(collection, source_id: str) -> None:
+    """Delete all indexed chunks belonging to a source document."""
+
+    collection.delete(
+        where={"source_id": source_id}
+    )
+
+
 def search_documents(collection, query: str, query_embedding, n_results: int = 3) -> dict:
     """Retrieve the most relevant document chunks for a query."""
 
