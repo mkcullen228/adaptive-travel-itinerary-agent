@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pydantic import ValidationError
 
 from src.models.retrieved_evidence import RetrievedEvidence
-
+from src.models.source_reference import VerificationStatus
 
 def test_valid_retrieved_evidence():
     evidence = RetrievedEvidence(
@@ -15,7 +15,8 @@ def test_valid_retrieved_evidence():
         retrieved_at=datetime(2026, 11, 10, tzinfo=timezone.utc),
         similarity_distance=0.25,
         reliability=0.85,
-        freshness_score=0.65
+        freshness_score=0.65,
+        verification_status=VerificationStatus.VERIFIED,
     )
     print(evidence)
     assert evidence.chunk_id == "washington_monument_1"
@@ -33,7 +34,8 @@ def test_negative_similarity_distance_is_rejected():
             retrieved_at=datetime.now(timezone.utc),
             similarity_distance=-0.1,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED,
         )
 
 
@@ -63,7 +65,8 @@ def test_similarity_distance_is_preserved():
         retrieved_at=datetime.now(timezone.utc),
         similarity_distance=original_distance, 
         reliability=0.85,
-        freshness_score=0.65
+        freshness_score=0.65,
+        verification_status=VerificationStatus.VERIFIED,
     )
 
     assert evidence.similarity_distance == original_distance

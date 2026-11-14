@@ -31,6 +31,6 @@ class SourceReference(BaseModel):
     source_name: str
     source_type: str
     url: HttpUrl
-    retrieved_at: datetime
+    retrieved_at: datetime | None = None
     reliability: float = Field(ge=0, le=1)
     verification_status: VerificationStatus

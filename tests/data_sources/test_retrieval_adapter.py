@@ -1,8 +1,8 @@
 import pytest
 from datetime import datetime, timezone
-from pydantic import ValidationError
 
 from src.data_sources.retrieval_adapter import (convert_search_results_to_evidence)
+from src.models.source_reference import VerificationStatus
 
 
 def create_mock_results():
@@ -16,6 +16,7 @@ def create_mock_results():
             "retrieved_at": "2026-11-11T20:18:05.637606+00:00",
             "reliability": 0.85,
             "freshness_score": 0.65,
+            "verification_status": VerificationStatus.VERIFIED,
         }]],
         "distances": [[0.3847]],
         
@@ -26,12 +27,14 @@ def test_converts_search_results_to_evidence():
     results = create_mock_results()
 
     evidence = convert_search_results_to_evidence(results)
+    print(evidence)
 
     assert len(evidence) == 1
     assert evidence[0].chunk_id == "washington_monument_1"
     assert evidence[0].content == "Timed-entry tickets are required."
     assert evidence[0].source_id == "washington_monument_visitor_info"
     assert evidence[0].subject == "Washington Monument"
+    assert evidence[0].verification_status == VerificationStatus.VERIFIED
 
 
 def test_converts_retrieved_at_to_datetime():

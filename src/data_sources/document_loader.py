@@ -13,9 +13,15 @@ def extract_required_metadata(header: str) -> dict:
         "retrieved_at": r"Retrieved at: (.+)",
         "reliability": r"Reliability: (.+)",
     }
+    
+    optional_fields = {
+        "venue_id": r"Venue ID: (.+)",
+        "verification_status": r"Verification status: (.+)",
+    }
 
     metadata = {}
 
+    # required fields
     for field, pattern in required_fields.items():
         match = re.search(pattern, header)
 
@@ -25,6 +31,13 @@ def extract_required_metadata(header: str) -> dict:
             )
 
         metadata[field] = match.group(1).strip()
+
+    # optional fields
+    for field, pattern in optional_fields.items():
+        match = re.search(pattern, header)
+
+        if match:
+            metadata[field] = match.group(1).strip()
 
     # Clean Markdown link formatting from URLs.
     url = metadata["url"]

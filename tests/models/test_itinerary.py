@@ -2,6 +2,7 @@ from datetime import date, datetime
 from src.models.activity import Activity
 from src.models.itinerary import Itinerary
 
+
 def test_valid_itinerary():
     t = Itinerary(
         itinerary_id="Fun Day Out",

@@ -29,6 +29,7 @@ class EvidenceAssessment(BaseModel):
     relevance: EvidenceRelevance
     coverage: EvidenceCoverage
     source_quality_assessed: bool = False
+    source_quality_warnings: List[str] = Field(default_factory=list)
     consistency_assessed: bool = False
     supporting_source_ids: List[str] = Field(default_factory=list)
     conflicting_source_ids: List[str] = Field(default_factory=list)
@@ -67,4 +68,3 @@ class EvidenceAssessment(BaseModel):
                 )
 
         return self
-

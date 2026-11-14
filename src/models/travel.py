@@ -43,7 +43,8 @@ class TravelLeg(BaseModel):
                     duration_minutes=8,
                     source="manual_test_data",
                     )
-            ]
+            ], 
+            selected_mode="walking"
         )
     """
     origin_activity_id: str

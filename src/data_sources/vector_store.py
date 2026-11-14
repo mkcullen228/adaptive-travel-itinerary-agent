@@ -57,14 +57,33 @@ def store_documents(collection, documents: list, embeddings) -> None:
     )
 
 
-def search_documents(collection, query: str, query_embedding, n_results: int = 3) -> dict:
+def delete_source_documents(collection, source_id: str) -> None:
+    """Delete all indexed chunks belonging to a source document."""
+
+    collection.delete(
+        where={"source_id": source_id}
+    )
+
+
+def search_documents(
+    collection,
+    query: str,
+    query_embedding,
+    n_results: int = 3,
+    venue_id: str | None = None,
+) -> dict:
     """Retrieve the most relevant document chunks for a query."""
 
-    return collection.query(
-        query_embeddings=[query_embedding.tolist()],
-        n_results=n_results,
-        include=["documents", "metadatas", "distances"]
-    )
+    query_parameters = {
+        "query_embeddings": [query_embedding.tolist()],
+        "n_results": n_results,
+        "include": ["documents", "metadatas", "distances"],
+    }
+
+    if venue_id is not None:
+        query_parameters["where"] = {"venue_id": venue_id}
+
+    return collection.query(**query_parameters)
 
 
 if __name__ == "__main__":

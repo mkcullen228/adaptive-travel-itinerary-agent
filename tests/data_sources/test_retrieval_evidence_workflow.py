@@ -29,7 +29,6 @@ def test_timed_entry_ticket_claim_is_supported():
 
     # 2. Convert retrieved chunks into structured evidence.
     evidence = convert_search_results_to_evidence(results)
-
     assert evidence
 
     # 3. Assess a claim using the retrieved evidence.
