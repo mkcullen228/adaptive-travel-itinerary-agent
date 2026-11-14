@@ -521,3 +521,57 @@ def test_assess_claim_evidence_includes_unverified_source_warning():
         "not been independently verified" in warning
         for warning in assessment.source_quality_warnings
     )
+
+
+def test_assess_claim_evidence_detects_conflicting_closing_times():
+    evidence = [
+        create_test_evidence(VerificationStatus.VERIFIED).model_copy(
+            update={
+                "source_id": "source_1",
+                "content": "The Washington Monument closes at 5 PM.",
+            }
+        ),
+        create_test_evidence(VerificationStatus.VERIFIED).model_copy(
+            update={
+                "source_id": "source_2",
+                "content": "The Washington Monument closes at 6 PM.",
+            }
+        ),
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="The Washington Monument closes at 5 PM.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.CONFLICTING
+    assert assessment.consistency_assessed is True
+    assert assessment.supporting_source_ids
+    assert assessment.conflicting_source_ids
+
+
+def test_assess_claim_evidence_confirms_consistency_when_sources_agree():
+    evidence = [
+        create_test_evidence(VerificationStatus.VERIFIED).model_copy(
+            update={
+                "source_id": "source_1",
+                "content": "The Washington Monument closes at 5 PM.",
+            }
+        ),
+        create_test_evidence(VerificationStatus.VERIFIED).model_copy(
+            update={
+                "source_id": "source_2",
+                "content": "The Washington Monument closes at 5 PM.",
+            }
+        ),
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="The Washington Monument closes at 5 PM.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.SUPPORTED
+    assert assessment.consistency_assessed is True
+    assert len(assessment.supporting_source_ids) == 2
+    assert not assessment.conflicting_source_ids

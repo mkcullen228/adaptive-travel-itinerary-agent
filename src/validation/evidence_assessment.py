@@ -162,6 +162,7 @@ def assess_claim_evidence(
         source_quality_assessed=True,
         source_quality_warnings=assess_source_quality(evidence),
         conflicting_source_ids=sorted(conflicting_sources),
+        consistency_assessed=True,
         explanation=(
             f"Supported statements: {supported_statements}. "
             f"Unsupported statements: {unsupported_statements}. "
