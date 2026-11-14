@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from src.models.retrieved_evidence import RetrievedEvidence
+from src.models.source_reference import VerificationStatus
 from src.validation.data_quality import calculate_freshness_score
 
 def convert_search_results_to_evidence(
@@ -42,7 +43,10 @@ def convert_search_results_to_evidence(
             similarity_distance=distance,
             reliability=metadata["reliability"],
             freshness_score=freshness_score,
-            verification_status=metadata["verification_status"]
+            verification_status=metadata.get(
+                "verification_status",
+                VerificationStatus.UNVERIFIED,
+            ),
         )
 
         evidence_items.append(evidence)

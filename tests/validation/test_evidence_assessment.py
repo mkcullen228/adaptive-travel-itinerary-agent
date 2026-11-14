@@ -1,11 +1,27 @@
 from datetime import datetime, timezone
 
 from src.models.evidence import EvidenceStatus
+from src.models.source_reference import VerificationStatus
 from src.models.retrieved_evidence import RetrievedEvidence
 from src.models.evidence import EvidenceAssessment, EvidenceRelevance, EvidenceCoverage
 from src.validation.evidence_assessment import (
     assess_claim_evidence, extract_meaningful_terms, assess_evidence_relevance, 
-    assess_evidence_coverage)
+    assess_evidence_coverage, assess_source_quality)
+
+
+def create_test_evidence(verification_status):
+    return RetrievedEvidence(
+        chunk_id="test_0",
+        content="Visitors need a ticket.",
+        subject="Washington Monument",
+        source_id="test_source",
+        source_url="https://example.com",
+        retrieved_at=datetime.now(timezone.utc),
+        similarity_distance=0.2,
+        reliability=0.95,
+        freshness_score=1.0,
+        verification_status=verification_status,
+    )
 
 
 def test_directly_supported_claim():
@@ -19,7 +35,8 @@ def test_directly_supported_claim():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -44,7 +61,8 @@ def test_unrelated_evidence_does_not_support_claim():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.30,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -68,7 +86,8 @@ def test_partially_supported_claim():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -91,7 +110,8 @@ def test_conflicting_evidence():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED
         ),
         RetrievedEvidence(
             chunk_id="source_2_chunk_1",
@@ -102,7 +122,8 @@ def test_conflicting_evidence():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.30,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         ),
     ]
 
@@ -129,7 +150,8 @@ def test_agreeing_evidence():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED
         ),
         RetrievedEvidence(
             chunk_id="source_2_chunk_1",
@@ -140,7 +162,8 @@ def test_agreeing_evidence():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.30,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         ),
     ]
 
@@ -164,7 +187,8 @@ def test_different_venue_does_not_create_conflict():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         ),
         RetrievedEvidence(
             chunk_id="source_2_chunk_1",
@@ -175,7 +199,8 @@ def test_different_venue_does_not_create_conflict():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.30,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         ),
     ]
 
@@ -204,7 +229,8 @@ def test_general_accessibility_does_not_support_restroom_claim():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.477,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -230,6 +256,7 @@ def test_partial_evidence_assessment_dimensions():
         consistency_assessed=False,
         supporting_source_ids=["source_1"],
         explanation="The evidence supports opening hours but not restroom accessibility.",
+        verification_status=VerificationStatus.VERIFIED
     )
 
     assert assessment.relevance == EvidenceRelevance.RELEVANT
@@ -261,7 +288,8 @@ def test_assess_evidence_relevance_relevant():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65, 
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -284,7 +312,8 @@ def test_assess_evidence_relevance_partiallyrelevant():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -307,7 +336,8 @@ def test_assess_evidence_relevance_irrelevant():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.25,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -333,7 +363,8 @@ def test_relevant_evidence_does_not_necessarily_support_claim():
             retrieved_at=datetime(2026, 11, 11, tzinfo=timezone.utc),
             similarity_distance=0.477,
             reliability=0.85,
-            freshness_score=0.65
+            freshness_score=0.65,
+            verification_status=VerificationStatus.VERIFIED
         )
     ]
 
@@ -370,3 +401,123 @@ def test_evidence_coverage_none():
         unsupported_statements=["Tickets are required."],
     )
     assert coverage == EvidenceCoverage.NONE
+
+
+def test_verified_source_has_no_warnings():
+    evidence = [create_test_evidence(VerificationStatus.VERIFIED)]
+
+    assert assess_source_quality(evidence) == []
+
+
+def test_unverified_source_generates_warning():
+    evidence = [create_test_evidence(VerificationStatus.UNVERIFIED)]
+
+    warnings = assess_source_quality(evidence)
+
+    assert len(warnings) == 1
+    assert "not been independently verified" in warnings[0]
+
+
+def test_stale_source_generates_warning():
+    evidence = [create_test_evidence(VerificationStatus.STALE)]
+
+    warnings = assess_source_quality(evidence)
+
+    assert len(warnings) == 1
+    assert "stale" in warnings[0]
+
+
+def test_conflicting_source_generates_warning():
+    evidence = [create_test_evidence(VerificationStatus.CONFLICTING)]
+
+    warnings = assess_source_quality(evidence)
+
+    assert len(warnings) == 1
+    assert "conflicting verification status" in warnings[0]
+
+
+def test_assess_claim_evidence_with_source_quality_warnings():
+    evidence = [create_test_evidence(VerificationStatus.VERIFIED)]
+
+    assessment = assess_claim_evidence(
+       claim="Visitors need a ticket.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.SUPPORTED
+    assert assessment.source_quality_assessed is True
+    assert assessment.source_quality_warnings == assess_source_quality(evidence)
+
+
+def test_assess_claim_evidence_recognizes_paraphrase():
+    evidence = [
+        create_test_evidence(VerificationStatus.UNVERIFIED).model_copy(
+            update={
+                "content": (
+                    "You can't get to the top of the Washington "
+                    "Monument without a ticket."
+                )
+            }
+        )
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="Visitors must have a ticket to reach the top of the Washington Monument.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.SUPPORTED
+
+
+def test_assess_claim_evidence_rejects_unrelated_keyword_overlap():
+    evidence = [
+        create_test_evidence(VerificationStatus.UNVERIFIED).model_copy(
+            update={
+                "content": (
+                    "Visitors need a ticket to access the Washington Monument."
+                )
+            }
+        )
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="The Washington Monument closes at 10 PM.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.UNSUPPORTED
+
+
+def test_ticket_requirement_without_matching_destination_is_unsupported():
+    evidence = [
+        create_test_evidence(VerificationStatus.UNVERIFIED).model_copy(
+            update={
+                "content": "Visitors need a ticket to enter the museum."
+            }
+        )
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="Visitors must have a ticket to reach the top of the Washington Monument.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.UNSUPPORTED
+
+
+def test_assess_claim_evidence_includes_unverified_source_warning():
+    evidence = [
+        create_test_evidence(VerificationStatus.UNVERIFIED)
+    ]
+
+    assessment = assess_claim_evidence(
+        claim="Visitors need a ticket.",
+        evidence=evidence,
+    )
+
+    assert assessment.status == EvidenceStatus.SUPPORTED
+    assert assessment.source_quality_assessed is True
+    assert any(
+        "not been independently verified" in warning
+        for warning in assessment.source_quality_warnings
+    )

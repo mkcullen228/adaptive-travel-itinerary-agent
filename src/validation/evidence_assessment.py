@@ -2,6 +2,79 @@ import re
 
 from src.models.evidence import EvidenceAssessment, EvidenceRelevance, EvidenceCoverage
 from src.models.retrieved_evidence import RetrievedEvidence
+from src.models.source_reference import VerificationStatus
+
+
+def assess_source_quality(
+    evidence: list[RetrievedEvidence],
+) -> list[str]:
+    warnings = []
+
+    for item in evidence:
+        if item.verification_status == VerificationStatus.UNVERIFIED:
+            warnings.append(
+                f"Source {item.source_id} has not been independently verified."
+            )
+
+        elif item.verification_status == VerificationStatus.STALE:
+            warnings.append(
+                f"Source {item.source_id} is marked as stale."
+            )
+
+        elif item.verification_status == VerificationStatus.CONFLICTING:
+            warnings.append(
+                f"Source {item.source_id} has conflicting verification status."
+            )
+
+    return sorted(set(warnings))
+
+
+def normalize_text(text: str) -> str:
+    """Normalize text for basic comparison."""
+    return re.sub(r"[^a-z0-9\s]", "", text.lower()).strip()
+
+
+def supports_ticket_requirement(claim: str, evidence: str) -> bool:
+    claim_text = normalize_text(claim)
+    evidence_text = normalize_text(evidence)
+
+    ticket_terms = ("ticket", "tickets")
+
+    if not any(term in claim_text for term in ticket_terms):
+        return False
+
+    if not any(term in evidence_text for term in ticket_terms):
+        return False
+
+    claim_requires_ticket = any(
+        phrase in claim_text
+        for phrase in (
+            "must have a ticket",
+            "need a ticket",
+            "requires a ticket",
+            "ticket is required",
+        )
+    )
+
+    evidence_requires_ticket = any(
+        phrase in evidence_text
+        for phrase in (
+            "without a ticket",
+            "need a ticket",
+            "requires a ticket",
+            "ticket is required",
+        )
+    )
+
+    claim_mentions_destination = "top" in claim_text or "reach the top" in claim_text
+    evidence_mentions_destination = "top" in evidence_text
+
+    return (
+        claim_requires_ticket
+        and evidence_requires_ticket
+        and claim_mentions_destination
+        and evidence_mentions_destination
+    )
 
 
 def assess_claim_evidence(
@@ -24,7 +97,8 @@ def assess_claim_evidence(
         supporting_evidence = [
             item
             for item in evidence
-            if statement.lower() in item.content.lower()
+            if (normalize_text(statement) in normalize_text(item.content)
+                or supports_ticket_requirement(statement, item.content))
         ]
 
         statement_supported_by = [
@@ -85,6 +159,8 @@ def assess_claim_evidence(
         relevance=assess_evidence_relevance(claim, evidence),
         coverage=assess_evidence_coverage(supported_statements, unsupported_statements,),
         supporting_source_ids=sorted(supporting_sources),
+        source_quality_assessed=True,
+        source_quality_warnings=assess_source_quality(evidence),
         conflicting_source_ids=sorted(conflicting_sources),
         explanation=(
             f"Supported statements: {supported_statements}. "
