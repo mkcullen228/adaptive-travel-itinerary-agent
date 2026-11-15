@@ -1,6 +1,6 @@
 import pytest
 from datetime import date, datetime
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from src.models.agent_workflow import (
     Constraint,
@@ -9,18 +9,22 @@ from src.models.agent_workflow import (
     ConstraintInterpretation,
     ConfirmationStatus,
     RecoveryOption,
+    RecoveryStrategy,
     RejectedOption,
     OptionValidation,
     ApprovalStatus,
     ApprovalRecord,
     ConstraintChange, 
-    ExecutionEvent
+    ExecutionEvent, 
+    RecoveryPlanningInput
 )
 from src.models.itinerary import Itinerary
 from src.models.validation import (
     ValidationResult,
     ValidationStatus,
 )
+from src.models.investigation import InvestigationResult
+from src.models.disruption import DisruptionScenario, DisruptionType, DisruptionSeverity
 
 
 def test_valid_mandatory_constraint():
@@ -97,6 +101,7 @@ def test_valid_recovery_option():
     option = RecoveryOption(
         option_id="option_001",
         proposed_itinerary=itinerary,
+        strategy=RecoveryStrategy.MINIMAL_DISRUPTION,
         rationale="Replaces an unavailable venue with an alternative.",
         preserved_constraints=["C001"],
         violated_constraints=[],
@@ -108,6 +113,8 @@ def test_valid_recovery_option():
     assert option.preserved_constraints == ["C001"]
     assert option.violated_constraints == []
     assert option.supporting_evidence_ids == ["E001"]
+    assert option.assumptions == []
+    assert option.uncertainties == []
 
 
 def test_valid_rejected_option():
@@ -181,3 +188,86 @@ def test_valid_execution_event():
     assert event.details["tool"] == "nws_weather"
     assert event.details["success"] is True
     assert event.timestamp.tzinfo is not None
+
+
+def test_recovery_strategy_values():
+    assert RecoveryStrategy.MINIMAL_DISRUPTION.value == "minimal_disruption"
+    assert RecoveryStrategy.BEST_OVERALL_FEASIBILITY.value == "best_overall_feasibility"
+    assert RecoveryStrategy.PREFERENCE_ORIENTED.value == "preference_oriented"
+    
+
+
+def test_invalid_recovery_strategy_is_rejected():
+    adapter = TypeAdapter(RecoveryStrategy)
+
+    with pytest.raises(ValidationError):
+        adapter.validate_python("create_new_itinerary")
+
+def make_recovery_planning_input():
+    itinerary = Itinerary(
+        itinerary_id="test_itinerary",
+        destination="Washington, DC",
+        itinerary_date=date(2026, 11, 7),
+        activities=[],
+        travel_legs=[],
+    )
+
+    disruption = DisruptionScenario(
+        scenario_id="test_disruption",
+        scenario_type=DisruptionType.TRAVEL_DELAY,
+        description="A 15-minute travel delay.",
+        severity=DisruptionSeverity.MODERATE,
+        additional_duration_minutes=15,
+    )
+
+    investigation = InvestigationResult(
+        investigation_id="test_investigation",
+        scenario_id="test_disruption",
+    )
+
+    return RecoveryPlanningInput(
+        original_itinerary=itinerary,
+        disruption_scenario=disruption,
+        investigation_result=investigation,
+        user_instructions="Keep the afternoon activities indoors if possible.",
+        strategy=RecoveryStrategy.MINIMAL_DISRUPTION,
+    )
+
+
+def test_recovery_planning_input_defaults():
+    planning_input = make_recovery_planning_input()
+
+    assert planning_input.revision_count == 0
+    assert planning_input.mandatory_constraints == []
+    assert planning_input.flexible_preferences == []
+    assert planning_input.rejected_options == []
+
+def test_recovery_planning_input_rejects_negative_revision_count():
+    planning_input = make_recovery_planning_input()
+
+    data = planning_input.model_dump()
+    data["revision_count"] = -1
+
+    with pytest.raises(ValidationError):
+        RecoveryPlanningInput(**data)
+
+
+def test_recovery_planning_input_rejects_invalid_strategy():
+    planning_input = make_recovery_planning_input()
+
+    data = planning_input.model_dump()
+    data["strategy"] = "create_new_itinerary"
+
+    with pytest.raises(ValidationError):
+        RecoveryPlanningInput(**data)
+
+
+def test_recovery_planning_input_preserves_revision_count():
+    planning_input = make_recovery_planning_input()
+
+    data = planning_input.model_dump()
+    data["revision_count"] = 2
+
+    updated_input = RecoveryPlanningInput(**data)
+
+    assert updated_input.revision_count == 2
