@@ -26,6 +26,26 @@ class ConfirmationStatus(str, Enum):
     REJECTED = "rejected"
 
 
+class ApprovalStatus(str, Enum):
+    NOT_REQUIRED = "not_required"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    REVISION_REQUESTED = "revision_requested"
+
+
+class RecoveryStrategy(str, Enum):
+    MINIMAL_DISRUPTION = "minimal_disruption"
+    BEST_OVERALL_FEASIBILITY = "best_overall_feasibility"
+    PREFERENCE_ORIENTED = "preference_oriented"
+
+
+class RecoveryProposalStatus(str, Enum):
+    COMPLETE = "complete"
+    PARTIAL = "partial"
+    REQUIRES_INVESTIGATION = "requires_investigation"
+
+
 class Constraint(BaseModel):
     constraint_id: str
     description: str
@@ -48,6 +68,7 @@ class RecoveryOption(BaseModel):
     option_id: str
     strategy: RecoveryStrategy
     proposed_itinerary: Itinerary
+    proposal_status: RecoveryProposalStatus
     rationale: str
     preserved_constraints: list[str] = Field(default_factory=list)
     violated_constraints: list[str] = Field(default_factory=list)
@@ -65,14 +86,6 @@ class RejectedOption(BaseModel):
 class OptionValidation(BaseModel):
     option_id: str
     validation_result: ValidationResult
-
-
-class ApprovalStatus(str, Enum):
-    NOT_REQUIRED = "not_required"
-    PENDING = "pending"
-    APPROVED = "approved"
-    REJECTED = "rejected"
-    REVISION_REQUESTED = "revision_requested"
 
 
 class ApprovalRecord(BaseModel):
@@ -101,12 +114,6 @@ class ExecutionEvent(BaseModel):
     details: dict[str, str | int | float | bool | None] = Field(
         default_factory=dict
     )
-
-
-class RecoveryStrategy(str, Enum):
-    MINIMAL_DISRUPTION = "minimal_disruption"
-    BEST_OVERALL_FEASIBILITY = "best_overall_feasibility"
-    PREFERENCE_ORIENTED = "preference_oriented"
 
 
 class RecoveryPlanningInput(BaseModel):
