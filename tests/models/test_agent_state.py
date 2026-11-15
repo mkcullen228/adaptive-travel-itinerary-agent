@@ -61,6 +61,12 @@ def test_agent_state_initialization():
         "approved_constraint_changes": [],
         "final_itinerary": None,
         "final_report": None,
+        "tool_call_counts": {},
+        "total_tool_call_count": 0,
+        "llm_call_count": 0,
+        "execution_trace": [],
+        "warnings": [],
+        "error_details": [],
     }
 
     assert state["investigation_id"] == "test_investigation"
@@ -85,3 +91,9 @@ def test_agent_state_initialization():
     assert state["approved_constraint_changes"] == []
     assert state["final_itinerary"] is None
     assert state["final_report"] is None
+    assert state["tool_call_counts"] == {}
+    assert state["total_tool_call_count"] == 0
+    assert state["llm_call_count"] == 0
+    assert state["execution_trace"] == []
+    assert state["warnings"] == []
+    assert state["error_details"] == []

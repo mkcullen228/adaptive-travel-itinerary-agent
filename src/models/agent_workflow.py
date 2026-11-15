@@ -1,5 +1,5 @@
 from enum import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
 from src.models.itinerary import Itinerary
@@ -83,3 +83,16 @@ class ConstraintChange(BaseModel):
     proposed_value: str
     reason: str
     approval_status: ApprovalStatus
+
+
+class ExecutionEvent(BaseModel):
+    event_id: str
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    stage: str
+    event_type: str
+    description: str
+    details: dict[str, str | int | float | bool | None] = Field(
+        default_factory=dict
+    )

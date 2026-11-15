@@ -13,7 +13,8 @@ from src.models.agent_workflow import (
     OptionValidation,
     ApprovalStatus,
     ApprovalRecord,
-    ConstraintChange
+    ConstraintChange, 
+    ExecutionEvent
 )
 from src.models.itinerary import Itinerary
 from src.models.validation import (
@@ -160,3 +161,23 @@ def test_valid_constraint_change():
     assert change.original_value == "indoor"
     assert change.proposed_value == "outdoor"
     assert change.approval_status == ApprovalStatus.PENDING
+
+
+def test_valid_execution_event():
+    event = ExecutionEvent(
+        event_id="event_001",
+        stage="investigation",
+        event_type="tool_call",
+        description="Retrieved current weather forecast.",
+        details={
+            "tool": "nws_weather",
+            "success": True,
+            "result_count": 12,
+        },
+    )
+
+    assert event.event_id == "event_001"
+    assert event.stage == "investigation"
+    assert event.details["tool"] == "nws_weather"
+    assert event.details["success"] is True
+    assert event.timestamp.tzinfo is not None

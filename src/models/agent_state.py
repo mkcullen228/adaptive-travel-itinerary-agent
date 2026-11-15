@@ -5,6 +5,7 @@ from typing import TypedDict
 from src.models.agent_workflow import (
     Constraint,
     ConstraintInterpretation,
+    ExecutionEvent,
     RecoveryOption,
     RejectedOption,
     OptionValidation,
@@ -71,4 +72,12 @@ class TravelAgentState(TypedDict):
     approved_constraint_changes: list[ConstraintChange]
     final_itinerary: Itinerary | None
     final_report: str | None
+
+    # Execution and audit
+    tool_call_counts: dict[str, int]
+    total_tool_call_count: int
+    llm_call_count: int
+    execution_trace: list[ExecutionEvent]
+    warnings: list[str]
+    error_details: list[str]
 
