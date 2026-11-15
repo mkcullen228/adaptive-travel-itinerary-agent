@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from src.models.agent_state import (
     TravelAgentState,
@@ -39,7 +39,7 @@ def test_agent_state_initialization():
 
     state: TravelAgentState = {
         "investigation_id": "test_investigation",
-        "created_at": datetime.now(),
+        "created_at": datetime.now(timezone.utc),
         "current_stage": WorkflowStage.INITIALIZATION,
         "status": WorkflowStatus.IN_PROGRESS,
         "original_itinerary": itinerary,
@@ -97,3 +97,4 @@ def test_agent_state_initialization():
     assert state["execution_trace"] == []
     assert state["warnings"] == []
     assert state["error_details"] == []
+    assert state["created_at"].tzinfo is not None
