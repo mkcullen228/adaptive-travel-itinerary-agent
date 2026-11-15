@@ -1,0 +1,87 @@
+{
+  "evaluation_version": "1.0",
+  "models": [
+    {
+      "model_name": "qwen3.5:4b",
+      "model_type": "local",
+      "scenarios": [
+        {
+          "scenario_id": "P-01",
+          "iterations": [
+                {
+                "evaluation_id": "QWEN-P01-001",
+                "model_name": "qwen3.5:4b",
+                "model_version": "4b",
+                "scenario_id": "P-01",
+                "iteration": 1,
+                "prompt_version": "v1",
+                "criterion_results": {
+                "constraint_adherence": "pass",
+                "evidence_grounding": "fail",
+                "uncertainty_handling": "partial",
+                "replacement_candidate_handling": "fail",
+                "unsupported_assumptions": "partial"
+                },
+                "overall_result": "partial",
+                "structured_output_valid": false,
+                "failure_observations": [
+                "Invented two replacement candidates without supplied investigation evidence.",
+                "Introduced unsupported assumptions about travel time and traffic.",
+                "Correctly removed the unavailable National Gallery and preserved the mandatory activity."
+                ],
+                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_1.md"
+            },
+            {
+                "evaluation_id": "QWEN-P01-002",
+                "model_name": "qwen3.5:4b",
+                "model_version": "4b",
+                "scenario_id": "P-01",
+                "iteration": 2,
+                "prompt_version": "v2",
+                "criterion_results": {
+                "constraint_adherence": "pass",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "partial",
+                "replacement_candidate_handling": "pass",
+                "unsupported_assumptions": "pass"
+                },
+                "overall_result": "partial",
+                "structured_output_valid": false,
+                "failure_observations": [
+                "Correctly returned an empty replacement candidate list.",
+                "Stopped introducing unsupported travel and traffic assumptions.",
+                "Still implied that remaining activities were available because no evidence indicated otherwise."
+                ],
+                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_2.md"
+            },
+            {
+                "evaluation_id": "QWEN-P01-003",
+                "model_name": "qwen3.5:4b",
+                "model_version": "4b",
+                "scenario_id": "P-01",
+                "iteration": 3,
+                "prompt_version": "v3",
+                "criterion_results": {
+                  "constraint_adherence": "partial",
+                  "evidence_grounding": "pass",
+                  "uncertainty_handling": "pass",
+                  "replacement_candidate_handling": "pass",
+                  "unsupported_assumptions": "pass"
+                },
+                "overall_result": "partial",
+                "structured_output_valid": false,
+                "failure_observations": [
+                "Correctly distinguished provisional preservation from confirmed availability.",
+                "Preserved mandatory Natural History without assuming it was available.",
+                "Returned an empty unverified candidate list.",
+                "Minor wording issue: described schedule continuity as assumed rather than explicitly stating that schedule feasibility had not been assessed.", 
+                "The unavailable National Gallery remained in preserved_activities instead of being removed from the proposed schedule."
+                ],
+                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_3.md"
+            }
+            ]
+        }
+      ]
+    }
+  ]
+}
