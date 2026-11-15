@@ -1,7 +1,9 @@
 from enum import Enum
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 from src.models.itinerary import Itinerary
+from src.models.validation import ValidationResult
 
 
 class ConstraintPriority(str, Enum):
@@ -53,3 +55,31 @@ class RecoveryOption(BaseModel):
 class RejectedOption(BaseModel):
     option_id: str
     rejection_reason: str
+
+
+class OptionValidation(BaseModel):
+    option_id: str
+    validation_result: ValidationResult
+
+
+class ApprovalStatus(str, Enum):
+    NOT_REQUIRED = "not_required"
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    REVISION_REQUESTED = "revision_requested"
+
+
+class ApprovalRecord(BaseModel):
+    option_id: str | None = None
+    status: ApprovalStatus
+    timestamp: datetime
+    user_feedback: str | None = None
+
+
+class ConstraintChange(BaseModel):
+    constraint_id: str
+    original_value: str
+    proposed_value: str
+    reason: str
+    approval_status: ApprovalStatus

@@ -5,6 +5,7 @@ from src.models.agent_state import (
     WorkflowStage,
     WorkflowStatus,
 )
+from src.models.agent_workflow import ApprovalStatus
 from src.models.disruption import (
     DisruptionScenario,
     DisruptionType,
@@ -54,6 +55,12 @@ def test_agent_state_initialization():
         "rejected_options": [],
         "revision_count": 0,
         "planning_rationale": "",
+        "validation_results": [],
+        "approval_status": ApprovalStatus.NOT_REQUIRED,
+        "approval_history": [],
+        "approved_constraint_changes": [],
+        "final_itinerary": None,
+        "final_report": None,
     }
 
     assert state["investigation_id"] == "test_investigation"
@@ -72,3 +79,9 @@ def test_agent_state_initialization():
     assert state["rejected_options"] == []
     assert state["revision_count"] == 0
     assert state["planning_rationale"] == ""
+    assert state["validation_results"] == []
+    assert state["approval_status"] == ApprovalStatus.NOT_REQUIRED
+    assert state["approval_history"] == []
+    assert state["approved_constraint_changes"] == []
+    assert state["final_itinerary"] is None
+    assert state["final_report"] is None

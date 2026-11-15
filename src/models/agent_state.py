@@ -7,6 +7,10 @@ from src.models.agent_workflow import (
     ConstraintInterpretation,
     RecoveryOption,
     RejectedOption,
+    OptionValidation,
+    ApprovalRecord,
+    ApprovalStatus,
+    ConstraintChange,
 )
 from src.models.itinerary import Itinerary
 from src.models.disruption import DisruptionScenario
@@ -59,3 +63,12 @@ class TravelAgentState(TypedDict):
     rejected_options: list[RejectedOption]
     revision_count: int
     planning_rationale: str
+
+    # Validation, approval, and finalization
+    validation_results: list[OptionValidation]
+    approval_status: ApprovalStatus
+    approval_history: list[ApprovalRecord]
+    approved_constraint_changes: list[ConstraintChange]
+    final_itinerary: Itinerary | None
+    final_report: str | None
+

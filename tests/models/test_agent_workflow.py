@@ -1,5 +1,5 @@
 import pytest
-from datetime import date
+from datetime import date, datetime
 from pydantic import ValidationError
 
 from src.models.agent_workflow import (
@@ -10,8 +10,17 @@ from src.models.agent_workflow import (
     ConfirmationStatus,
     RecoveryOption,
     RejectedOption,
+    OptionValidation,
+    ApprovalStatus,
+    ApprovalRecord,
+    ConstraintChange
 )
 from src.models.itinerary import Itinerary
+from src.models.validation import (
+    ValidationResult,
+    ValidationStatus,
+)
+
 
 def test_valid_mandatory_constraint():
     constraint = Constraint(
@@ -108,3 +117,46 @@ def test_valid_rejected_option():
 
     assert rejected.option_id == "option_002"
     assert "mandatory timing constraint" in rejected.rejection_reason
+
+
+def test_valid_option_validation():
+    result = ValidationResult(
+        status=ValidationStatus.INVALID,
+        issues=[],
+    )
+
+    option_validation = OptionValidation(
+        option_id="option_001",
+        validation_result=result,
+    )
+
+    assert option_validation.option_id == "option_001"
+    assert option_validation.validation_result.status == ValidationStatus.INVALID
+
+
+def test_valid_approval_record():
+    record = ApprovalRecord(
+        option_id="option_001",
+        status=ApprovalStatus.REVISION_REQUESTED,
+        timestamp=datetime.now(),
+        user_feedback="Please preserve the afternoon museum visit.",
+    )
+
+    assert record.option_id == "option_001"
+    assert record.status == ApprovalStatus.REVISION_REQUESTED
+    assert record.user_feedback == "Please preserve the afternoon museum visit."
+
+
+def test_valid_constraint_change():
+    change = ConstraintChange(
+        constraint_id="C001",
+        original_value="indoor",
+        proposed_value="outdoor",
+        reason="No feasible indoor alternatives are available.",
+        approval_status=ApprovalStatus.PENDING,
+    )
+
+    assert change.constraint_id == "C001"
+    assert change.original_value == "indoor"
+    assert change.proposed_value == "outdoor"
+    assert change.approval_status == ApprovalStatus.PENDING
