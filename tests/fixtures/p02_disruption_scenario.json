@@ -1,0 +1,13 @@
+{
+  "scenario_id": "P-02",
+  "scenario_type": "weather",
+  "description": "A controlled heavy-rain weather scenario begins at 12:00 PM and continues through 6:00 PM on November 7, 2026. Outdoor activities during this period are unsuitable.",
+  "affected_activity_ids": [
+    "wwii_memorial",
+    "lincoln_memorial"
+  ],
+  "severity": "high",
+  "weather_condition": "heavy_rain",
+  "affected_time_start": "2026-11-07T12:00:00",
+  "affected_time_end": "2026-11-07T18:00:00"
+}

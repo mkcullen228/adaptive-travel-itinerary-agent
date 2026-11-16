@@ -1,3 +1,4 @@
+
 from enum import Enum
 from datetime import datetime, timezone
 
@@ -8,6 +9,7 @@ class EvaluationLevel(str, Enum):
     PASS = "pass"
     PARTIAL = "partial"
     FAIL = "fail"
+    NOT_APPLICABLE = "not_applicable"
 
 
 class OverallResult(str, Enum):
@@ -25,6 +27,7 @@ class LLMEvaluationRecord(BaseModel):
 
     strategy: str | None = None
     prompt_version: str
+    rubric_version: str = "2.0"
 
     criterion_results: dict[str, EvaluationLevel]
 
@@ -42,3 +45,8 @@ class LLMEvaluationRecord(BaseModel):
     evaluated_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
+
+    deterministic_validation: dict | None = None
+    schedule_comparison: dict | None = None
+    schedule_robustness: dict | None = None
+    recovery_consistency: dict | None = None

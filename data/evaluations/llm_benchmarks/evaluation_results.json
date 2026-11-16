@@ -8,78 +8,964 @@
         {
           "scenario_id": "P-01",
           "iterations": [
-                {
-                "evaluation_id": "QWEN-P01-001",
-                "model_name": "qwen3.5:4b",
-                "model_version": "4b",
-                "scenario_id": "P-01",
-                "iteration": 1,
-                "prompt_version": "v1",
-                "criterion_results": {
+            {
+              "evaluation_id": "QWEN-P01-001",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-01",
+              "iteration": 1,
+              "prompt_version": "v1",
+              "criterion_results": {
                 "constraint_adherence": "pass",
                 "evidence_grounding": "fail",
                 "uncertainty_handling": "partial",
                 "replacement_candidate_handling": "fail",
                 "unsupported_assumptions": "partial"
-                },
-                "overall_result": "partial",
-                "structured_output_valid": false,
-                "failure_observations": [
+              },
+              "overall_result": "partial",
+              "structured_output_valid": false,
+              "failure_observations": [
                 "Invented two replacement candidates without supplied investigation evidence.",
                 "Introduced unsupported assumptions about travel time and traffic.",
                 "Correctly removed the unavailable National Gallery and preserved the mandatory activity."
-                ],
-                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_1.md"
+              ],
+              "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_1.md"
             },
             {
-                "evaluation_id": "QWEN-P01-002",
-                "model_name": "qwen3.5:4b",
-                "model_version": "4b",
-                "scenario_id": "P-01",
-                "iteration": 2,
-                "prompt_version": "v2",
-                "criterion_results": {
+              "evaluation_id": "QWEN-P01-002",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-01",
+              "iteration": 2,
+              "prompt_version": "v2",
+              "criterion_results": {
                 "constraint_adherence": "pass",
                 "evidence_grounding": "partial",
                 "uncertainty_handling": "partial",
                 "replacement_candidate_handling": "pass",
                 "unsupported_assumptions": "pass"
-                },
-                "overall_result": "partial",
-                "structured_output_valid": false,
-                "failure_observations": [
+              },
+              "overall_result": "partial",
+              "structured_output_valid": false,
+              "failure_observations": [
                 "Correctly returned an empty replacement candidate list.",
                 "Stopped introducing unsupported travel and traffic assumptions.",
                 "Still implied that remaining activities were available because no evidence indicated otherwise."
-                ],
-                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_2.md"
+              ],
+              "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_2.md"
             },
             {
-                "evaluation_id": "QWEN-P01-003",
-                "model_name": "qwen3.5:4b",
-                "model_version": "4b",
-                "scenario_id": "P-01",
-                "iteration": 3,
-                "prompt_version": "v3",
-                "criterion_results": {
-                  "constraint_adherence": "partial",
-                  "evidence_grounding": "pass",
-                  "uncertainty_handling": "pass",
-                  "replacement_candidate_handling": "pass",
-                  "unsupported_assumptions": "pass"
-                },
-                "overall_result": "partial",
-                "structured_output_valid": false,
-                "failure_observations": [
+              "evaluation_id": "QWEN-P01-003",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-01",
+              "iteration": 3,
+              "prompt_version": "v3",
+              "criterion_results": {
+                "constraint_adherence": "partial",
+                "evidence_grounding": "pass",
+                "uncertainty_handling": "pass",
+                "replacement_candidate_handling": "pass",
+                "unsupported_assumptions": "pass"
+              },
+              "overall_result": "partial",
+              "structured_output_valid": false,
+              "failure_observations": [
                 "Correctly distinguished provisional preservation from confirmed availability.",
                 "Preserved mandatory Natural History without assuming it was available.",
                 "Returned an empty unverified candidate list.",
-                "Minor wording issue: described schedule continuity as assumed rather than explicitly stating that schedule feasibility had not been assessed.", 
+                "Minor wording issue: described schedule continuity as assumed rather than explicitly stating that schedule feasibility had not been assessed.",
                 "The unavailable National Gallery remained in preserved_activities instead of being removed from the proposed schedule."
+              ],
+              "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_3.md"
+            },
+            {
+              "evaluation_id": "P01-QWEN-004",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-01",
+              "iteration": 4,
+              "strategy": "minimal_disruption",
+              "prompt_version": "p01-v1",
+              "criterion_results": {
+                "constraint_adherence": "pass",
+                "disruption_handling": "pass",
+                "schedule_change_accuracy": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "pass"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "All four remaining activities were rescheduled earlier.",
+                "The rationale incorrectly described the schedule changes as shifting forward by 50 minutes.",
+                "The rationale referred to the removed activity as having a 50-minute duration, while the baseline specifies 90 minutes.",
+                "Venue availability and travel estimate accuracy remain unverified."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/structured_output_1.md",
+              "evaluated_at": "2026-11-16T17:34:38.571687Z",
+              "deterministic_validation": {
+                "status": "valid",
+                "issues": []
+              },
+              "schedule_comparison": {
+                "retained_activities": [],
+                "removed_activities": [
+                  "national_gallery"
                 ],
-                "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/iteration_3.md"
+                "added_activities": [],
+                "rescheduled_activities": [
+                  {
+                    "activity_id": "american_history",
+                    "original_start": "2026-11-07T10:50:00",
+                    "proposed_start": "2026-11-07T09:00:00-05:00",
+                    "change_minutes": -110
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "original_start": "2026-11-07T15:50:00",
+                    "proposed_start": "2026-11-07T13:50:00-05:00",
+                    "change_minutes": -120
+                  },
+                  {
+                    "activity_id": "natural_history",
+                    "original_start": "2026-11-07T13:20:00",
+                    "proposed_start": "2026-11-07T10:50:00-05:00",
+                    "change_minutes": -150
+                  },
+                  {
+                    "activity_id": "wwii_memorial",
+                    "original_start": "2026-11-07T15:10:00",
+                    "proposed_start": "2026-11-07T12:40:00-05:00",
+                    "change_minutes": -150
+                  }
+                ]
+              }
+            },
+            {
+              "evaluation_id": "P01-QWEN-005",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-01",
+              "iteration": 4,
+              "strategy": "minimal_disruption",
+              "prompt_version": "p01-v1",
+              "rubric_version": "2.0",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "not_applicable",
+                "disruption_handling": "pass",
+                "schedule_change_accuracy": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "pass"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "All four remaining activities were rescheduled earlier.",
+                "The rationale incorrectly described the schedule changes as shifting forward by 50 minutes.",
+                "The rationale referred to the removed activity as having a 50-minute duration, while the baseline specifies 90 minutes.",
+                "Venue availability and travel estimate accuracy remain unverified."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-01/structured_output_1.md",
+              "evaluated_at": "2026-11-16T17:51:03.216595Z",
+              "deterministic_validation": {
+                "status": "valid",
+                "issues": []
+              },
+              "schedule_comparison": {
+                "retained_activities": [],
+                "removed_activities": [
+                  "national_gallery"
+                ],
+                "added_activities": [],
+                "rescheduled_activities": [
+                  {
+                    "activity_id": "american_history",
+                    "original_start": "2026-11-07T10:50:00",
+                    "proposed_start": "2026-11-07T09:00:00-05:00",
+                    "change_minutes": -110
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "original_start": "2026-11-07T15:50:00",
+                    "proposed_start": "2026-11-07T13:50:00-05:00",
+                    "change_minutes": -120
+                  },
+                  {
+                    "activity_id": "natural_history",
+                    "original_start": "2026-11-07T13:20:00",
+                    "proposed_start": "2026-11-07T10:50:00-05:00",
+                    "change_minutes": -150
+                  },
+                  {
+                    "activity_id": "wwii_memorial",
+                    "original_start": "2026-11-07T15:10:00",
+                    "proposed_start": "2026-11-07T12:40:00-05:00",
+                    "change_minutes": -150
+                  }
+                ]
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": 3,
+                "average_slack_minutes": 15.33,
+                "low_slack_leg_count": 1,
+                "infeasible_leg_count": 0,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 15,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": 3,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "low_slack"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 40,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 28,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              }
             }
-            ]
+          ]
+        },
+        {
+          "scenario_id": "P-02",
+          "iterations": [
+            {
+              "evaluation_id": "P02-QWEN-001",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-02",
+              "iteration": 2,
+              "strategy": "minimal_disruption",
+              "prompt_version": "p02-v1",
+              "rubric_version": "2.0",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "partial",
+                "disruption_handling": "fail",
+                "schedule_change_accuracy": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "partial"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "Both weather-affected outdoor activities remain scheduled during the disruption window.",
+                "The rationale describes rescheduling that is not reflected in the structured itinerary.",
+                "The proposed schedule passes deterministic validation, but that does not establish that the weather disruption has been resolved.",
+                "Indoor replacement availability was not verified."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-02/iteration_2.md",
+              "evaluated_at": "2026-11-16T19:54:07.519287Z",
+              "deterministic_validation": {
+                "status": "valid",
+                "issues": []
+              },
+              "schedule_comparison": {
+                "retained_activities": [
+                  "american_history",
+                  "lincoln_memorial",
+                  "national_gallery",
+                  "natural_history",
+                  "wwii_memorial"
+                ],
+                "removed_activities": [],
+                "added_activities": [],
+                "rescheduled_activities": []
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": 3,
+                "average_slack_minutes": 18.5,
+                "low_slack_leg_count": 1,
+                "infeasible_leg_count": 0,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "national_gallery",
+                    "destination_activity_id": "american_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 60,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 55,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": 3,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "low_slack"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              },
+              "recovery_consistency": {
+                "affected_activities": [
+                  {
+                    "activity_id": "wwii_memorial",
+                    "status": "retained_during_disruption"
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "status": "retained_during_disruption"
+                  }
+                ],
+                "mandatory_activities": [
+                  {
+                    "activity_id": "natural_history",
+                    "preserved": true
+                  }
+                ],
+                "removed_activity_ids": [],
+                "added_activity_ids": [],
+                "rescheduled_activity_ids": [],
+                "unresolved_affected_activity_ids": [
+                  "wwii_memorial",
+                  "lincoln_memorial"
+                ],
+                "all_mandatory_activities_preserved": true,
+                "all_affected_activities_addressed": false
+              }
+            },
+            {
+              "evaluation_id": "P02-QWEN-002",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-02",
+              "iteration": 2,
+              "strategy": "minimal_disruption",
+              "prompt_version": "p02-v1",
+              "rubric_version": "2.1",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "partial",
+                "disruption_handling": "fail",
+                "schedule_change_accuracy": "fail",
+                "narrative_itinerary_consistency": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "partial"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "Both weather-affected outdoor activities remain scheduled during the disruption window.",
+                "The rationale describes rescheduling that is not reflected in the structured itinerary.",
+                "The proposed schedule passes deterministic validation, but that does not establish that the weather disruption has been resolved.",
+                "Indoor replacement availability was not verified."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-02/iteration_2.md",
+              "evaluated_at": "2026-11-16T20:04:11.835877Z",
+              "deterministic_validation": {
+                "status": "valid",
+                "issues": []
+              },
+              "schedule_comparison": {
+                "retained_activities": [
+                  "american_history",
+                  "lincoln_memorial",
+                  "national_gallery",
+                  "natural_history",
+                  "wwii_memorial"
+                ],
+                "removed_activities": [],
+                "added_activities": [],
+                "rescheduled_activities": []
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": 3,
+                "average_slack_minutes": 18.5,
+                "low_slack_leg_count": 1,
+                "infeasible_leg_count": 0,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "national_gallery",
+                    "destination_activity_id": "american_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 60,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 55,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": 3,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "low_slack"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              },
+              "recovery_consistency": {
+                "affected_activities": [
+                  {
+                    "activity_id": "wwii_memorial",
+                    "status": "retained_during_disruption"
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "status": "retained_during_disruption"
+                  }
+                ],
+                "mandatory_activities": [
+                  {
+                    "activity_id": "natural_history",
+                    "preserved": true
+                  }
+                ],
+                "removed_activity_ids": [],
+                "added_activity_ids": [],
+                "rescheduled_activity_ids": [],
+                "unresolved_affected_activity_ids": [
+                  "wwii_memorial",
+                  "lincoln_memorial"
+                ],
+                "all_mandatory_activities_preserved": true,
+                "all_affected_activities_addressed": false
+              }
+            },
+            {
+              "evaluation_id": "P02-QWEN-003",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-02",
+              "iteration": 3,
+              "strategy": "best_overall_feasibility",
+              "prompt_version": "p02-v1",
+              "rubric_version": "2.1",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "partial",
+                "disruption_handling": "fail",
+                "schedule_change_accuracy": "fail",
+                "narrative_itinerary_consistency": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "partial"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "Both weather-affected outdoor activities remain scheduled during the disruption window.",
+                "The rationale incorrectly claims the activities were moved before noon.",
+                "The proposed WWII Memorial visit overlaps the mandatory Natural History Museum visit by 20 minutes.",
+                "The proposed schedule does not provide sufficient time for the Natural History to WWII Memorial walking leg.",
+                "No verified indoor replacement activities were available in the investigation context.",
+                "The proposal changes activity times but does not successfully resolve the weather disruption."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-02/iteration_3.md",
+              "evaluated_at": "2026-11-16T20:58:27.210076Z",
+              "deterministic_validation": {
+                "status": "invalid",
+                "issues": [
+                  {
+                    "issue_type": "insufficient_travel_time",
+                    "description": "Insufficient time to travel between consecutive activities using the selected transportation mode.",
+                    "activity_ids": [
+                      "natural_history",
+                      "wwii_memorial"
+                    ]
+                  },
+                  {
+                    "issue_type": "activity_overlap",
+                    "description": "The second activity starts before the first activity has ended.",
+                    "activity_ids": [
+                      "natural_history",
+                      "wwii_memorial"
+                    ]
+                  }
+                ]
+              },
+              "schedule_comparison": {
+                "retained_activities": [
+                  "american_history",
+                  "national_gallery",
+                  "natural_history"
+                ],
+                "removed_activities": [],
+                "added_activities": [],
+                "rescheduled_activities": [
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "original_start": "2026-11-07T16:00:00",
+                    "proposed_start": "2026-11-07T15:40:00-05:00",
+                    "change_minutes": -20
+                  },
+                  {
+                    "activity_id": "wwii_memorial",
+                    "original_start": "2026-11-07T15:10:00",
+                    "proposed_start": "2026-11-07T14:30:00-05:00",
+                    "change_minutes": -40
+                  }
+                ]
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": -37,
+                "average_slack_minutes": 13.5,
+                "low_slack_leg_count": 0,
+                "infeasible_leg_count": 1,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "national_gallery",
+                    "destination_activity_id": "american_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 60,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 55,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": -20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": -37,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "infeasible"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 40,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 28,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              },
+              "recovery_consistency": {
+                "affected_activities": [
+                  {
+                    "activity_id": "wwii_memorial",
+                    "status": "retained_during_disruption"
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "status": "retained_during_disruption"
+                  }
+                ],
+                "mandatory_activities": [
+                  {
+                    "activity_id": "natural_history",
+                    "preserved": true
+                  }
+                ],
+                "removed_activity_ids": [],
+                "added_activity_ids": [],
+                "rescheduled_activity_ids": [
+                  "lincoln_memorial",
+                  "wwii_memorial"
+                ],
+                "unresolved_affected_activity_ids": [
+                  "wwii_memorial",
+                  "lincoln_memorial"
+                ],
+                "all_mandatory_activities_preserved": true,
+                "all_affected_activities_addressed": false
+              }
+            },
+            {
+              "evaluation_id": "P02-QWEN-004",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-02",
+              "iteration": 4,
+              "strategy": "minimal_disruption",
+              "prompt_version": "p02-v1",
+              "rubric_version": "2.1",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "partial",
+                "disruption_handling": "fail",
+                "schedule_change_accuracy": "fail",
+                "narrative_itinerary_consistency": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "partial"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "Both weather-affected outdoor activities remain scheduled during the noon-to-6 PM disruption window.",
+                "The rationale claims the outdoor activities were rescheduled before noon, but their structured start times remain 15:10 and 16:00.",
+                "The rationale describes a compressed schedule, although no activity start times or durations changed.",
+                "The proposal preserves the original itinerary and does not provide a verified recovery for either affected outdoor activity.",
+                "No verified indoor replacement activities were available in the supplied investigation context."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-02/iteration_4.md",
+              "evaluated_at": "2026-11-16T21:07:49.151694Z",
+              "deterministic_validation": {
+                "status": "valid",
+                "issues": []
+              },
+              "schedule_comparison": {
+                "retained_activities": [
+                  "american_history",
+                  "lincoln_memorial",
+                  "national_gallery",
+                  "natural_history",
+                  "wwii_memorial"
+                ],
+                "removed_activities": [],
+                "added_activities": [],
+                "rescheduled_activities": []
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": 3,
+                "average_slack_minutes": 18.5,
+                "low_slack_leg_count": 1,
+                "infeasible_leg_count": 0,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "national_gallery",
+                    "destination_activity_id": "american_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 60,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 55,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": 3,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "low_slack"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              },
+              "recovery_consistency": {
+                "affected_activities": [
+                  {
+                    "activity_id": "wwii_memorial",
+                    "status": "retained_during_disruption"
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "status": "retained_during_disruption"
+                  }
+                ],
+                "mandatory_activities": [
+                  {
+                    "activity_id": "natural_history",
+                    "preserved": true
+                  }
+                ],
+                "removed_activity_ids": [],
+                "added_activity_ids": [],
+                "rescheduled_activity_ids": [],
+                "unresolved_affected_activity_ids": [
+                  "wwii_memorial",
+                  "lincoln_memorial"
+                ],
+                "all_mandatory_activities_preserved": true,
+                "all_affected_activities_addressed": false
+              }
+            },
+            {
+              "evaluation_id": "P02-QWEN-005",
+              "model_name": "qwen3.5:4b",
+              "model_version": "4b",
+              "scenario_id": "P-02",
+              "iteration": 5,
+              "strategy": "best_overall_feasibility",
+              "prompt_version": "p02-v1",
+              "rubric_version": "2.1",
+              "criterion_results": {
+                "mandatory_constraint_preservation": "pass",
+                "flexible_constraint_adherence": "partial",
+                "disruption_handling": "fail",
+                "schedule_change_accuracy": "fail",
+                "narrative_itinerary_consistency": "fail",
+                "evidence_grounding": "partial",
+                "uncertainty_handling": "pass",
+                "unsupported_assumptions": "partial"
+              },
+              "overall_result": "partial",
+              "failure_observations": [
+                "Both weather-affected outdoor activities remain scheduled during the noon-to-6 PM disruption window.",
+                "The rationale claims both outdoor activities were moved before the onset of rain, but their structured start times are 14:30 and 15:40.",
+                "The World War II Memorial is scheduled from 14:30 to 15:00, overlapping the mandatory Natural History Museum visit, which runs until 14:50.",
+                "The supplied Natural History Museum-to-World War II Memorial walking estimate is 17 minutes, so the proposed sequence is also infeasible on travel time.",
+                "The rationale says the schedule preserves the original sequence and minimizes travel time, but the structured schedule does not establish a feasible recovery.",
+                "The proposal includes only four travel legs, while the expanded benchmark baseline contains eight directed travel legs; four supplied alternative route legs are not carried into the proposal.",
+                "No verified indoor replacement activities or venue availability were supplied by the investigation context.",
+                "The proposal assumes the supplied walking estimates remain accurate at the proposed times without evidence of time-specific validation."
+              ],
+              "structured_output_valid": true,
+              "latency_seconds": null,
+              "input_tokens": null,
+              "output_tokens": null,
+              "estimated_cost": null,
+              "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/P-02/iteration_5.md",
+              "evaluated_at": "2026-11-16T21:19:31.098824Z",
+              "deterministic_validation": {
+                "status": "invalid",
+                "issues": [
+                  {
+                    "issue_type": "insufficient_travel_time",
+                    "description": "Insufficient time to travel between consecutive activities using the selected transportation mode.",
+                    "activity_ids": [
+                      "natural_history",
+                      "wwii_memorial"
+                    ]
+                  },
+                  {
+                    "issue_type": "activity_overlap",
+                    "description": "The second activity starts before the first activity has ended.",
+                    "activity_ids": [
+                      "natural_history",
+                      "wwii_memorial"
+                    ]
+                  }
+                ]
+              },
+              "schedule_comparison": {
+                "retained_activities": [
+                  "american_history",
+                  "national_gallery",
+                  "natural_history"
+                ],
+                "removed_activities": [],
+                "added_activities": [],
+                "rescheduled_activities": [
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "original_start": "2026-11-07T16:00:00",
+                    "proposed_start": "2026-11-07T15:40:00-05:00",
+                    "change_minutes": -20
+                  },
+                  {
+                    "activity_id": "wwii_memorial",
+                    "original_start": "2026-11-07T15:10:00",
+                    "proposed_start": "2026-11-07T14:30:00-05:00",
+                    "change_minutes": -40
+                  }
+                ]
+              },
+              "schedule_robustness": {
+                "status": "complete",
+                "minimum_slack_minutes": -37,
+                "average_slack_minutes": 13.5,
+                "low_slack_leg_count": 0,
+                "infeasible_leg_count": 1,
+                "missing_estimate_count": 0,
+                "legs": [
+                  {
+                    "origin_activity_id": "national_gallery",
+                    "destination_activity_id": "american_history",
+                    "available_gap_minutes": 20,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 8,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "american_history",
+                    "destination_activity_id": "natural_history",
+                    "available_gap_minutes": 60,
+                    "travel_duration_minutes": 5,
+                    "slack_minutes": 55,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  },
+                  {
+                    "origin_activity_id": "natural_history",
+                    "destination_activity_id": "wwii_memorial",
+                    "available_gap_minutes": -20,
+                    "travel_duration_minutes": 17,
+                    "slack_minutes": -37,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "infeasible"
+                  },
+                  {
+                    "origin_activity_id": "wwii_memorial",
+                    "destination_activity_id": "lincoln_memorial",
+                    "available_gap_minutes": 40,
+                    "travel_duration_minutes": 12,
+                    "slack_minutes": 28,
+                    "selected_mode": "walking",
+                    "travel_source": "OpenRouteService",
+                    "status": "feasible"
+                  }
+                ]
+              },
+              "recovery_consistency": {
+                "affected_activities": [
+                  {
+                    "activity_id": "wwii_memorial",
+                    "status": "retained_during_disruption"
+                  },
+                  {
+                    "activity_id": "lincoln_memorial",
+                    "status": "retained_during_disruption"
+                  }
+                ],
+                "mandatory_activities": [
+                  {
+                    "activity_id": "natural_history",
+                    "preserved": true
+                  }
+                ],
+                "removed_activity_ids": [],
+                "added_activity_ids": [],
+                "rescheduled_activity_ids": [
+                  "lincoln_memorial",
+                  "wwii_memorial"
+                ],
+                "unresolved_affected_activity_ids": [
+                  "wwii_memorial",
+                  "lincoln_memorial"
+                ],
+                "all_mandatory_activities_preserved": true,
+                "all_affected_activities_addressed": false
+              }
+            }
+          ]
         }
       ]
     }

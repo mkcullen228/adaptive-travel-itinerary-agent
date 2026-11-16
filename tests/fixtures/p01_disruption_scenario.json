@@ -1,0 +1,9 @@
+{
+  "scenario_id": "P-01",
+  "scenario_type": "venue_unavailable",
+  "description": "The National Gallery of Art is unavailable during its scheduled visit from 9:00 AM to 10:30 AM.",
+  "affected_activity_ids": [
+    "national_gallery"
+  ],
+  "severity": "high"
+}

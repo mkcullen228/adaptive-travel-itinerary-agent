@@ -1,0 +1,26 @@
+{
+  "investigation_id": "p01_controlled_test",
+  "scenario_id": "P-01",
+  "retrieved_evidence": [],
+  "evidence_assessments": [
+    {
+      "claim": "A replacement venue is available and feasible for the affected itinerary.",
+      "status": "unsupported",
+      "relevance": "relevant",
+      "coverage": "none",
+      "source_quality_assessed": false,
+      "source_quality_warnings": [
+        "No retrieved evidence establishes replacement venue availability."
+      ],
+      "consistency_assessed": false,
+      "supporting_source_ids": [],
+      "conflicting_source_ids": [],
+      "explanation": "No verified replacement venue availability information was retrieved. Absence of evidence does not establish availability."
+    }
+  ],
+  "investigation_warnings": [
+    "Replacement venue availability has not been verified.",
+    "The availability of the remaining original activities has not been independently verified.",
+    "Schedule feasibility after removing the unavailable National Gallery has not been assessed."
+  ]
+}

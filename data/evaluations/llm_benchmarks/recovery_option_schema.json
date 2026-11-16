@@ -1,0 +1,287 @@
+{
+  "$defs": {
+    "Activity": {
+      "description": "Represents an individual activity within a travel itinerary.\n\nAn activity includes identifying information, location, scheduled\nstart time, duration, and attributes used during itinerary recovery\nand validation.\n\nEx: \n    museum = Activity(\n        activity_id=\"activity_001\",\n        name=\"National Gallery of Art\",\n        location=\"Washington, DC\",\n        start_time=datetime(2026, 11, 7, 10, 0),\n        duration_minutes=90,\n        mandatory=False,\n        indoor=True)\n    \n    museam.end_time",
+      "properties": {
+        "activity_id": {
+          "title": "Activity Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "start_time": {
+          "format": "date-time",
+          "title": "Start Time",
+          "type": "string"
+        },
+        "duration_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Minutes",
+          "type": "integer"
+        },
+        "mandatory": {
+          "default": false,
+          "title": "Mandatory",
+          "type": "boolean"
+        },
+        "indoor": {
+          "default": true,
+          "title": "Indoor",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "activity_id",
+        "name",
+        "location",
+        "start_time",
+        "duration_minutes"
+      ],
+      "title": "Activity",
+      "type": "object"
+    },
+    "Itinerary": {
+      "description": "Represents a travel itinerary for a specific destination and date.\n\nContains a collection of scheduled activities and the travel legs\nconnecting those activities. Travel estimates can support multiple\ntransportation modes.\n\nex: \n    itinerary_a = Itinerary(\n        itinerary_id=\"Fun Day Out\",\n        destination=\"Washington, DC\", \n        itinerary_date=date(2026, 11, 7),\n        activities=[\n            Activity(\n                activity_id=\"activity_001\",\n                name=\"National Gallery of Art\",\n                location=\"Washington, DC\",\n                start_time=datetime(2026, 11, 7, 10, 0),\n                duration_minutes=90,\n            ),\n            Activity(\n                activity_id=\"activity_002\",\n                name=\"Smithsonian's National Air and Space Museum\",\n                location=\"Washington, DC\",\n                start_time=datetime(2026, 11, 7, 13, 30),\n                duration_minutes=90,\n            ),\n        ]\n    )    ",
+      "properties": {
+        "itinerary_id": {
+          "title": "Itinerary Id",
+          "type": "string"
+        },
+        "destination": {
+          "title": "Destination",
+          "type": "string"
+        },
+        "itinerary_date": {
+          "format": "date",
+          "title": "Itinerary Date",
+          "type": "string"
+        },
+        "activities": {
+          "items": {
+            "$ref": "#/$defs/Activity"
+          },
+          "title": "Activities",
+          "type": "array"
+        },
+        "travel_legs": {
+          "items": {
+            "$ref": "#/$defs/TravelLeg"
+          },
+          "title": "Travel Legs",
+          "type": "array"
+        },
+        "routing_failures": {
+          "items": {
+            "$ref": "#/$defs/RoutingFailure"
+          },
+          "title": "Routing Failures",
+          "type": "array"
+        }
+      },
+      "required": [
+        "itinerary_id",
+        "destination",
+        "itinerary_date",
+        "activities"
+      ],
+      "title": "Itinerary",
+      "type": "object"
+    },
+    "RecoveryProposalStatus": {
+      "enum": [
+        "complete",
+        "partial",
+        "requires_investigation"
+      ],
+      "title": "RecoveryProposalStatus",
+      "type": "string"
+    },
+    "RecoveryStrategy": {
+      "enum": [
+        "minimal_disruption",
+        "best_overall_feasibility",
+        "preference_oriented"
+      ],
+      "title": "RecoveryStrategy",
+      "type": "string"
+    },
+    "RoutingFailure": {
+      "properties": {
+        "origin_activity_id": {
+          "title": "Origin Activity Id",
+          "type": "string"
+        },
+        "destination_activity_id": {
+          "title": "Destination Activity Id",
+          "type": "string"
+        },
+        "requested_mode": {
+          "title": "Requested Mode",
+          "type": "string"
+        },
+        "failure_reason": {
+          "title": "Failure Reason",
+          "type": "string"
+        },
+        "attempted_at": {
+          "format": "date-time",
+          "title": "Attempted At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_activity_id",
+        "destination_activity_id",
+        "requested_mode",
+        "failure_reason"
+      ],
+      "title": "RoutingFailure",
+      "type": "object"
+    },
+    "TravelEstimate": {
+      "description": "Stores a travel-time estimate for a specific transportation mode.\n\nIncludes the estimated duration and the source of the estimate.\n\nEx: \n    TravelEstimate(\n        mode=\"walking\",\n        duration_minutes=12,\n        source=\"manual_test_data\",\n        )",
+      "properties": {
+        "mode": {
+          "title": "Mode",
+          "type": "string"
+        },
+        "duration_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Minutes",
+          "type": "integer"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "number"
+        },
+        "distance_meters": {
+          "exclusiveMinimum": 0,
+          "title": "Distance Meters",
+          "type": "number"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "duration_minutes",
+        "duration_seconds",
+        "distance_meters",
+        "source"
+      ],
+      "title": "TravelEstimate",
+      "type": "object"
+    },
+    "TravelLeg": {
+      "description": "Represents travel between two activities in an itinerary.\n\nStores available travel estimates for different transportation\nmodes and identifies which mode is selected for itinerary validation.\n\nEx: \n    TravelLeg(\n        origin_activity_id=\"activity_001\",\n        destination_activity_id=\"activity_002\",\n        estimates=[\n            TravelEstimate(\n                mode=\"walking\",\n                duration_minutes=12,\n                source=\"manual_test_data\",\n                ), \n            TravelEstimate(\n                mode=\"driving\",\n                duration_minutes=8,\n                source=\"manual_test_data\",\n                )\n        ], \n        selected_mode=\"walking\"\n    )",
+      "properties": {
+        "origin_activity_id": {
+          "title": "Origin Activity Id",
+          "type": "string"
+        },
+        "destination_activity_id": {
+          "title": "Destination Activity Id",
+          "type": "string"
+        },
+        "estimates": {
+          "items": {
+            "$ref": "#/$defs/TravelEstimate"
+          },
+          "title": "Estimates",
+          "type": "array"
+        },
+        "selected_mode": {
+          "title": "Selected Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "origin_activity_id",
+        "destination_activity_id",
+        "estimates",
+        "selected_mode"
+      ],
+      "title": "TravelLeg",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "option_id": {
+      "title": "Option Id",
+      "type": "string"
+    },
+    "strategy": {
+      "$ref": "#/$defs/RecoveryStrategy"
+    },
+    "proposed_itinerary": {
+      "$ref": "#/$defs/Itinerary"
+    },
+    "proposal_status": {
+      "$ref": "#/$defs/RecoveryProposalStatus"
+    },
+    "rationale": {
+      "title": "Rationale",
+      "type": "string"
+    },
+    "preserved_constraints": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Preserved Constraints",
+      "type": "array"
+    },
+    "violated_constraints": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Violated Constraints",
+      "type": "array"
+    },
+    "trade_offs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Trade Offs",
+      "type": "array"
+    },
+    "supporting_evidence_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Supporting Evidence Ids",
+      "type": "array"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "uncertainties": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainties",
+      "type": "array"
+    }
+  },
+  "required": [
+    "option_id",
+    "strategy",
+    "proposed_itinerary",
+    "proposal_status",
+    "rationale"
+  ],
+  "title": "RecoveryOption",
+  "type": "object"
+}
