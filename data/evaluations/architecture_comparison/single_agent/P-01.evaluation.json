@@ -1,0 +1,163 @@
+{
+  "evaluation_version": "deterministic_eval_v1",
+  "evaluated_at_utc": "2026-11-17T21:05:39.517360+00:00",
+  "benchmark": {
+    "benchmark_id": "P-01-SINGLE-AGENT",
+    "scenario_id": "P-01",
+    "proposal_id": "recovery_proposal_001"
+  },
+  "generation": {
+    "model_name": "qwen3.5:4b",
+    "strategy": "minimal_disruption",
+    "prompt_version": "shared_generator_v1",
+    "latency_seconds": 39.177682208130136,
+    "input_tokens": 2420,
+    "output_tokens": 1184,
+    "structured_output_valid": true
+  },
+  "source_artifacts": {
+    "raw_response_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/architecture_comparison/single_agent/P-01.json",
+    "generation_metadata_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/evaluations/architecture_comparison/single_agent/P-01.metadata.json",
+    "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07.json",
+    "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_investigation_context.json",
+    "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_disruption_scenario.json"
+  },
+  "results": {
+    "deterministic_validation": {
+      "status": "incomplete",
+      "issues": [
+        {
+          "issue_type": "missing_travel_estimate",
+          "description": "Missing selected travel estimate between consecutive activities.",
+          "activity_ids": [
+            "american_history",
+            "natural_history"
+          ]
+        },
+        {
+          "issue_type": "missing_travel_estimate",
+          "description": "Missing selected travel estimate between consecutive activities.",
+          "activity_ids": [
+            "natural_history",
+            "wwii_memorial"
+          ]
+        },
+        {
+          "issue_type": "missing_travel_estimate",
+          "description": "Missing selected travel estimate between consecutive activities.",
+          "activity_ids": [
+            "wwii_memorial",
+            "lincoln_memorial"
+          ]
+        }
+      ]
+    },
+    "recovery_consistency": {
+      "affected_activities": [
+        {
+          "activity_id": "national_gallery",
+          "status": "removed"
+        }
+      ],
+      "mandatory_activities": [
+        {
+          "activity_id": "natural_history",
+          "preserved": true
+        }
+      ],
+      "removed_activity_ids": [
+        "national_gallery"
+      ],
+      "added_activity_ids": [],
+      "rescheduled_activity_ids": [
+        "american_history",
+        "lincoln_memorial",
+        "natural_history",
+        "wwii_memorial"
+      ],
+      "unresolved_affected_activity_ids": [],
+      "all_mandatory_activities_preserved": true,
+      "all_affected_activities_addressed": true
+    },
+    "schedule_comparison": {
+      "retained_activities": [],
+      "removed_activities": [
+        "national_gallery"
+      ],
+      "added_activities": [],
+      "rescheduled_activities": [
+        {
+          "activity_id": "american_history",
+          "original_start": "2026-11-07T10:50:00",
+          "proposed_start": "2026-11-07T09:00:00-05:00",
+          "change_minutes": -110
+        },
+        {
+          "activity_id": "lincoln_memorial",
+          "original_start": "2026-11-07T15:50:00",
+          "proposed_start": "2026-11-07T12:50:00-05:00",
+          "change_minutes": -180
+        },
+        {
+          "activity_id": "natural_history",
+          "original_start": "2026-11-07T13:20:00",
+          "proposed_start": "2026-11-07T10:50:00-05:00",
+          "change_minutes": -150
+        },
+        {
+          "activity_id": "wwii_memorial",
+          "original_start": "2026-11-07T15:10:00",
+          "proposed_start": "2026-11-07T12:20:00-05:00",
+          "change_minutes": -170
+        }
+      ]
+    },
+    "schedule_robustness": {
+      "status": "incomplete",
+      "minimum_slack_minutes": null,
+      "average_slack_minutes": null,
+      "low_slack_leg_count": 0,
+      "infeasible_leg_count": 0,
+      "missing_estimate_count": 3,
+      "legs": [
+        {
+          "origin_activity_id": "american_history",
+          "destination_activity_id": "natural_history",
+          "available_gap_minutes": 20,
+          "travel_duration_minutes": null,
+          "slack_minutes": null,
+          "selected_mode": null,
+          "travel_source": null,
+          "status": "missing_estimate"
+        },
+        {
+          "origin_activity_id": "natural_history",
+          "destination_activity_id": "wwii_memorial",
+          "available_gap_minutes": 0,
+          "travel_duration_minutes": null,
+          "slack_minutes": null,
+          "selected_mode": null,
+          "travel_source": null,
+          "status": "missing_estimate"
+        },
+        {
+          "origin_activity_id": "wwii_memorial",
+          "destination_activity_id": "lincoln_memorial",
+          "available_gap_minutes": 0,
+          "travel_duration_minutes": null,
+          "slack_minutes": null,
+          "selected_mode": null,
+          "travel_source": null,
+          "status": "missing_estimate"
+        }
+      ]
+    },
+    "narrative_consistency": {
+      "status": "inconclusive",
+      "checked_claims": [],
+      "inconsistent_claims": [],
+      "checked_claim_count": 0,
+      "inconsistent_claim_count": 0
+    }
+  }
+}

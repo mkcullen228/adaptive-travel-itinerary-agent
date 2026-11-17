@@ -53,6 +53,8 @@ def initialize_agent_state(
         "rejected_options": [],
         "revision_count": 0,
         "planning_rationale": "",
+        "recovery_planning_input": None,
+        "recovery_generation_metadata": None,
 
         # Validation, approval, and finalization
         "itinerary_validation_result": None,

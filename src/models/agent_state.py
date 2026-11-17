@@ -16,6 +16,7 @@ from src.models.agent_workflow import (
     ApprovalRecord,
     ApprovalStatus,
     ConstraintChange,
+    RecoveryPlanningInput,
 )
 
 from src.workflows.state_reducers import (
@@ -73,6 +74,10 @@ class TravelAgentState(TypedDict):
     rejected_options: list[RejectedOption]
     revision_count: int
     planning_rationale: str
+    recovery_planning_input: RecoveryPlanningInput | None
+    recovery_generation_metadata: dict[
+        str, str | int | float | None
+    ] | None
 
     # Validation, approval, and finalization
     validation_results: list[OptionValidation]
