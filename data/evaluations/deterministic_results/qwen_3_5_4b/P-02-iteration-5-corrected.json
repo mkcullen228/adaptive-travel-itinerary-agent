@@ -1,0 +1,165 @@
+{
+  "evaluation_version": "deterministic_eval_v1",
+  "evaluated_at_utc": "2026-11-17T18:59:34.822228+00:00",
+  "benchmark": {
+    "benchmark_id": "P-02-ITERATION-5-CORRECTED",
+    "scenario_id": "P-02",
+    "proposal_id": "recovery_proposal_dc_2026_11_07_heavy_rain"
+  },
+  "generation": {
+    "model_name": "qwen3.5:4b",
+    "strategy": "best_overall_feasibility",
+    "prompt_version": "shared_generator_v1",
+    "latency_seconds": 59.364129999885336,
+    "input_tokens": 3541,
+    "output_tokens": 1794,
+    "structured_output_valid": true
+  },
+  "source_artifacts": {
+    "raw_response_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/consolidated/P-02-iteration-5-corrected.json",
+    "generation_metadata_path": "data/evaluations/llm_benchmarks/raw_responses/qwen_3_5_4b/consolidated/P-02-iteration-5-corrected.metadata.json",
+    "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07_p02_routes_expanded.json",
+    "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p02_investigation_context.json",
+    "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p02_disruption_scenario.json"
+  },
+  "results": {
+    "deterministic_validation": {
+      "status": "valid",
+      "issues": []
+    },
+    "recovery_consistency": {
+      "affected_activities": [
+        {
+          "activity_id": "wwii_memorial",
+          "status": "retained_during_disruption"
+        },
+        {
+          "activity_id": "lincoln_memorial",
+          "status": "retained_during_disruption"
+        }
+      ],
+      "mandatory_activities": [
+        {
+          "activity_id": "natural_history",
+          "preserved": true
+        }
+      ],
+      "removed_activity_ids": [],
+      "added_activity_ids": [],
+      "rescheduled_activity_ids": [],
+      "unresolved_affected_activity_ids": [
+        "wwii_memorial",
+        "lincoln_memorial"
+      ],
+      "all_mandatory_activities_preserved": true,
+      "all_affected_activities_addressed": false
+    },
+    "schedule_comparison": {
+      "retained_activities": [
+        "american_history",
+        "lincoln_memorial",
+        "national_gallery",
+        "natural_history",
+        "wwii_memorial"
+      ],
+      "removed_activities": [],
+      "added_activities": [],
+      "rescheduled_activities": []
+    },
+    "schedule_robustness": {
+      "status": "complete",
+      "minimum_slack_minutes": 3,
+      "average_slack_minutes": 18.5,
+      "low_slack_leg_count": 1,
+      "infeasible_leg_count": 0,
+      "missing_estimate_count": 0,
+      "legs": [
+        {
+          "origin_activity_id": "national_gallery",
+          "destination_activity_id": "american_history",
+          "available_gap_minutes": 20,
+          "travel_duration_minutes": 12,
+          "slack_minutes": 8,
+          "selected_mode": "walking",
+          "travel_source": "OpenRouteService",
+          "status": "feasible"
+        },
+        {
+          "origin_activity_id": "american_history",
+          "destination_activity_id": "natural_history",
+          "available_gap_minutes": 60,
+          "travel_duration_minutes": 5,
+          "slack_minutes": 55,
+          "selected_mode": "walking",
+          "travel_source": "OpenRouteService",
+          "status": "feasible"
+        },
+        {
+          "origin_activity_id": "natural_history",
+          "destination_activity_id": "wwii_memorial",
+          "available_gap_minutes": 20,
+          "travel_duration_minutes": 17,
+          "slack_minutes": 3,
+          "selected_mode": "walking",
+          "travel_source": "OpenRouteService",
+          "status": "low_slack"
+        },
+        {
+          "origin_activity_id": "wwii_memorial",
+          "destination_activity_id": "lincoln_memorial",
+          "available_gap_minutes": 20,
+          "travel_duration_minutes": 12,
+          "slack_minutes": 8,
+          "selected_mode": "walking",
+          "travel_source": "OpenRouteService",
+          "status": "feasible"
+        }
+      ]
+    },
+    "narrative_consistency": {
+      "status": "inconsistent",
+      "checked_claims": [
+        {
+          "activity_id": "natural_history",
+          "activity_name": "National Museum of Natural History",
+          "claimed_start_time": "12:00 PM",
+          "actual_start_time": "1:20 PM"
+        },
+        {
+          "activity_id": "wwii_memorial",
+          "activity_name": "World War II Memorial",
+          "claimed_start_time": "10:50 AM",
+          "actual_start_time": "3:10 PM"
+        },
+        {
+          "activity_id": "lincoln_memorial",
+          "activity_name": "Lincoln Memorial",
+          "claimed_start_time": "11:40 AM",
+          "actual_start_time": "4:00 PM"
+        }
+      ],
+      "inconsistent_claims": [
+        {
+          "activity_id": "natural_history",
+          "activity_name": "National Museum of Natural History",
+          "claimed_start_time": "12:00 PM",
+          "actual_start_time": "1:20 PM"
+        },
+        {
+          "activity_id": "wwii_memorial",
+          "activity_name": "World War II Memorial",
+          "claimed_start_time": "10:50 AM",
+          "actual_start_time": "3:10 PM"
+        },
+        {
+          "activity_id": "lincoln_memorial",
+          "activity_name": "Lincoln Memorial",
+          "claimed_start_time": "11:40 AM",
+          "actual_start_time": "4:00 PM"
+        }
+      ],
+      "checked_claim_count": 3,
+      "inconsistent_claim_count": 3
+    }
+  }
+}

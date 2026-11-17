@@ -126,3 +126,4 @@ class RecoveryPlanningInput(BaseModel):
     strategy: RecoveryStrategy
     revision_count: int = Field(default=0, ge=0)
     rejected_options: list[RejectedOption] = Field(default_factory=list)
+    additional_instructions: str = ""
