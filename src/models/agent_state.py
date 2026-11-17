@@ -1,7 +1,10 @@
-from datetime import datetime
 from enum import Enum
-from typing import TypedDict
+from datetime import datetime
+from typing import Annotated, TypedDict
 
+from src.models.itinerary import Itinerary
+from src.models.disruption import DisruptionScenario
+from src.models.investigation import InvestigationResult
 from src.models.agent_workflow import (
     Constraint,
     ConstraintInterpretation,
@@ -13,10 +16,12 @@ from src.models.agent_workflow import (
     ApprovalStatus,
     ConstraintChange,
 )
-from src.models.itinerary import Itinerary
-from src.models.disruption import DisruptionScenario
-from src.models.investigation import InvestigationResult
 
+from src.workflows.state_reducers import (
+    append_execution_events,
+    append_unique_strings,
+    append_approval_records,
+)
 
 
 class WorkflowStage(str, Enum):
@@ -47,6 +52,9 @@ class TravelAgentState(TypedDict):
     # Original inputs
     original_itinerary: Itinerary
     disruption_scenario: DisruptionScenario
+    venue_id: str
+    latitude: float
+    longitude: float
     
     # User instructions and constraints
     user_instructions: str
@@ -68,7 +76,10 @@ class TravelAgentState(TypedDict):
     # Validation, approval, and finalization
     validation_results: list[OptionValidation]
     approval_status: ApprovalStatus
-    approval_history: list[ApprovalRecord]
+    approval_history: Annotated[
+        list[ApprovalRecord],
+        append_approval_records,
+    ]
     approved_constraint_changes: list[ConstraintChange]
     final_itinerary: Itinerary | None
     final_report: str | None
@@ -77,7 +88,15 @@ class TravelAgentState(TypedDict):
     tool_call_counts: dict[str, int]
     total_tool_call_count: int
     llm_call_count: int
-    execution_trace: list[ExecutionEvent]
-    warnings: list[str]
-    error_details: list[str]
-
+    execution_trace: Annotated[
+        list[ExecutionEvent],
+        append_execution_events,
+    ]
+    warnings: Annotated[
+        list[str],
+        append_unique_strings,
+    ]
+    error_details: Annotated[
+        list[str],
+        append_unique_strings,
+    ]

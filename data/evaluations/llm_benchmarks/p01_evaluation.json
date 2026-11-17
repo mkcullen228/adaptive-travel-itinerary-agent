@@ -1,0 +1,36 @@
+
+{
+  "scenario_id": "P-01",
+  "scenario_description": "National Gallery of Art unavailable",
+  "runs": [
+    {
+      "iteration": 1,
+      "model": "qwen3.5:4b",
+      "strategy": "minimal_disruption",
+      "structured_output": {
+        "passed": null,
+        "errors": []
+      },
+      "deterministic_validation": {
+        "status": null,
+        "issues": []
+      },
+      "schedule_comparison": {
+        "retained_activities": [],
+        "removed_activities": [],
+        "added_activities": [],
+        "rescheduled_activities": [],
+        "rationale_matches_changes": null
+      },
+      "quality_scores": {
+        "constraint_adherence": null,
+        "disruption_handling": null,
+        "schedule_change_accuracy": null,
+        "evidence_grounding": null,
+        "uncertainty_handling": null,
+        "unsupported_assumptions": null
+      },
+      "review_notes": []
+    }
+  ]
+}

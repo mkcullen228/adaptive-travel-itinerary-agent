@@ -1,0 +1,33 @@
+{
+  "investigation_id": "p02_controlled_test",
+  "scenario_id": "P-02",
+  "weather_result": {
+    "latitude": 38.9072,
+    "longitude": -77.0369,
+    "retrieved_at": "2026-11-06T18:00:00-05:00",
+    "forecast_source_url": "https://example.org/benchmark/p02/forecast",
+    "alerts_source_url": "https://example.org/benchmark/p02/alerts",
+    "forecast_periods": [
+      {
+        "start_time": "2026-11-07T12:00:00-05:00",
+        "end_time": "2026-11-07T18:00:00-05:00",
+        "temperature": 12,
+        "temperature_unit": "C",
+        "precipitation_probability": 95,
+        "wind_speed": "15 mph",
+        "short_forecast": "Heavy rain",
+        "detailed_forecast": "Synthetic benchmark condition: heavy rain throughout the affected period. Outdoor sightseeing is considered unsuitable."
+      }
+    ],
+    "alerts": [],
+    "retrieval_status": "success"
+  },
+  "retrieved_evidence": [],
+  "evidence_assessments": [],
+  "investigation_warnings": [
+    "Weather information is synthetic controlled benchmark input and is not a live forecast.",
+    "No replacement venue availability information has been retrieved or verified.",
+    "Indoor alternatives must not be treated as confirmed available activities.",
+    "Any proposed outdoor activity rescheduling before 12:00 PM must be supported by feasible schedule timing and available walking estimates."
+  ]
+}
