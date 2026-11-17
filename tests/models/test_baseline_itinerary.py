@@ -27,12 +27,17 @@ def test_baseline_itinerary_loads():
     assert mandatory_activities[0].activity_id == "natural_history"
     
     assert len(itinerary.travel_legs) == 4
-    # assert itinerary.travel_legs == [
-    #     TravelLeg(origin_activity_id='national_gallery', destination_activity_id='american_history', estimates=[
-    #         TravelEstimate(mode='walking', duration_minutes=12, duration_seconds=683.5, distance_meters=949.3, source='OpenRouteService')], selected_mode='walking'), 
-    #     TravelLeg(origin_activity_id='american_history', destination_activity_id='natural_history', estimates=[
-    #         TravelEstimate(mode='walking', duration_minutes=5, duration_seconds=299.5, distance_meters=416.0, source='OpenRouteService')], selected_mode='walking'), 
-    #     TravelLeg(origin_activity_id='natural_history', destination_activity_id='wwii_memorial', estimates=[
-    #         TravelEstimate(mode='walking', duration_minutes=17, duration_seconds=985.9, distance_meters=1369.3, source='OpenRouteService')], selected_mode='walking'), 
-    #     TravelLeg(origin_activity_id='wwii_memorial', destination_activity_id='lincoln_memorial', estimates=[
-    #         TravelEstimate(mode='walking', duration_minutes=12, duration_seconds=694.1, distance_meters=964.0, source='OpenRouteService')], selected_mode='walking')]
+    assert len(itinerary.travel_legs) == 4
+
+    assert [
+        (leg.origin_activity_id, leg.destination_activity_id)
+        for leg in itinerary.travel_legs
+    ] == [
+        ("national_gallery", "american_history"),
+        ("american_history", "natural_history"),
+        ("natural_history", "wwii_memorial"),
+        ("wwii_memorial", "lincoln_memorial"),
+    ]
+
+    assert all(leg.estimates == [] for leg in itinerary.travel_legs)
+   

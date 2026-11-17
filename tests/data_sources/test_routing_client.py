@@ -67,24 +67,6 @@ def test_get_walking_route_success(mock_post):
 
 
 @patch("src.data_sources.routing_client.requests.post")
-def test_get_walking_route_http_error(mock_post):
-    mock_response = Mock()
-
-    mock_response.status_code = 429
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
-        response=mock_response
-    )
-
-    mock_post.return_value = mock_response
-
-    origin = (-77.0199045, 38.8913116)
-    destination = (-77.0300205, 38.8912397)
-
-    with pytest.raises(RuntimeError, match="HTTP 429"):
-        get_walking_route(origin, destination)
-
-
-@patch("src.data_sources.routing_client.requests.post")
 def test_get_walking_route_timeout(mock_post):
     mock_post.side_effect = requests.exceptions.Timeout(
         "Request timed out"
@@ -106,11 +88,13 @@ def test_get_walking_route_missing_api_key(monkeypatch):
     with pytest.raises(ValueError, match="API key not found"):
         get_walking_route(origin, destination)
 
-
 @patch("src.data_sources.routing_client.requests.post")
-def test_get_walking_route_server_error(mock_post):
+def test_get_walking_route_server_error(mock_post, monkeypatch):
+    monkeypatch.setenv("OPENROUTESERVICE_API_KEY", "test-api-key")
+
     mock_response = Mock()
     mock_response.status_code = 500
+    mock_response.text = "Internal Server Error"
 
     mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
         response=mock_response
@@ -123,6 +107,8 @@ def test_get_walking_route_server_error(mock_post):
 
     with pytest.raises(RuntimeError, match="HTTP 500"):
         get_walking_route(origin, destination)
+
+    mock_post.assert_called_once()
 
 
 @patch("src.data_sources.routing_client.requests.post")

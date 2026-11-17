@@ -54,6 +54,31 @@
       "indoor": false
     }
   ],
-  "travel_legs": [],
+  "travel_legs": [
+    {
+      "origin_activity_id": "national_gallery",
+      "destination_activity_id": "american_history",
+      "estimates": [],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "american_history",
+      "destination_activity_id": "natural_history",
+      "estimates": [],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "natural_history",
+      "destination_activity_id": "wwii_memorial",
+      "estimates": [],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "wwii_memorial",
+      "destination_activity_id": "lincoln_memorial",
+      "estimates": [],
+      "selected_mode": "walking"
+    }
+  ],
   "routing_failures": []
 }

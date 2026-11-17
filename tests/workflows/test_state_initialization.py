@@ -122,3 +122,21 @@ def test_initialize_agent_state_creates_independent_states():
 
     assert state_2["warnings"] == []
     assert state_2["tool_call_counts"] == {}
+
+
+def test_initialize_agent_state_without_disruption():
+    itinerary, _ = make_test_inputs()
+
+    state = initialize_agent_state(itinerary=itinerary)
+
+    assert state["original_itinerary"] is itinerary
+    assert state["disruption_scenario"] is None
+    assert state["venue_id"] is None
+    assert state["latitude"] is None
+    assert state["longitude"] is None
+
+    assert state["investigation_result"] is None
+    assert state["itinerary_validation_result"] is None
+    assert state["validation_results"] == []
+    assert state["recovery_options"] == []
+    assert state["status"].value == "in_progress"
