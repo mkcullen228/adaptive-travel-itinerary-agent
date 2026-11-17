@@ -56,6 +56,11 @@ def get_walking_route(
 
 
     try:
+        print("OpenRouteService request")
+        print("Origin:", origin_coordinates)
+        print("Destination:", destination_coordinates)
+        print("Profile: foot-walking")
+
         response = requests.post(
             url,
             json=payload,
@@ -86,6 +91,21 @@ def get_walking_route(
             "duration_seconds": duration,
             "distance_meters": distance
         }
+
+    except requests.exceptions.HTTPError as error:
+        response = error.response
+
+        response_body = (
+            response.text[:2000]
+            if response is not None
+            else "No response body"
+        )
+
+        raise RuntimeError(
+            f"OpenRouteService returned HTTP "
+            f"{response.status_code if response is not None else 'unknown'}. "
+            f"Response: {response_body}"
+        ) from error
 
     except requests.exceptions.HTTPError as error:
         raise RuntimeError(

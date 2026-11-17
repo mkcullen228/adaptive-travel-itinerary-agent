@@ -9,6 +9,7 @@ from src.models.itinerary import Itinerary
 activities = [
     Activity(
         activity_id="national_gallery",
+        attraction_id="national_gallery",
         name="National Gallery of Art",
         location="6th Street and Constitution Avenue NW, Washington, DC",
         start_time=datetime(2026, 11, 7, 9, 0),
@@ -18,6 +19,7 @@ activities = [
     ),
     Activity(
         activity_id="american_history",
+        attraction_id="american_history",
         name="National Museum of American History",
         location="1300 Constitution Ave. NW, Washington, DC",
         start_time=datetime(2026, 11, 7, 10, 50),
@@ -27,6 +29,7 @@ activities = [
     ),
     Activity(
         activity_id="natural_history",
+        attraction_id="natural_history",
         name="National Museum of Natural History",
         location="10th St. & Constitution Ave. NW, Washington, DC",
         start_time=datetime(2026, 11, 7, 13, 20),
@@ -36,6 +39,7 @@ activities = [
     ),
     Activity(
         activity_id="wwii_memorial",
+        attraction_id="wwii_memorial",
         name="World War II Memorial",
         location="1750 Independence Ave. SW, Washington, DC",
         start_time=datetime(2026, 11, 7, 15, 10),
@@ -45,6 +49,7 @@ activities = [
     ),
     Activity(
         activity_id="lincoln_memorial",
+        attraction_id="lincoln_memorial",
         name="Lincoln Memorial",
         location="2 Lincoln Memorial Circle NW, Washington, DC",
         start_time=datetime(2026, 11, 7, 15, 50),

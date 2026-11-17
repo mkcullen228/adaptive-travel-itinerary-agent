@@ -24,6 +24,7 @@ class Activity(BaseModel):
 
     """
     activity_id: str
+    attraction_id: str | None = None
     name: str
     location: str
 

@@ -17,15 +17,15 @@
 #     print(alert.event, alert.severity)
 
 
-from pathlib import Path
-import json
+# from pathlib import Path
+# import json
 
-path = Path("data/venues/venue_sources.json").resolve()
+# path = Path("data/venues/venue_sources.json").resolve()
 
-print("Registry path:", path)
+# print("Registry path:", path)
 
-data = json.loads(path.read_text(encoding="utf-8"))
+# data = json.loads(path.read_text(encoding="utf-8"))
 
-for venue in data:
-    for source in venue["sources"]:
-        print(source["source_id"], repr(source["url"]))
+# for venue in data:
+#     for source in venue["sources"]:
+#         print(source["source_id"], repr(source["url"]))

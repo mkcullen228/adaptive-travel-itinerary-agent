@@ -146,6 +146,7 @@ def test_process_itinerary_routes_all_valid():
         itinerary_date=date(2026, 11, 7),
         activities=[Activity(
                         activity_id="national_gallery",
+                        attraction_id="national_gallery",
                         name="National Gallery of Art",
                         location="Washington, DC",
                         start_time=datetime(2026, 11, 7, 10, 0),
@@ -153,6 +154,7 @@ def test_process_itinerary_routes_all_valid():
                     ),
                     Activity(
                         activity_id="american_history",
+                        attraction_id="american_history",
                         name="National Museum of American History",
                         location="Washington, DC",
                         start_time=datetime(2026, 11, 7, 12, 00),
