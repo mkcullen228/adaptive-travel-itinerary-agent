@@ -2,11 +2,15 @@ import json
 import ollama
 from pathlib import Path
 
-from src.models.agent_workflow import RecoveryOption
+from src.models.agent_workflow import (
+    RecoveryPlanningInput,
+    RecoveryStrategy,
+)
 from src.models.disruption import DisruptionScenario
 from src.models.investigation import InvestigationResult
 from src.models.itinerary import Itinerary
 from src.validation.schedule_validator import validate_itinerary
+from src.recovery.generation import generate_recovery_option
 
 from src.prompts.recovery_planning import RECOVERY_SYSTEM_PROMPT
 from src.prompts.strategy_instructions import (
@@ -94,52 +98,62 @@ def run_benchmark():
         investigation_result,
         disruption_scenario,
     ) = load_test_inputs()
-    print("Starting Qwen P-01 benchmark...", flush=True)
-    user_prompt = build_user_prompt(
-        original_itinerary,
-        investigation_result,
-        disruption_scenario,
-    )
-    print("Sending request to Ollama...", flush=True)
-    response = ollama.chat(
-        model=MODEL_NAME,
-        think=False,
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    RECOVERY_SYSTEM_PROMPT
-                    + "\n\n"
-                    + MINIMAL_DISRUPTION_INSTRUCTION
-                ),
-            },
-            {
-                "role": "user",
-                "content": user_prompt,
-            },
-        ],
-        format=RecoveryOption.model_json_schema(),
-        options={"temperature": 0},
-    )
-    print("Received response from Ollama.", flush=True)
-    raw_response = response.message.content
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(raw_response, encoding="utf-8")
 
-    validated_option = RecoveryOption.model_validate_json(raw_response)
+    print("Starting P-01 benchmark using shared generator...", flush=True)
+
+    planning_input = RecoveryPlanningInput(
+        original_itinerary=original_itinerary,
+        disruption_scenario=disruption_scenario,
+        investigation_result=investigation_result,
+        user_instructions=(
+            "Recover the itinerary after the confirmed "
+            "National Gallery unavailability."
+        ),
+        strategy=RecoveryStrategy.MINIMAL_DISRUPTION,
+        additional_instructions=(
+            "Preserve all unaffected original activities provisionally. "
+            "Remove the confirmed unavailable National Gallery. "
+            "Do not imply that the remaining venues are available. "
+            "Do not claim schedule feasibility has been established. "
+            "Do not invent replacement activities. "
+            "Explain all remaining uncertainties."
+        ),
+    )
+
+    result = generate_recovery_option(
+        planning_input=planning_input,
+        model_name=MODEL_NAME,
+    )
+
+    # Use a new output filename so the historical response is preserved.
+    shared_output_path = OUTPUT_PATH.with_name(
+        "structured_output_shared_generator_1.json"
+    )
+
+    shared_output_path.parent.mkdir(parents=True, exist_ok=True)
+    shared_output_path.write_text(
+        result.raw_response,
+        encoding="utf-8",
+    )
 
     validation_result = validate_itinerary(
-        validated_option.proposed_itinerary
+        result.recovery_option.proposed_itinerary
     )
+
+    print("\nGENERATION METADATA:")
+    print(f"Model: {result.model_name}")
+    print(f"Latency: {result.latency_seconds:.2f} seconds")
+    print(f"Input tokens: {result.input_tokens}")
+    print(f"Output tokens: {result.output_tokens}")
 
     print("\nDETERMINISTIC VALIDATION:")
     print(validation_result.model_dump_json(indent=2))
 
     print("\nSTRUCTURED OUTPUT VALIDATION: PASSED")
     print("\nMODEL RESPONSE:")
-    print(validated_option.model_dump_json(indent=2))
+    print(result.recovery_option.model_dump_json(indent=2))
 
-    print(f"\nRaw response saved to: {OUTPUT_PATH}")
+    print(f"\nRaw response saved to: {shared_output_path}")
 
 
 if __name__ == "__main__":

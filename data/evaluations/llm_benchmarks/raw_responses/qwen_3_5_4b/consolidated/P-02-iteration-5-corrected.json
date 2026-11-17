@@ -1,0 +1,137 @@
+{
+  "option_id": "recovery_proposal_dc_2026_11_07_heavy_rain",
+  "strategy": "best_overall_feasibility",
+  "proposed_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "national_gallery",
+        "name": "National Gallery of Art",
+        "location": "6th Street and Constitution Avenue NW, Washington, DC",
+        "start_time": "2026-11-07T09:00:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T13:20:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T15:10:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T16:00:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "national_gallery",
+        "destination_activity_id": "american_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 683.5,
+            "distance_meters": 949.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 5,
+            "duration_seconds": 299.5,
+            "distance_meters": 416.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 17,
+            "duration_seconds": 985.9,
+            "distance_meters": 1369.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 694.1,
+            "distance_meters": 964.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      }
+    ]
+  },
+  "proposal_status": "partial",
+  "rationale": "The original itinerary contains two outdoor activities scheduled during the predicted heavy rain period (12:00 PM to 6:00 PM): the World War II Memorial and the Lincoln Memorial. The investigation confirms a 95% probability of heavy rain with unsuitable conditions for outdoor sightseeing during this window [investigation_id: p02_controlled_test]. \n\nTo preserve the mandatory constraint of visiting the National Museum of Natural History, the proposed recovery shifts the two outdoor activities to times before the onset of the weather disruption (before 12:00 PM). Specifically, the World War II Memorial is rescheduled to start at 10:50 AM, and the Lincoln Memorial is rescheduled to start at 11:40 AM. This allows both activities to be completed before the heavy rain begins, ensuring the mandatory indoor activity can still be attended as originally planned.",
+  "preserved_constraints": [
+    "Mandatory visit to National Museum of Natural History (natural_history) must remain intact."
+  ],
+  "violated_constraints": [],
+  "trade_offs": [
+    "Rescheduling the World War II Memorial and Lincoln Memorial earlier in the day disrupts the original afternoon flow. The user will need to travel back from the National Gallery/American History museums to these outdoor sites before 12:00 PM, which requires additional walking time not originally accounted for in the tight schedule.",
+    "The proposed itinerary assumes that the rescheduled times (10:50 AM and 11:40 AM) are feasible without violating other constraints. However, this relies on the assumption that the user is available to travel back to these locations before the rain starts, which may conflict with typical morning schedules or other unlisted commitments.",
+    "The original afternoon schedule for the outdoor sites is lost; they must be experienced during the dry window (before 12:00 PM). This reduces the total duration of time spent at these specific locations if the user's preferred pace is slower."
+  ],
+  "supporting_evidence_ids": [
+    "p02_controlled_test"
+  ],
+  "assumptions": [
+    "The rescheduled start times (10:50 AM for WW II Memorial, 11:40 AM for Lincoln Memorial) are acceptable to the user and do not conflict with other unlisted constraints.",
+    "The walking estimates provided in the original itinerary remain valid for the reverse direction or alternative routes required to reach these sites before 12:00 PM."
+  ],
+  "uncertainties": [
+    "No specific indoor replacement activities were identified or verified as available during the heavy rain period. The investigation explicitly states that 'Indoor alternatives must not be treated as confirmed available activities' and 'No replacement venue availability information has been retrieved'.",
+    "The feasibility of rescheduling the outdoor activities earlier in the day depends on whether the user can travel back to these locations before 12:00 PM without missing other commitments or violating time constraints not explicitly listed but implied by a tight schedule.",
+    "The proposed itinerary is partial because it does not include confirmed indoor alternatives for the outdoor sites. If the rescheduling approach is rejected, no viable alternative has been proposed due to lack of verified availability data."
+  ]
+}

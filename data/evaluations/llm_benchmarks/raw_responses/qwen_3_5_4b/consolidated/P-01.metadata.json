@@ -1,0 +1,16 @@
+{
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "prompt_version": "shared_generator_v1",
+  "config_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/src/evaluation/configs/p01.json",
+  "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07.json",
+  "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_investigation_context.json",
+  "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_disruption_scenario.json",
+  "latency_seconds": 39.761771582998335,
+  "input_tokens": 2420,
+  "output_tokens": 1181,
+  "structured_output_valid": true,
+  "completed_at_utc": "2026-11-17T17:36:46.792708+00:00"
+}
