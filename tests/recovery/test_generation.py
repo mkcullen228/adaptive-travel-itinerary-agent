@@ -9,10 +9,13 @@ from src.models.agent_workflow import (
     RecoveryOption,
     RecoveryStrategy,
 )
+from src.models.multi_agent import EvidenceBrief, EvidenceFinding
+from src.models.evidence import EvidenceStatus
 from src.recovery.generation import (
     build_recovery_messages,
     generate_recovery_option,
 )
+
 from tests.models.test_agent_workflow import make_recovery_planning_input
 
 
@@ -139,3 +142,45 @@ def test_generation_uses_selected_strategy_instruction(
         messages[0]["content"]
     )
     assert result.recovery_option is not None
+
+
+
+def test_build_recovery_messages_without_evidence_brief():
+    planning_input = make_recovery_planning_input()
+
+    messages = build_recovery_messages(planning_input)
+
+    assert len(messages) == 2
+    assert "ADDITIONAL RESEARCHER EVIDENCE BRIEF" not in (
+        messages[1]["content"]
+    )
+
+
+def test_build_recovery_messages_includes_evidence_brief():
+    planning_input = make_recovery_planning_input()
+
+    brief = EvidenceBrief(
+        findings=[
+            EvidenceFinding(
+                claim="The National Gallery is unavailable.",
+                status=EvidenceStatus.SUPPORTED,
+                supporting_source_ids=["source_1"],
+                explanation="The supplied evidence confirms closure.",
+            )
+        ],
+        source_ids_reviewed=["source_1"],
+        unresolved_questions=["Remaining venue availability is unknown."],
+    )
+
+    messages = build_recovery_messages(
+        planning_input,
+        evidence_brief=brief,
+    )
+
+    assert "ADDITIONAL RESEARCHER EVIDENCE BRIEF" in (
+        messages[1]["content"]
+    )
+    assert "source_1" in messages[1]["content"]
+    assert "Remaining venue availability is unknown." in (
+        messages[1]["content"]
+    )

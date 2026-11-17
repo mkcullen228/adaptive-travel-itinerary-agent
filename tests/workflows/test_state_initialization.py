@@ -52,6 +52,11 @@ def test_initialize_agent_state_defaults():
     assert state["llm_call_count"] == 0
     assert state["warnings"] == []
     assert state["error_details"] == []
+    assert state["evidence_brief"] is None
+    assert state["research_generation_metadata"] is None
+    assert state["planning_generation_metadata"] is None
+    assert state["audit_report"] is None
+    assert state["audit_generation_metadata"] is None
 
 
 def test_initialize_agent_state_with_user_inputs():
@@ -91,6 +96,11 @@ def test_initialize_agent_state_with_user_inputs():
     )
     assert state["mandatory_constraints"] == [mandatory]
     assert state["flexible_preferences"] == [flexible]
+    assert state["evidence_brief"] is None
+    assert state["research_generation_metadata"] is None
+    assert state["planning_generation_metadata"] is None
+    assert state["audit_report"] is None
+    assert state["audit_generation_metadata"] is None
 
 
 def test_initialize_agent_state_creates_independent_states():
@@ -122,6 +132,11 @@ def test_initialize_agent_state_creates_independent_states():
 
     assert state_2["warnings"] == []
     assert state_2["tool_call_counts"] == {}
+    assert state_2["evidence_brief"] is None
+    assert state_2["research_generation_metadata"] is None
+    assert state_2["planning_generation_metadata"] is None
+    assert state_2["audit_report"] is None
+    assert state_2["audit_generation_metadata"] is None
 
 
 def test_initialize_agent_state_without_disruption():
@@ -140,3 +155,8 @@ def test_initialize_agent_state_without_disruption():
     assert state["validation_results"] == []
     assert state["recovery_options"] == []
     assert state["status"].value == "in_progress"
+    assert state["evidence_brief"] is None
+    assert state["research_generation_metadata"] is None
+    assert state["planning_generation_metadata"] is None
+    assert state["audit_report"] is None
+    assert state["audit_generation_metadata"] is None

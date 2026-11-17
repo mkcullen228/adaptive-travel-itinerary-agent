@@ -46,6 +46,8 @@ def initialize_agent_state(
 
         # Investigation
         "investigation_result": None,
+        "evidence_brief": None,
+        "research_generation_metadata": None,
 
         # Recovery planning
         "recovery_options": [],
@@ -55,6 +57,7 @@ def initialize_agent_state(
         "planning_rationale": "",
         "recovery_planning_input": None,
         "recovery_generation_metadata": None,
+        "planning_generation_metadata": None,
 
         # Validation, approval, and finalization
         "itinerary_validation_result": None,
@@ -64,6 +67,9 @@ def initialize_agent_state(
         "approved_constraint_changes": [],
         "final_itinerary": None,
         "final_report": None,
+
+        "audit_report": None,
+        "audit_generation_metadata": None,
 
         # Execution and audit
         "execution_trace": [],
