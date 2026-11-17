@@ -6,25 +6,22 @@ from src.models.agent_state import (
     WorkflowStage,
     WorkflowStatus,
 )
-from src.models.agent_workflow import (
-    ApprovalStatus,
-    Constraint,
-)
+from src.models.agent_workflow import ApprovalStatus, Constraint
 from src.models.itinerary import Itinerary
 from src.models.disruption import DisruptionScenario
 
 
 def initialize_agent_state(
     itinerary: Itinerary,
-    disruption: DisruptionScenario,
-    venue_id: str,
-    latitude: float,
-    longitude: float,
+    disruption: DisruptionScenario | None = None,
+    venue_id: str | None = None,
+    latitude: float | None = None,
+    longitude: float | None = None,
     user_instructions: str = "",
     mandatory_constraints: list[Constraint] | None = None,
     flexible_preferences: list[Constraint] | None = None,
 ) -> TravelAgentState:
-    """Create the initial state for a travel recovery workflow."""
+    """Create the initial state for a normal itinerary or recovery workflow."""
 
     return {
         # Workflow identity
@@ -58,6 +55,7 @@ def initialize_agent_state(
         "planning_rationale": "",
 
         # Validation, approval, and finalization
+        "itinerary_validation_result": None,
         "validation_results": [],
         "approval_status": ApprovalStatus.NOT_REQUIRED,
         "approval_history": [],

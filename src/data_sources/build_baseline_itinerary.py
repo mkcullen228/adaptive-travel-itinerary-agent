@@ -4,6 +4,7 @@ from datetime import date, datetime
 
 from src.models.activity import Activity
 from src.models.itinerary import Itinerary
+from src.models.travel import TravelLeg
 
 
 activities = [
@@ -59,12 +60,39 @@ activities = [
     ),
 ]
 
+travel_legs = [
+    TravelLeg(
+        origin_activity_id="national_gallery",
+        destination_activity_id="american_history",
+        estimates=[],
+        selected_mode="walking",
+    ),
+    TravelLeg(
+        origin_activity_id="american_history",
+        destination_activity_id="natural_history",
+        estimates=[],
+        selected_mode="walking",
+    ),
+    TravelLeg(
+        origin_activity_id="natural_history",
+        destination_activity_id="wwii_memorial",
+        estimates=[],
+        selected_mode="walking",
+    ),
+    TravelLeg(
+        origin_activity_id="wwii_memorial",
+        destination_activity_id="lincoln_memorial",
+        estimates=[],
+        selected_mode="walking",
+    ),
+]
 
 baseline_itinerary = Itinerary(
     itinerary_id="dc_baseline_2026_11_07",
     destination="Washington, DC",
     itinerary_date=date(2026, 11, 7),
     activities=activities,
+    travel_legs=travel_legs,
 )
 
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Annotated, TypedDict
 
 from src.models.itinerary import Itinerary
+from src.models.validation import ValidationResult
 from src.models.disruption import DisruptionScenario
 from src.models.investigation import InvestigationResult
 from src.models.agent_workflow import (
@@ -52,9 +53,9 @@ class TravelAgentState(TypedDict):
     # Original inputs
     original_itinerary: Itinerary
     disruption_scenario: DisruptionScenario
-    venue_id: str
-    latitude: float
-    longitude: float
+    venue_id: str | None
+    latitude: float | None
+    longitude: float | None
     
     # User instructions and constraints
     user_instructions: str
@@ -75,6 +76,7 @@ class TravelAgentState(TypedDict):
 
     # Validation, approval, and finalization
     validation_results: list[OptionValidation]
+    itinerary_validation_result: ValidationResult | None
     approval_status: ApprovalStatus
     approval_history: Annotated[
         list[ApprovalRecord],
