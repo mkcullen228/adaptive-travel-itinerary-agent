@@ -1,0 +1,13 @@
+{
+  "benchmark_id": "P-01-MULTI-AGENT",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "baseline_path": "data/itineraries/dc_baseline_2026_11_07.json",
+  "investigation_path": "tests/fixtures/p01_investigation_context.json",
+  "disruption_path": "tests/fixtures/p01_disruption_scenario.json",
+  "user_instructions": "Recover the itinerary after the confirmed National Gallery unavailability.",
+  "additional_instructions": "Preserve all unaffected original activities provisionally. Remove the confirmed unavailable National Gallery. Do not imply that the remaining venues are available. Do not claim schedule feasibility has been established. Do not invent replacement activities. Explain all remaining uncertainties.",
+  "prompt_version": "multi_agent_v1",
+  "output_path": "data/evaluations/architecture_comparison/multi_agent/P-01.json"
+}

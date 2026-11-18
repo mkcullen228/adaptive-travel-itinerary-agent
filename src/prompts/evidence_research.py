@@ -26,6 +26,9 @@ EVIDENCE INTERPRETATION
 8. Identify stale, unverified, incomplete, or conflicting sources.
 9. Do not arbitrarily resolve credible conflicts between sources.
 10. Explain what information is missing to resolve uncertainty.
+11. The investigation ID and scenario ID are not source IDs.
+12. If no retrieved evidence is supplied, do not cite any source IDs.
+    Explain that the investigation contains no retrieved sources.
 
 DISRUPTION ANALYSIS
 

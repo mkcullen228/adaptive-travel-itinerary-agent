@@ -38,10 +38,20 @@ def build_research_messages(
         "investigation_result": investigation.model_dump(mode="json"),
     }
 
+    allowed_source_ids = sorted({
+    evidence.source_id
+    for evidence in investigation.retrieved_evidence
+    })
+
+    research_context["allowed_source_ids"] = allowed_source_ids
+
     user_prompt = (
         "Interpret the following investigation results and disruption "
         "scenario. Produce an evidence brief for the recovery planner.\n\n"
-        "Use only the supplied information and exact source IDs.\n\n"
+        "Use only the supplied information and exact source IDs.\n"
+        "You may reference only IDs in allowed_source_ids. "
+        "If allowed_source_ids is empty, do not invent or reference any "
+        "source IDs. Report that no retrieved sources were available.\n\n"
         + json.dumps(research_context, indent=2)
     )
 

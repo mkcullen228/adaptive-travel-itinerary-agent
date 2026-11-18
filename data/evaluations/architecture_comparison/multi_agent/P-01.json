@@ -1,0 +1,103 @@
+{
+  "option_id": "recovery_proposal_dc_001",
+  "strategy": "minimal_disruption",
+  "proposed_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "american_history",
+        "attraction_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00Z",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "attraction_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T13:20:00Z",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "attraction_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T15:10:00Z",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "attraction_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T15:50:00Z",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [],
+        "selected_mode": "walking"
+      }
+    ],
+    "routing_failures": []
+  },
+  "proposal_status": "partial",
+  "rationale": "The original itinerary has been modified to remove the confirmed unavailable activity, 'National Gallery of Art' (activity_id: national_gallery). This removal is necessary due to the high-severity disruption where the venue is explicitly unavailable during its scheduled window. The remaining activities have been preserved in their original sequence and times to minimize disruption. No new activities have been added as no verified replacement options exist.",
+  "preserved_constraints": [
+    "Preservation of all unaffected original activities (American History, Natural History, WWII Memorial, Lincoln Memorial).",
+    "Preservation of the original itinerary date (2026-11-07) and destination (Washington, DC).",
+    "Preservation of travel modes (walking) between remaining activities.",
+    "Preservation of mandatory constraint for 'National Museum of Natural History'."
+  ],
+  "violated_constraints": [
+    "The original activity 'National Gallery of Art' was scheduled but is now confirmed unavailable, violating the feasibility requirement for that specific slot.",
+    "The original travel leg connecting 'national_gallery' to 'american_history' cannot be executed as the origin activity does not exist in the proposed itinerary."
+  ],
+  "trade_offs": [
+    "Trade-off: Removal of the National Gallery activity results in a loss of one scheduled experience. However, this is required to avoid scheduling an unavailable venue.",
+    "Trade-off: The gap created by removing the National Gallery (originally 9:00 AM - 10:30 AM) is not filled with a new activity. This leaves the morning hours open, potentially reducing the total number of activities completed on this day compared to a full itinerary.",
+    "Trade-off: No alternative venue was proposed because no verified evidence exists to confirm availability or feasibility of replacements."
+  ],
+  "supporting_evidence_ids": [
+    "investigation_result_id_p01_controlled_test",
+    "disruption_scenario_id_P-01"
+  ],
+  "assumptions": [
+    "Assumption: The remaining activities (American History, Natural History, WWII Memorial, Lincoln Memorial) are open and operational on 2026-11-07. This assumption is not verified by the investigation results.",
+    "Assumption: Walking travel times between the remaining venues are feasible within the original scheduled windows. This assumption is not verified by routing validation data."
+  ],
+  "uncertainties": [
+    "The availability of replacement venues for the National Gallery has not been verified. No source data exists to confirm any alternative museum or attraction is open and suitable.",
+    "The operational status of the remaining original activities (American History, Natural History, WWII Memorial, Lincoln Memorial) has not been independently verified. The investigation explicitly warns that this availability has not been checked.",
+    "Schedule feasibility after removing the National Gallery and without adding a replacement activity has not been assessed. It is unknown if the remaining activities can be completed within the user's desired timeframe or if there are hidden conflicts.",
+    "Unverified Replacement Suggestions: None identified. Without verified evidence, no potential replacements can be listed as feasible options."
+  ]
+}
