@@ -46,6 +46,8 @@ def initialize_agent_state(
 
         # Investigation
         "investigation_result": None,
+        "evidence_brief": None,
+        "research_generation_metadata": None,
 
         # Recovery planning
         "recovery_options": [],
@@ -53,6 +55,9 @@ def initialize_agent_state(
         "rejected_options": [],
         "revision_count": 0,
         "planning_rationale": "",
+        "recovery_planning_input": None,
+        "recovery_generation_metadata": None,
+        "planning_generation_metadata": None,
 
         # Validation, approval, and finalization
         "itinerary_validation_result": None,
@@ -63,6 +68,9 @@ def initialize_agent_state(
         "final_itinerary": None,
         "final_report": None,
 
+        "audit_report": None,
+        "audit_generation_metadata": None,
+
         # Execution and audit
         "execution_trace": [],
         "tool_call_counts": {},
@@ -70,4 +78,10 @@ def initialize_agent_state(
         "llm_call_count": 0,
         "warnings": [],
         "error_details": [],
+
+        "research_raw_response": None,
+        "planning_raw_response": None,
+        "audit_raw_response": None,
+        "multi_agent_generation_metadata": None,
+        "workflow_started_at": None,
     }

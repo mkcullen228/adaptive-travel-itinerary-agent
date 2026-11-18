@@ -1,0 +1,96 @@
+{
+  "option_id": "recovery_proposal_001",
+  "strategy": "minimal_disruption",
+  "proposed_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "american_history",
+        "attraction_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T09:00:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "attraction_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "attraction_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T12:20:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "attraction_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T12:50:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [],
+        "selected_mode": "walking"
+      }
+    ],
+    "routing_failures": []
+  },
+  "proposal_status": "partial",
+  "rationale": "The original itinerary has been modified to remove the confirmed unavailable activity, 'National Gallery of Art' (national_gallery), as per the disruption scenario. To maintain schedule feasibility, subsequent activities have been shifted forward by the duration of the removed activity (90 minutes). The remaining activities were preserved in their relative sequence. No new activities or replacements have been added due to a lack of verified availability data.",
+  "preserved_constraints": [
+    "Original itinerary date: 2026-11-07",
+    "Destination: Washington, DC",
+    "Mandatory activity: National Museum of Natural History (natural_history) must remain in the schedule."
+  ],
+  "violated_constraints": [],
+  "trade_offs": [
+    "Trade-off: Removal of 'National Gallery of Art' reduces the total number of activities from 5 to 4. This is necessary due to confirmed unavailability but results in a shorter itinerary duration.",
+    "Trade-off: Shifting subsequent activities forward by 90 minutes alters the original scheduled times for the National Museum of American History, Natural History Museum, World War II Memorial, and Lincoln Memorial. These changes are required to maintain logical flow but deviate from the user's original time preferences."
+  ],
+  "supporting_evidence_ids": [
+    "p01_controlled_test"
+  ],
+  "assumptions": [
+    "The National Museum of American History, National Museum of Natural History, World War II Memorial, and Lincoln Memorial are open and accessible on 2026-11-07.",
+    "Walking travel times between the remaining venues remain consistent with the original estimates."
+  ],
+  "uncertainties": [
+    "The availability of replacement activities has not been verified. No evidence exists to confirm if alternative museums or sites are open on this date.",
+    "The schedule feasibility of the modified itinerary (without the National Gallery) has not been independently validated against potential delays at other venues.",
+    "The original travel estimates between the remaining activities were not explicitly verified for the new start times."
+  ]
+}

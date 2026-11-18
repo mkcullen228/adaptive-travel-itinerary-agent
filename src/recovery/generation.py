@@ -6,6 +6,7 @@ from typing import Any
 
 import ollama
 
+from src.models.multi_agent import EvidenceBrief
 from src.models.agent_workflow import (
     RecoveryOption,
     RecoveryPlanningInput,
@@ -43,10 +44,16 @@ class RecoveryGenerationResult:
     output_tokens: int | None = None
 
 
+
 def build_recovery_messages(
     planning_input: RecoveryPlanningInput,
+    evidence_brief: EvidenceBrief | None = None,
 ) -> list[dict[str, str]]:
-    """Build the system and user messages for recovery generation."""
+    """Build messages for recovery proposal generation.
+
+    An optional EvidenceBrief provides additional structured
+    research context for the multi-agent workflow.
+    """
 
     strategy_instruction = STRATEGY_INSTRUCTIONS[
         planning_input.strategy
@@ -64,8 +71,20 @@ def build_recovery_messages(
         "Prepare a recovery proposal using the following planning context.\n\n"
         "Return a complete RecoveryOption object.\n"
         "The original itinerary must remain unchanged.\n\n"
-        + json.dumps(planning_context, indent=2)
     )
+
+    if evidence_brief is not None:
+        user_prompt += (
+            "ADDITIONAL RESEARCHER EVIDENCE BRIEF\n"
+            "The following brief is an interpretation of the original "
+            "investigation evidence. Use it as additional context, but "
+            "do not treat interpretations as stronger than the underlying "
+            "evidence. The original investigation remains the source of truth.\n\n"
+            + evidence_brief.model_dump_json(indent=2)
+            + "\n\n"
+        )
+
+    user_prompt += json.dumps(planning_context, indent=2)
 
     return [
         {
@@ -83,6 +102,7 @@ def generate_recovery_option(
     planning_input: RecoveryPlanningInput,
     model_name: str = DEFAULT_MODEL,
     client: Any | None = None,
+    evidence_brief: EvidenceBrief | None = None,
 ) -> RecoveryGenerationResult:
     """
     Generate a structured recovery proposal.
@@ -94,7 +114,10 @@ def generate_recovery_option(
     if client is None:
         client = ollama
 
-    messages = build_recovery_messages(planning_input)
+    messages = build_recovery_messages(
+        planning_input,
+        evidence_brief=evidence_brief,
+    )
 
     start_time = time.perf_counter()
 

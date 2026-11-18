@@ -1,0 +1,88 @@
+{
+  "benchmark_id": "P-01-MULTI-AGENT",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "prompt_version": "multi_agent_v1",
+  "config_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/src/evaluation/configs/p01_multi_agent.json",
+  "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07.json",
+  "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_investigation_context.json",
+  "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_disruption_scenario.json",
+  "workflow_status": "completed",
+  "current_stage": "completed",
+  "llm_call_count": 3,
+  "tool_call_count": 0,
+  "research_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 11.095384000102058,
+    "input_tokens": 1039,
+    "output_tokens": 249
+  },
+  "planning_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 43.532868458889425,
+    "input_tokens": 2738,
+    "output_tokens": 1384
+  },
+  "audit_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 8.174555249977857,
+    "input_tokens": 3392,
+    "output_tokens": 183
+  },
+  "aggregate_generation_metadata": {
+    "agent_count": 3,
+    "total_llm_calls": 3,
+    "total_latency_seconds": 62.80280770896934,
+    "total_input_tokens": 7169,
+    "total_output_tokens": 1816,
+    "input_tokens_complete": true,
+    "output_tokens_complete": true,
+    "total_workflow_latency_seconds": 62.84185704099946
+  },
+  "deterministic_validation_status": "incomplete",
+  "deterministic_validation_issues": [
+    {
+      "issue_type": "missing_travel_estimate",
+      "description": "Missing selected travel estimate between consecutive activities.",
+      "activity_ids": [
+        "american_history",
+        "natural_history"
+      ]
+    },
+    {
+      "issue_type": "missing_travel_estimate",
+      "description": "Missing selected travel estimate between consecutive activities.",
+      "activity_ids": [
+        "natural_history",
+        "wwii_memorial"
+      ]
+    },
+    {
+      "issue_type": "missing_travel_estimate",
+      "description": "Missing selected travel estimate between consecutive activities.",
+      "activity_ids": [
+        "wwii_memorial",
+        "lincoln_memorial"
+      ]
+    }
+  ],
+  "audit_report": {
+    "assessment": "supported",
+    "supported_claims": [],
+    "unsupported_claims": [],
+    "conflicting_claims": [],
+    "omitted_uncertainties": [],
+    "rationale_findings": [
+      "The proposal correctly identifies the 'National Gallery of Art' as unavailable based on the disruption scenario and evidence brief.",
+      "The removal of the unavailable activity is a valid response to the high-severity venue unavailability.",
+      "The preservation of remaining activities and travel modes aligns with the 'minimal_disruption' strategy.",
+      "The proposal explicitly acknowledges the lack of verified replacement options in its rationale and uncertainties section."
+    ],
+    "recommendations": [
+      "Address the deterministic validation issues regarding missing travel estimates between consecutive activities (American History to Natural History, Natural History to WWII Memorial, WWII Memorial to Lincoln Memorial).",
+      "Clarify that while the proposal assumes remaining activities are operational, this assumption is explicitly unverified per the evidence brief."
+    ]
+  },
+  "completed_at_utc": "2026-11-18T20:19:34.854241+00:00"
+}

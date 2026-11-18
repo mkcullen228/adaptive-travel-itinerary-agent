@@ -16,7 +16,9 @@ from src.models.agent_workflow import (
     ApprovalRecord,
     ApprovalStatus,
     ConstraintChange,
+    RecoveryPlanningInput,
 )
+from src.models.multi_agent import EvidenceBrief, AuditReport
 
 from src.workflows.state_reducers import (
     append_execution_events,
@@ -66,6 +68,12 @@ class TravelAgentState(TypedDict):
 
     # Investigation
     investigation_result: InvestigationResult | None
+    
+    # Multi-agent research
+    evidence_brief: EvidenceBrief | None
+    research_generation_metadata: dict[
+        str, str | int | float | None
+    ] | None
 
     # Recovery planning
     recovery_options: list[RecoveryOption]
@@ -73,6 +81,15 @@ class TravelAgentState(TypedDict):
     rejected_options: list[RejectedOption]
     revision_count: int
     planning_rationale: str
+    recovery_planning_input: RecoveryPlanningInput | None
+    recovery_generation_metadata: dict[
+        str, str | int | float | None
+    ] | None
+
+    # Planner output metadata
+    planning_generation_metadata: dict[
+        str, str | int | float | None
+    ] | None
 
     # Validation, approval, and finalization
     validation_results: list[OptionValidation]
@@ -85,6 +102,12 @@ class TravelAgentState(TypedDict):
     approved_constraint_changes: list[ConstraintChange]
     final_itinerary: Itinerary | None
     final_report: str | None
+    
+    # Multi-agent audit
+    audit_report: AuditReport | None
+    audit_generation_metadata: dict[
+        str, str | int | float | None
+    ] | None
 
     # Execution and audit
     tool_call_counts: dict[str, int]
@@ -102,3 +125,14 @@ class TravelAgentState(TypedDict):
         list[str],
         append_unique_strings,
     ]
+
+    research_raw_response: str | None
+    planning_raw_response: str | None
+    audit_raw_response: str | None
+
+    # Multi-agent workflow aggregate metadata
+    multi_agent_generation_metadata: dict[
+        str, str | int | float | bool | None
+    ] | None
+
+    workflow_started_at: float | None
