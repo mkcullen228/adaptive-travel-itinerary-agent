@@ -1,4 +1,4 @@
-
+import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -38,6 +38,10 @@ def test_multi_agent_graph_stops_when_research_fails(monkeypatch):
     assert result["evidence_brief"] is None
     assert result["audit_report"] is None
     assert any("Research failed" in item for item in result["error_details"])
+    assert result["research_raw_response"] is None
+    assert result["planning_raw_response"] is None
+    assert result["audit_raw_response"] is None
+    
 
 
 def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
@@ -62,6 +66,7 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     research_result = SimpleNamespace(
         evidence_brief=evidence_brief,
+        raw_response='{"findings": []}',
         model_name="qwen3.5:4b",
         latency_seconds=1.0,
         input_tokens=100,
@@ -70,6 +75,7 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     planning_result = SimpleNamespace(
         recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
         model_name="qwen3.5:4b",
         latency_seconds=2.0,
         input_tokens=200,
@@ -78,6 +84,7 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     audit_result = SimpleNamespace(
         audit_report=audit_report,
+        raw_response='{"assessment": "partially_supported"}',
         model_name="qwen3.5:4b",
         latency_seconds=1.5,
         input_tokens=150,
@@ -125,3 +132,31 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     # Completing the workflow does not imply user approval or execution.
     assert result["final_itinerary"] is None
+    assert result["research_raw_response"] is not None
+    assert result["planning_raw_response"] is not None
+    assert result["audit_raw_response"] is not None
+
+    metadata = result["multi_agent_generation_metadata"]
+
+    assert metadata["agent_count"] == 3
+    assert metadata["total_llm_calls"] == 3
+    assert metadata["total_latency_seconds"] == pytest.approx(
+        research_result.latency_seconds
+        + planning_result.latency_seconds
+        + audit_result.latency_seconds
+    )
+    assert metadata["total_input_tokens"] == (
+        research_result.input_tokens
+        + planning_result.input_tokens
+        + audit_result.input_tokens
+    )
+    assert metadata["total_output_tokens"] == (
+        research_result.output_tokens
+        + planning_result.output_tokens
+        + audit_result.output_tokens
+    )
+    assert metadata["input_tokens_complete"] is True
+    assert metadata["output_tokens_complete"] is True
+    assert metadata["total_workflow_latency_seconds"] is not None
+    assert metadata["total_workflow_latency_seconds"] > 0
+    assert result["workflow_started_at"] is not None

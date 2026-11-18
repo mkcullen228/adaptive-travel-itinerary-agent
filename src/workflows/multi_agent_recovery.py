@@ -1,6 +1,6 @@
 
 from uuid import uuid4
-
+from time import perf_counter
 from langgraph.graph import StateGraph, START, END
 
 from src.models.agent_state import (
@@ -19,7 +19,6 @@ from src.recovery.generation import DEFAULT_MODEL
 from src.recovery.planning import plan_recovery
 from src.recovery.research import research_evidence
 from src.validation.schedule_validator import validate_itinerary
-from tests.recovery.test_generation import planning_input
 
 
 def build_multi_agent_recovery_graph(
@@ -75,6 +74,8 @@ def build_multi_agent_recovery_graph(
         }
 
     def prepare_recovery_input(state: TravelAgentState):
+        workflow_started_at = perf_counter()
+
         try:
             disruption = state["disruption_scenario"]
             investigation = state["investigation_result"]
@@ -111,6 +112,7 @@ def build_multi_agent_recovery_graph(
 
             return {
                 "recovery_planning_input": planning_input,
+                "workflow_started_at": workflow_started_at,
                 "current_stage": WorkflowStage.INVESTIGATION,
                 "execution_trace": [event],
             }
@@ -123,6 +125,7 @@ def build_multi_agent_recovery_graph(
             )
 
     def research_context(state: TravelAgentState):
+        llm_call_attempted = False
         try:
             investigation = state["investigation_result"]
             disruption = state["disruption_scenario"]
@@ -131,8 +134,6 @@ def build_multi_agent_recovery_graph(
                 raise ValueError(
                     "Investigation result and disruption scenario are required."
                 )
-
-            llm_call_attempted = False
 
             llm_call_attempted = True
             result = research_evidence(
@@ -165,6 +166,7 @@ def build_multi_agent_recovery_graph(
             return {
                 "evidence_brief": result.evidence_brief,
                 "research_generation_metadata": metadata,
+                "research_raw_response": result.raw_response,
                 "llm_call_count": state["llm_call_count"] + 1,
                 "current_stage": WorkflowStage.RECOVERY_PLANNING,
                 "execution_trace": [event],
@@ -179,6 +181,7 @@ def build_multi_agent_recovery_graph(
             )
 
     def generate_plan(state: TravelAgentState):
+        llm_call_attempted = False
         try:
             planning_input = state["recovery_planning_input"]
             evidence_brief = state["evidence_brief"]
@@ -188,8 +191,6 @@ def build_multi_agent_recovery_graph(
 
             if evidence_brief is None:
                 raise ValueError("Researcher evidence brief is missing.")
-
-            llm_call_attempted = False
 
             llm_call_attempted = True
             result = plan_recovery(
@@ -227,6 +228,7 @@ def build_multi_agent_recovery_graph(
                 "llm_call_count": state["llm_call_count"] + 1,
                 "current_stage": WorkflowStage.VALIDATION,
                 "execution_trace": [event],
+                "planning_raw_response": result.raw_response,
             }
 
         except Exception as error:
@@ -293,6 +295,7 @@ def build_multi_agent_recovery_graph(
             )
 
     def audit_proposal(state: TravelAgentState):
+        llm_call_attempted = False
         try:
             planning_input = state["recovery_planning_input"]
             evidence_brief = state["evidence_brief"]
@@ -324,8 +327,6 @@ def build_multi_agent_recovery_graph(
                 if validation_result is not None
                 else None
             )
-
-            llm_call_attempted = False
 
             llm_call_attempted = True
             result = audit_recovery_proposal(
@@ -361,6 +362,7 @@ def build_multi_agent_recovery_graph(
                 "llm_call_count": state["llm_call_count"] + 1,
                 "current_stage": WorkflowStage.FINALIZATION,
                 "execution_trace": [event],
+                "audit_raw_response": result.raw_response,
             }
 
         except Exception as error:
@@ -385,10 +387,65 @@ def build_multi_agent_recovery_graph(
             },
         )
 
+        agent_metadata = [
+            state.get("research_generation_metadata"),
+            state.get("planning_generation_metadata"),
+            state.get("audit_generation_metadata"),
+        ]
+
+        completed_metadata = [
+            metadata for metadata in agent_metadata if metadata is not None
+        ]
+
+        input_tokens = [
+            metadata.get("input_tokens") for metadata in completed_metadata
+        ]
+        output_tokens = [
+            metadata.get("output_tokens") for metadata in completed_metadata
+        ]
+
+        total_input_tokens = (
+            sum(input_tokens)
+            if len(input_tokens) == 3 and all(value is not None for value in input_tokens)
+            else None
+        )
+
+        total_output_tokens = (
+            sum(output_tokens)
+            if len(output_tokens) == 3 and all(value is not None for value in output_tokens)
+            else None
+        )
+
+        total_latency_seconds = sum(
+            float(metadata["latency_seconds"])
+            for metadata in completed_metadata
+            if metadata.get("latency_seconds") is not None
+        )
+
+        workflow_started_at = state.get("workflow_started_at")
+
+        total_workflow_latency_seconds = (
+            perf_counter() - workflow_started_at
+            if workflow_started_at is not None
+            else None
+        )
+        
+        aggregate_metadata = {
+            "agent_count": len(completed_metadata),
+            "total_llm_calls": state.get("llm_call_count", 0),
+            "total_latency_seconds": total_latency_seconds,
+            "total_input_tokens": total_input_tokens,
+            "total_output_tokens": total_output_tokens,
+            "input_tokens_complete": total_input_tokens is not None,
+            "output_tokens_complete": total_output_tokens is not None,
+            "total_workflow_latency_seconds": total_workflow_latency_seconds,
+        }
+
         return {
             "current_stage": WorkflowStage.COMPLETED,
             "status": WorkflowStatus.COMPLETED,
             "execution_trace": [event],
+            "multi_agent_generation_metadata": aggregate_metadata,
         }
 
     def route_on_status(state: TravelAgentState):

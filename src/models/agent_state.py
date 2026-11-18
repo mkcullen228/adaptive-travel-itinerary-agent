@@ -102,6 +102,7 @@ class TravelAgentState(TypedDict):
     approved_constraint_changes: list[ConstraintChange]
     final_itinerary: Itinerary | None
     final_report: str | None
+    
     # Multi-agent audit
     audit_report: AuditReport | None
     audit_generation_metadata: dict[
@@ -124,3 +125,14 @@ class TravelAgentState(TypedDict):
         list[str],
         append_unique_strings,
     ]
+
+    research_raw_response: str | None
+    planning_raw_response: str | None
+    audit_raw_response: str | None
+
+    # Multi-agent workflow aggregate metadata
+    multi_agent_generation_metadata: dict[
+        str, str | int | float | bool | None
+    ] | None
+
+    workflow_started_at: float | None

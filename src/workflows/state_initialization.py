@@ -78,4 +78,10 @@ def initialize_agent_state(
         "llm_call_count": 0,
         "warnings": [],
         "error_details": [],
+
+        "research_raw_response": None,
+        "planning_raw_response": None,
+        "audit_raw_response": None,
+        "multi_agent_generation_metadata": None,
+        "workflow_started_at": None,
     }
