@@ -80,6 +80,18 @@ def build_recovery_messages(
             "investigation evidence. Use it as additional context, but "
             "do not treat interpretations as stronger than the underlying "
             "evidence. The original investigation remains the source of truth.\n\n"
+            "EVIDENCE PROVENANCE RULES:\n"
+            "- Only use source IDs belonging to actual retrieved evidence records "
+            "in supporting_evidence_ids.\n"
+            "- Investigation IDs and disruption scenario IDs are contextual "
+            "identifiers, not evidence source IDs. Never include them in "
+            "supporting_evidence_ids.\n"
+            "- If no retrieved evidence records are supplied, return an empty "
+            "supporting_evidence_ids list.\n"
+            "- Do not treat the Researcher's interpretations, claims, or "
+            "evidence brief as independent evidence sources. Cite only "
+            "original retrieved evidence source IDs.\n\n"
+            "RESEARCHER EVIDENCE BRIEF:\n"
             + evidence_brief.model_dump_json(indent=2)
             + "\n\n"
         )

@@ -1,11 +1,14 @@
 import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
+from datetime import datetime, timezone
 
 from src.models.agent_state import WorkflowStage, WorkflowStatus
 from src.models.multi_agent import EvidenceBrief, AuditReport
 from src.models.agent_workflow import RecoveryOption
 from src.models.validation import ValidationResult
+from src.models.retrieved_evidence import RetrievedEvidence
+from src.models.source_reference import VerificationStatus
 
 from src.workflows.multi_agent_recovery import (
     build_multi_agent_recovery_graph,
@@ -59,6 +62,7 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     recovery_option = Mock()
     recovery_option.option_id = "test-option"
+    recovery_option.supporting_evidence_ids = []
     recovery_option.rationale = "Test recovery rationale"
     recovery_option.proposed_itinerary = (
         initialized_recovery_state["original_itinerary"]
@@ -160,3 +164,166 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
     assert metadata["total_workflow_latency_seconds"] is not None
     assert metadata["total_workflow_latency_seconds"] > 0
     assert result["workflow_started_at"] is not None
+
+
+def test_multi_agent_graph_rejects_unavailable_evidence_source(
+    monkeypatch,
+):
+    initialized_recovery_state = make_state()
+
+    evidence_brief = EvidenceBrief()
+
+    research_result = SimpleNamespace(
+        evidence_brief=evidence_brief,
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    recovery_option = Mock()
+    recovery_option.supporting_evidence_ids = [
+        "test_investigation"
+    ]
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    research_mock = Mock(return_value=research_result)
+    planning_mock = Mock(return_value=planning_result)
+    audit_mock = Mock()
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        research_mock,
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        planning_mock,
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        audit_mock,
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+    result = graph.invoke(initialized_recovery_state)
+
+    assert result["status"] == WorkflowStatus.FAILED
+    assert result["current_stage"] == WorkflowStage.RECOVERY_PLANNING
+    assert research_mock.call_count == 1
+    audit_mock.assert_not_called()
+
+    assert any(
+        "test_investigation" in item
+        for item in result["error_details"]
+    )
+
+
+def test_multi_agent_graph_accepts_valid_evidence_source(
+    monkeypatch,
+):
+    initialized_recovery_state = make_state()
+
+    retrieved_evidence = RetrievedEvidence(
+        chunk_id="chunk_001",
+        content="The National Gallery is closed on November 7.",
+        subject="National Gallery availability",
+        source_id="source_001",
+        source_url="https://example.com/venue-status",
+        retrieved_at=datetime.now(timezone.utc),
+        similarity_distance=0.1,
+        reliability=0.95,
+        freshness_score=0.95,
+        verification_status=VerificationStatus.VERIFIED,
+    )
+
+    initialized_recovery_state["investigation_result"].retrieved_evidence = [
+        retrieved_evidence
+    ]
+
+    evidence_brief = EvidenceBrief()
+
+    audit_report = AuditReport(
+        assessment="partially_supported",
+        supported_claims=[],
+        unsupported_claims=[],
+        conflicting_claims=[],
+        omitted_uncertainties=[],
+        rationale_findings=[],
+        recommendations=[],
+    )
+
+    recovery_option = Mock()
+    recovery_option.supporting_evidence_ids = ["source_001"]
+    recovery_option.option_id = "test-option"
+    recovery_option.rationale = "Test recovery rationale"
+    recovery_option.proposed_itinerary = (
+        initialized_recovery_state["original_itinerary"]
+    )
+
+    research_result = SimpleNamespace(
+        evidence_brief=evidence_brief,
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    audit_result = SimpleNamespace(
+        audit_report=audit_report,
+        raw_response='{"assessment": "partially_supported"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.5,
+        input_tokens=150,
+        output_tokens=75,
+    )
+
+    research_mock = Mock(return_value=research_result)
+    planning_mock = Mock(return_value=planning_result)
+    audit_mock = Mock(return_value=audit_result)
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        research_mock,
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        planning_mock,
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        audit_mock,
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+    result = graph.invoke(initialized_recovery_state)
+
+    assert result["status"] == WorkflowStatus.COMPLETED
+    assert result["current_stage"] == WorkflowStage.COMPLETED
+    assert len(result["recovery_options"]) == 1
+
+    assert result["recovery_options"][0].supporting_evidence_ids == [
+        "source_001"
+    ]
+
+    research_mock.assert_called_once()
+    planning_mock.assert_called_once()
+    audit_mock.assert_called_once()

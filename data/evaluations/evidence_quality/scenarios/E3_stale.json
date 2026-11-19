@@ -1,0 +1,51 @@
+
+{
+  "scenario_id": "E3",
+  "scenario_name": "stale",
+  "description": "A historically reliable source contains outdated information about extending the existing Natural History Museum visit.",
+  "evaluation_reference_time": "2026-11-07T08:00:00-05:00",
+  "base_case": {
+    "itinerary_id": "P-01",
+    "unavailable_venue": "National Gallery of Art",
+    "recovery_target": "National Museum of Natural History",
+    "recovery_action": "reschedule_or_extend_existing_visit", 
+    "mandatory_activity_name": "National Museum of Natural History"
+  },
+  "retrieved_evidence": [
+    {
+      "chunk_id": "chunk_e3_001",
+      "content": "A previously published venue notice indicated that the National Museum of Natural History could accommodate extended visits. The notice applies to an earlier operating period and does not confirm availability on November 7, 2026.",
+      "subject": "National Museum of Natural History visit availability",
+      "source_id": "source_e3_001",
+      "source_url": "https://example.com/historical-natural-history-availability",
+      "retrieved_at": "2026-10-01T08:00:00-04:00",
+      "similarity_distance": 0.12,
+      "reliability": 0.95,
+      "freshness_score": 0.20,
+      "verification_status": "stale"
+    }
+  ],
+  "expected_researcher_output": {
+    "status": "partially_supported",
+    "supporting_source_ids": [
+      "source_e3_001"
+    ],
+    "conflicting_source_ids": [],
+    "source_quality_warnings": [
+      "Source information is stale.",
+      "Historical information does not confirm current availability."
+    ],
+    "source_ids_reviewed": [
+      "source_e3_001"
+    ]
+  },
+  "expected_planner_behavior": {
+    "may_recommend_recovery": true,
+    "must_preserve_mandatory_visit": true,
+    "must_not_add_duplicate_visit": true,
+    "must_not_claim_unverified_availability": true,
+    "must_communicate_unresolved_questions": true,
+    "must_request_current_verification": true,
+    "must_avoid_high_confidence": true
+  }
+}

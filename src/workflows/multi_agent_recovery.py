@@ -202,6 +202,29 @@ def build_multi_agent_recovery_graph(
 
             option = result.recovery_option
 
+            investigation = state["investigation_result"]
+
+            if investigation is None:
+                raise ValueError(
+                    "Investigation result is required for evidence validation."
+                )
+
+            available_source_ids = {
+                evidence.source_id
+                for evidence in investigation.retrieved_evidence
+            }
+
+            invalid_source_ids = (
+                set(option.supporting_evidence_ids)
+                - available_source_ids
+            )
+
+            if invalid_source_ids:
+                raise ValueError(
+                    "Planner referenced evidence IDs not present in the "
+                    f"investigation: {sorted(invalid_source_ids)}"
+                )
+
             metadata = {
                 "model_name": result.model_name,
                 "latency_seconds": result.latency_seconds,
