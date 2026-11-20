@@ -230,17 +230,15 @@ def run_scenario(
         },
     }
 
-    # Preserve the existing Researcher + Planner pass definition.
-    # Include Auditor when an Auditor evaluation is available.
+    # An overall pass requires all three evaluations to exist and pass.
+    # A missing Auditor evaluation must not be treated as a pass.
     result["overall_evaluation_passed"] = (
         researcher_evaluation is not None
         and planner_evaluation is not None
+        and auditor_evaluation is not None
         and researcher_evaluation.passed
         and planner_evaluation.passed
-        and (
-            auditor_evaluation is None
-            or auditor_evaluation.passed
-        )
+        and auditor_evaluation.passed
     )
 
     output_directory.mkdir(parents=True, exist_ok=True)
