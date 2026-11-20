@@ -1,0 +1,93 @@
+{
+  "original_run_id": "c3649f8c-22cd-4f49-8e9c-ee05bf17509a",
+  "original_result_file": "E3_c3649f8c-22cd-4f49-8e9c-ee05bf17509a.json",
+  "scenario_id": "E3",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 13.314012290909886,
+        "input_tokens": 1368,
+        "output_tokens": 393
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 49.48754850006662,
+        "input_tokens": 3300,
+        "output_tokens": 1602
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.452739167027175,
+        "input_tokens": 4008,
+        "output_tokens": 305
+      }
+    },
+    "total_latency_seconds": 74.25429995800368,
+    "total_input_tokens": 8676,
+    "total_output_tokens": 2300,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E3",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E3",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": false,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "Rationale schedule time for 'National Museum of Natural History' is 10:00 PM, but the proposed itinerary schedules it for 10:50 AM.",
+      "The Planner's stated recovery action does not match the actual changes to the existing mandatory visit.",
+      "Planner cited sources reviewed for an unsupported Researcher finding: ['source_e3_001']"
+    ],
+    "recovery_action_consistent": false,
+    "travel_claims_supported": true,
+    "rationale_uncertainty_communicated": true,
+    "downstream_schedule_changes_qualified": true,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "schedule_validation_complete": false,
+    "schedule_validation_status": "INCOMPLETE",
+    "schedule_consistency_unresolved": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": false
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E3",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": false,
+    "uncertainty_coverage": true,
+    "passed": false,
+    "failures": [
+      "Auditor did not acknowledge one or more deterministic schedule validation failures."
+    ]
+  },
+  "overall_evaluation_passed": false
+}

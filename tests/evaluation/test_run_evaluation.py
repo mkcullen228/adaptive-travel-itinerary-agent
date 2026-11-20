@@ -77,7 +77,7 @@ def test_run_scenario_saves_result(
     monkeypatch.setattr(
         run_evaluation,
         "evaluate_planner_output",
-        lambda scenario, itinerary, option: FakeEvaluation(True),
+        lambda scenario, original_itinerary, recovery_option, evidence_brief=None: FakeEvaluation(True),
     )
 
     graph = Mock()
@@ -177,7 +177,7 @@ def test_separate_runs_do_not_overwrite_results(
     monkeypatch.setattr(
         run_evaluation,
         "evaluate_planner_output",
-        lambda scenario, itinerary, option: FakeEvaluation(True),
+        lambda scenario, original_itinerary, recovery_option, evidence_brief=None: FakeEvaluation(True),
     )
 
     graph = Mock()

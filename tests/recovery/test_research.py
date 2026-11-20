@@ -4,12 +4,15 @@ from types import SimpleNamespace
 import pytest
 
 from src.models.evidence import EvidenceStatus
-from src.models.multi_agent import EvidenceBrief
+from src.models.multi_agent import EvidenceBrief, EvidenceFinding
 from src.recovery.research import (
     build_research_messages,
     research_evidence,
     validate_evidence_brief_sources,
+    validate_evidence_brief_findings, 
+    build_evidence_brief_schema
 )
+
 
 
 def make_investigation():
@@ -135,3 +138,62 @@ def test_research_accepts_empty_evidence():
         brief,
         investigation,
     )
+
+
+def test_research_rejects_empty_evidence_findings():
+    brief = EvidenceBrief(findings=[])
+
+    with pytest.raises(
+        ValueError,
+        match="exactly one structured evidence finding",
+    ):
+        validate_evidence_brief_findings(brief)
+
+
+def test_research_rejects_multiple_evidence_findings():
+    brief = EvidenceBrief(
+        findings=[
+            EvidenceFinding(
+                claim="Test claim",
+                status=EvidenceStatus.SUPPORTED,
+                supporting_source_ids=["source_001"],
+                explanation="Test explanation",
+            ),
+            EvidenceFinding(
+                claim="Another test claim",
+                status=EvidenceStatus.SUPPORTED,
+                supporting_source_ids=["source_001"],
+                explanation="Another test explanation",
+            ),
+        ]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="exactly one structured evidence finding",
+    ):
+        validate_evidence_brief_findings(brief)
+
+
+def test_evidence_brief_schema_requires_exactly_one_finding():
+    schema = build_evidence_brief_schema()
+
+    assert "findings" in schema["required"]
+
+    findings_schema = schema["properties"]["findings"]
+
+    assert findings_schema["minItems"] == 1
+    assert findings_schema["maxItems"] == 1
+
+
+def test_evidence_brief_model_still_allows_empty_findings():
+    brief = EvidenceBrief()
+
+    assert brief.findings == []
+
+
+def test_research_schema_requires_source_ids_reviewed():
+    schema = build_evidence_brief_schema()
+
+    assert "source_ids_reviewed" in schema["required"]
+    assert schema["properties"]["source_ids_reviewed"]["type"] == "array"

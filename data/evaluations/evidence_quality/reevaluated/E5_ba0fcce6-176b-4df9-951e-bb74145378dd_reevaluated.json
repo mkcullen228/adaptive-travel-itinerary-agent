@@ -1,0 +1,88 @@
+{
+  "original_run_id": "ba0fcce6-176b-4df9-951e-bb74145378dd",
+  "original_result_file": "E5_ba0fcce6-176b-4df9-951e-bb74145378dd.json",
+  "scenario_id": "E5",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 9.04029441694729,
+        "input_tokens": 1151,
+        "output_tokens": 255
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 62.147108250064775,
+        "input_tokens": 3147,
+        "output_tokens": 1451
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.55018041585572,
+        "input_tokens": 3702,
+        "output_tokens": 183
+      }
+    },
+    "total_latency_seconds": 82.73758308286779,
+    "total_input_tokens": 8000,
+    "total_output_tokens": 1889,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E5",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "Rationale schedule time for 'National Museum of American History' is 10:50 AM, but the proposed itinerary schedules it for 9:00 AM.",
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'.",
+      "Planner made a quantified travel-time or buffer claim without supporting travel estimates."
+    ],
+    "recovery_action_consistent": true,
+    "travel_claims_supported": false,
+    "rationale_uncertainty_communicated": true,
+    "downstream_schedule_changes_qualified": true,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": false
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": false,
+    "uncertainty_coverage": true,
+    "passed": false,
+    "failures": [
+      "Auditor did not acknowledge one or more deterministic schedule validation failures."
+    ]
+  },
+  "overall_evaluation_passed": false
+}

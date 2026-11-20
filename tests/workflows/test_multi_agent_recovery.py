@@ -1,7 +1,7 @@
 import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from src.models.agent_state import WorkflowStage, WorkflowStatus
 from src.models.multi_agent import EvidenceBrief, AuditReport
@@ -9,6 +9,7 @@ from src.models.agent_workflow import RecoveryOption
 from src.models.validation import ValidationResult
 from src.models.retrieved_evidence import RetrievedEvidence
 from src.models.source_reference import VerificationStatus
+from src.models.activity import Activity
 
 from src.workflows.multi_agent_recovery import (
     build_multi_agent_recovery_graph,
@@ -327,3 +328,312 @@ def test_multi_agent_graph_accepts_valid_evidence_source(
     research_mock.assert_called_once()
     planning_mock.assert_called_once()
     audit_mock.assert_called_once()
+
+
+def test_auditor_receives_validation_issues_and_schedule_findings(
+    monkeypatch,
+):
+    initialized_recovery_state = make_state()
+
+    # make_state() uses an empty itinerary fixture.
+    # Create a real activity specifically for this workflow test.
+    activity = Activity(
+        activity_id="test_activity",
+        name="Test Museum",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=90,
+        mandatory=False,
+        indoor=True,
+    )
+
+    original_itinerary = initialized_recovery_state[
+        "original_itinerary"
+    ].model_copy(
+        update={"activities": [activity]}
+    )
+
+    initialized_recovery_state["original_itinerary"] = original_itinerary
+
+    # This is a travel-delay scenario, so the activity is not affected
+    # by the disruption itself.
+    initialized_recovery_state[
+        "disruption_scenario"
+    ].affected_activity_ids = []
+
+    changed_activity = activity.model_copy(
+        update={
+            "start_time": activity.start_time + timedelta(minutes=15)
+        }
+    )
+
+    proposed_itinerary = original_itinerary.model_copy(
+        update={"activities": [changed_activity]}
+    )
+
+    recovery_option = Mock()
+    recovery_option.option_id = "test-option"
+    recovery_option.supporting_evidence_ids = []
+    recovery_option.rationale = "Test recovery rationale"
+    recovery_option.proposed_itinerary = proposed_itinerary
+
+    evidence_brief = EvidenceBrief()
+
+    audit_report = AuditReport(
+        assessment="partially_supported",
+        supported_claims=[],
+        unsupported_claims=[],
+        conflicting_claims=[],
+        omitted_uncertainties=[],
+        rationale_findings=[],
+        recommendations=[],
+    )
+
+    research_result = SimpleNamespace(
+        evidence_brief=evidence_brief,
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    audit_result = SimpleNamespace(
+        audit_report=audit_report,
+        raw_response='{"assessment": "partially_supported"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.5,
+        input_tokens=150,
+        output_tokens=75,
+    )
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        Mock(return_value=research_result),
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        Mock(return_value=planning_result),
+    )
+
+    audit_mock = Mock(return_value=audit_result)
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        audit_mock,
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+    result = graph.invoke(initialized_recovery_state)
+
+    assert result["status"] == WorkflowStatus.COMPLETED
+    audit_mock.assert_called_once()
+
+    deterministic_validation = (
+        audit_mock.call_args.kwargs["deterministic_validation"]
+    )
+
+    # Original validation issues remain available at the top level.
+    expected_validation = (
+        result["itinerary_validation_result"].model_dump(mode="json")
+    )
+
+    assert deterministic_validation["issues"] == (
+        expected_validation["issues"]
+    )
+
+    # The changed activity should be identified for Auditor review.
+    schedule_findings = deterministic_validation[
+        "schedule_preservation_findings"
+    ]
+
+    assert len(schedule_findings) == 1
+    assert schedule_findings[0]["activity_id"] == "test_activity"
+    assert schedule_findings[0]["original_start_time"] == (
+        activity.start_time.isoformat()
+    )
+    assert schedule_findings[0]["proposed_start_time"] == (
+        changed_activity.start_time.isoformat()
+    )
+
+
+def test_auditor_receives_no_schedule_finding_for_unchanged_activities(
+    monkeypatch,
+):
+    initialized_recovery_state = make_state()
+    original_itinerary = initialized_recovery_state["original_itinerary"]
+
+    recovery_option = Mock()
+    recovery_option.option_id = "test-option"
+    recovery_option.supporting_evidence_ids = []
+    recovery_option.rationale = "Test recovery rationale"
+    recovery_option.proposed_itinerary = original_itinerary
+
+    audit_report = AuditReport(
+        assessment="partially_supported",
+        supported_claims=[],
+        unsupported_claims=[],
+        conflicting_claims=[],
+        omitted_uncertainties=[],
+        rationale_findings=[],
+        recommendations=[],
+    )
+
+    research_result = SimpleNamespace(
+        evidence_brief=EvidenceBrief(),
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    audit_result = SimpleNamespace(
+        audit_report=audit_report,
+        raw_response='{"assessment": "partially_supported"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.5,
+        input_tokens=150,
+        output_tokens=75,
+    )
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        Mock(return_value=research_result),
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        Mock(return_value=planning_result),
+    )
+
+    audit_mock = Mock(return_value=audit_result)
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        audit_mock,
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+    result = graph.invoke(initialized_recovery_state)
+
+    assert result["status"] == WorkflowStatus.COMPLETED
+
+    deterministic_validation = (
+        audit_mock.call_args.kwargs["deterministic_validation"]
+    )
+
+    assert deterministic_validation["schedule_preservation_findings"] == []
+
+
+def test_schedule_findings_exclude_disrupted_activity(
+    monkeypatch,
+):
+    initialized_recovery_state = make_state()
+    original_itinerary = initialized_recovery_state["original_itinerary"]
+
+    affected_ids = set(
+        initialized_recovery_state["disruption_scenario"].affected_activity_ids
+    )
+
+    # Keep unaffected activities unchanged and remove the disrupted activity.
+    proposed_activities = [
+        activity
+        for activity in original_itinerary.activities
+        if activity.activity_id not in affected_ids
+    ]
+
+    proposed_itinerary = original_itinerary.model_copy(
+        update={"activities": proposed_activities}
+    )
+
+    recovery_option = Mock()
+    recovery_option.option_id = "test-option"
+    recovery_option.supporting_evidence_ids = []
+    recovery_option.rationale = "Test recovery rationale"
+    recovery_option.proposed_itinerary = proposed_itinerary
+
+    audit_report = AuditReport(
+        assessment="partially_supported",
+        supported_claims=[],
+        unsupported_claims=[],
+        conflicting_claims=[],
+        omitted_uncertainties=[],
+        rationale_findings=[],
+        recommendations=[],
+    )
+
+    research_result = SimpleNamespace(
+        evidence_brief=EvidenceBrief(),
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "test-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    audit_result = SimpleNamespace(
+        audit_report=audit_report,
+        raw_response='{"assessment": "partially_supported"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.5,
+        input_tokens=150,
+        output_tokens=75,
+    )
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        Mock(return_value=research_result),
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        Mock(return_value=planning_result),
+    )
+
+    audit_mock = Mock(return_value=audit_result)
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        audit_mock,
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+    result = graph.invoke(initialized_recovery_state)
+
+    assert result["status"] == WorkflowStatus.COMPLETED
+
+    deterministic_validation = (
+        audit_mock.call_args.kwargs["deterministic_validation"]
+    )
+
+    schedule_findings = deterministic_validation[
+        "schedule_preservation_findings"
+    ]
+
+    assert all(
+        finding["activity_id"] not in affected_ids
+        for finding in schedule_findings
+    )

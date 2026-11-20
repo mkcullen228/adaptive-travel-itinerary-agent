@@ -1,0 +1,85 @@
+{
+  "original_run_id": "5fb1baa9-3f70-4f07-9a77-031f49fa57d6",
+  "original_result_file": "E5_5fb1baa9-3f70-4f07-9a77-031f49fa57d6.json",
+  "scenario_id": "E5",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.025475417030975,
+        "input_tokens": 1151,
+        "output_tokens": 286
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 53.22070554201491,
+        "input_tokens": 2990,
+        "output_tokens": 1339
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.422713625011966,
+        "input_tokens": 3629,
+        "output_tokens": 193
+      }
+    },
+    "total_latency_seconds": 75.66889458405785,
+    "total_input_tokens": 7770,
+    "total_output_tokens": 1818,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E5",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'.",
+      "Planner made a quantified travel-time or buffer claim without supporting travel estimates."
+    ],
+    "recovery_action_consistent": true,
+    "travel_claims_supported": false,
+    "rationale_uncertainty_communicated": true,
+    "downstream_schedule_changes_qualified": true,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": true
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": true,
+    "passed": true,
+    "failures": []
+  },
+  "overall_evaluation_passed": false
+}

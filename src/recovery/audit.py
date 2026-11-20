@@ -27,6 +27,55 @@ class AuditGenerationResult:
     output_tokens: int | None = None
 
 
+def compare_mandatory_activities(
+    original_itinerary,
+    proposed_itinerary,
+) -> list[dict[str, Any]]:
+    """Compare mandatory activities between original and proposed itineraries."""
+
+    comparison = []
+
+    for original_activity in original_itinerary.activities:
+        if not original_activity.mandatory:
+            continue
+
+        matching_activity = next(
+            (
+                activity
+                for activity in proposed_itinerary.activities
+                if activity.activity_id == original_activity.activity_id
+            ),
+            None,
+        )
+
+        comparison.append({
+            "activity_id": original_activity.activity_id,
+            "activity_name": original_activity.name,
+            "original_mandatory": True,
+            "preserved": (
+                matching_activity is not None
+                and matching_activity.mandatory
+            ),
+            "proposed_activity_id": (
+                matching_activity.activity_id
+                if matching_activity is not None
+                else None
+            ),
+            "proposed_activity_name": (
+                matching_activity.name
+                if matching_activity is not None
+                else None
+            ),
+            "proposed_mandatory": (
+                matching_activity.mandatory
+                if matching_activity is not None
+                else None
+            ),
+        })
+
+    return comparison
+
+
 def build_audit_messages(
     planning_input: RecoveryPlanningInput,
     evidence_brief: EvidenceBrief,
@@ -34,6 +83,11 @@ def build_audit_messages(
     deterministic_validation: dict[str, Any] | None = None,
 ) -> list[dict[str, str]]:
     """Build the messages used by the Auditor."""
+
+    mandatory_activity_comparison = compare_mandatory_activities(
+        original_itinerary=planning_input.original_itinerary,
+        proposed_itinerary=recovery_option.proposed_itinerary,
+    )
 
     audit_context = {
         "original_itinerary": (
@@ -45,6 +99,7 @@ def build_audit_messages(
         "evidence_brief": evidence_brief.model_dump(mode="json"),
         "recovery_proposal": recovery_option.model_dump(mode="json"),
         "deterministic_validation": deterministic_validation,
+        "mandatory_activity_comparison": mandatory_activity_comparison,
     }
 
     user_prompt = (

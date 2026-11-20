@@ -1,0 +1,92 @@
+{
+  "original_run_id": "d4bf08b8-e1dd-4ac9-9b50-85e0d519ee5f",
+  "original_result_file": "E1_d4bf08b8-e1dd-4ac9-9b50-85e0d519ee5f.json",
+  "scenario_id": "E1",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.157773750135675,
+        "input_tokens": 1356,
+        "output_tokens": 298
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 39.457723583094776,
+        "input_tokens": 3039,
+        "output_tokens": 1221
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 12.64122312492691,
+        "input_tokens": 3527,
+        "output_tokens": 328
+      }
+    },
+    "total_latency_seconds": 63.25672045815736,
+    "total_input_tokens": 7922,
+    "total_output_tokens": 1847,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E1",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E1",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "Planner did not explicitly qualify schedule feasibility in the main rationale.",
+      "Planner did not communicate that schedule feasibility could not be fully validated because travel data is missing.",
+      "Planner made a travel-time or buffer claim, but the proposed itinerary does not contain complete selected-mode travel estimates.",
+      "Planner changed the timing or duration of retained activities without explicitly qualifying downstream schedule feasibility in the main rationale."
+    ],
+    "recovery_action_consistent": true,
+    "travel_claims_supported": false,
+    "rationale_uncertainty_communicated": false,
+    "downstream_schedule_changes_qualified": false,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "schedule_validation_complete": false,
+    "schedule_validation_status": "INCOMPLETE",
+    "schedule_consistency_unresolved": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": true
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E1",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": true,
+    "passed": true,
+    "failures": []
+  },
+  "overall_evaluation_passed": false
+}

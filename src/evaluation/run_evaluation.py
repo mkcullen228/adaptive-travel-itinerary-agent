@@ -1,10 +1,12 @@
-
 import argparse
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
+from src.evaluation.auditor_evaluator import (
+    evaluate_auditor_output,
+)
 from src.evaluation.evidence_quality_evaluator import (
     evaluate_researcher_output,
 )
@@ -59,6 +61,30 @@ def _metadata_totals(state: dict) -> dict:
     }
 
 
+def _auditor_validation_input(validation_result):
+    """
+    Adapt the workflow's ValidationResult for the current Auditor evaluator.
+
+    The workflow model uses `issues`; the Auditor evaluator currently
+    expects a dictionary containing a `failures` list.
+    """
+
+    if validation_result is None:
+        return None
+
+    failures = []
+
+    for issue in validation_result.issues:
+        issue_type = getattr(issue.issue_type, "value", issue.issue_type)
+        description = issue.description
+
+        failures.append(
+            f"Schedule issue ({issue_type}): {description}"
+        )
+
+    return {"failures": failures}
+
+
 def run_scenario(
     scenario_id: str,
     model_name: str = DEFAULT_MODEL,
@@ -79,10 +105,17 @@ def run_scenario(
 
     final_state = graph.invoke(initial_state)
 
-    completed = final_state.get("status") == WorkflowStatus.COMPLETED
+    workflow_status = final_state.get("status")
+
+    completed = (
+        workflow_status == WorkflowStatus.COMPLETED
+        or getattr(workflow_status, "value", workflow_status)
+        == WorkflowStatus.COMPLETED.value
+    )
 
     researcher_evaluation = None
     planner_evaluation = None
+    auditor_evaluation = None
     evaluation_skip_reason = None
 
     if completed:
@@ -93,21 +126,48 @@ def run_scenario(
             evaluation_skip_reason = (
                 "Workflow completed without a Researcher evidence brief."
             )
+
         elif not recovery_options:
             evaluation_skip_reason = (
                 "Workflow completed without a Planner recovery option."
             )
+
         else:
+            original_itinerary = final_state["original_itinerary"]
+            recovery_option = recovery_options[0]
+
+            # Researcher evaluation
             researcher_evaluation = evaluate_researcher_output(
                 scenario,
                 evidence_brief,
             )
 
+            # Planner evaluation
             planner_evaluation = evaluate_planner_output(
                 scenario,
-                final_state["original_itinerary"],
-                recovery_options[0],
+                original_itinerary,
+                recovery_option,
             )
+
+            # Auditor evaluation
+            audit_report = final_state.get("audit_report")
+
+            if audit_report is not None:
+                validation_result = final_state.get(
+                    "itinerary_validation_result"
+                )
+
+                deterministic_validation = (
+                    _auditor_validation_input(validation_result)
+                )
+
+                auditor_evaluation = evaluate_auditor_output(
+                    scenario=scenario,
+                    original_itinerary=original_itinerary,
+                    proposed_itinerary=recovery_option.proposed_itinerary,
+                    audit_report=audit_report,
+                    deterministic_validation=deterministic_validation,
+                )
 
     result = {
         "run_id": run_id,
@@ -117,9 +177,9 @@ def run_scenario(
         "started_at": started_at.isoformat(),
         "completed_at": datetime.now(timezone.utc).isoformat(),
         "workflow_status": (
-            final_state["status"].value
-            if hasattr(final_state.get("status"), "value")
-            else str(final_state.get("status"))
+            workflow_status.value
+            if hasattr(workflow_status, "value")
+            else str(workflow_status)
         ),
         "current_stage": (
             final_state["current_stage"].value
@@ -128,22 +188,41 @@ def run_scenario(
         ),
         "error_details": final_state.get("error_details", []),
         "metadata": _metadata_totals(final_state),
+
         "researcher_evaluation": (
             researcher_evaluation.model_dump(mode="json")
             if researcher_evaluation is not None
             else None
         ),
+
         "planner_evaluation": (
             planner_evaluation.model_dump(mode="json")
             if planner_evaluation is not None
             else None
         ),
+
+        "auditor_evaluation": (
+            auditor_evaluation.model_dump(mode="json")
+            if auditor_evaluation is not None
+            else None
+        ),
+
         "evaluation_skip_reason": evaluation_skip_reason,
+
         "audit_report": (
             final_state["audit_report"].model_dump(mode="json")
             if final_state.get("audit_report") is not None
             else None
         ),
+
+        "deterministic_validation": (
+            final_state["itinerary_validation_result"].model_dump(
+                mode="json"
+            )
+            if final_state.get("itinerary_validation_result") is not None
+            else None
+        ),
+
         "raw_responses": {
             "researcher": final_state.get("research_raw_response"),
             "planner": final_state.get("planning_raw_response"),
@@ -151,11 +230,17 @@ def run_scenario(
         },
     }
 
+    # Preserve the existing Researcher + Planner pass definition.
+    # Include Auditor when an Auditor evaluation is available.
     result["overall_evaluation_passed"] = (
         researcher_evaluation is not None
         and planner_evaluation is not None
         and researcher_evaluation.passed
         and planner_evaluation.passed
+        and (
+            auditor_evaluation is None
+            or auditor_evaluation.passed
+        )
     )
 
     output_directory.mkdir(parents=True, exist_ok=True)
@@ -198,10 +283,12 @@ def main():
     )
 
     selection = parser.add_mutually_exclusive_group(required=True)
+
     selection.add_argument(
         "--scenario",
         choices=["E1", "E2", "E3", "E4", "E5"],
     )
+
     selection.add_argument(
         "--all",
         action="store_true",
@@ -213,6 +300,7 @@ def main():
         default=DEFAULT_MODEL,
         help="Model name used by the multi-agent workflow.",
     )
+
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -224,7 +312,9 @@ def main():
 
     if args.all:
         scenarios = load_scenarios(SCENARIO_DIRECTORY)
-        scenario_ids = [scenario.scenario_id for scenario in scenarios]
+        scenario_ids = [
+            scenario.scenario_id for scenario in scenarios
+        ]
     else:
         scenario_ids = [args.scenario]
 

@@ -1,0 +1,34 @@
+{
+  "run_id": "e6addc30-8bf9-425a-bd42-35cd8406b68e",
+  "scenario_id": "E1",
+  "scenario_name": "high_quality",
+  "model_name": "qwen3.5:4b",
+  "started_at": "2026-11-19T00:41:33.980203+00:00",
+  "completed_at": "2026-11-19T00:41:44.962300+00:00",
+  "workflow_status": "failed",
+  "current_stage": "investigation",
+  "error_details": [
+    "research: Researcher must return exactly one structured evidence finding."
+  ],
+  "metadata": {
+    "agents": {
+      "researcher": null,
+      "planner": null,
+      "auditor": null
+    },
+    "total_latency_seconds": 0.0,
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "llm_call_count": 1
+  },
+  "researcher_evaluation": null,
+  "planner_evaluation": null,
+  "evaluation_skip_reason": null,
+  "audit_report": null,
+  "raw_responses": {
+    "researcher": null,
+    "planner": null,
+    "auditor": null
+  },
+  "overall_evaluation_passed": false
+}

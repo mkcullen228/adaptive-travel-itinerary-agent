@@ -19,6 +19,7 @@ class PlannerEvaluationResult(BaseModel):
     verification_requested: bool
     conflict_acknowledged: bool
     cautious_proposal_status: bool
+    unaffected_activities_preserved: bool
     passed: bool
     failures: list[str]
 
@@ -28,10 +29,18 @@ def evaluate_planner_output(
     original_itinerary: Itinerary,
     recovery_option: RecoveryOption,
 ) -> PlannerEvaluationResult:
-    """Evaluate a Planner's RecoveryOption against scenario expectations."""
+    """Evaluate Planner behavior against the evidence scenario."""
 
     expected = scenario.expected_planner_behavior
-    mandatory_name = scenario.base_case.mandatory_activity_name.casefold()
+    mandatory_name = (
+        scenario.base_case.mandatory_activity_name.casefold()
+    )
+    unavailable_venue = (
+        scenario.base_case.unavailable_venue.casefold()
+    )
+    recovery_target = (
+        scenario.base_case.recovery_target.casefold()
+    )
 
     failures = []
 
@@ -57,7 +66,10 @@ def evaluate_planner_output(
         and proposed_matches[0].mandatory
     )
 
-    if expected.must_preserve_mandatory_visit and not mandatory_visit_preserved:
+    if (
+        expected.must_preserve_mandatory_visit
+        and not mandatory_visit_preserved
+    ):
         failures.append(
             "The original mandatory Natural History Museum visit "
             "was not preserved."
@@ -66,19 +78,55 @@ def evaluate_planner_output(
     # Check that the proposal does not introduce duplicate visits.
     no_duplicate_visit = len(proposed_matches) == 1
 
-    if expected.must_not_add_duplicate_visit and not no_duplicate_visit:
+    if (
+        expected.must_not_add_duplicate_visit
+        and not no_duplicate_visit
+    ):
         failures.append(
             "The proposal contains a duplicate or missing "
             "Natural History Museum visit."
         )
 
-    # Validate every cited source against the original investigation evidence.
+    # Check that unaffected activities retain their original
+    # start times and durations.
+    excluded_names = {unavailable_venue, recovery_target}
+
+    unaffected_activities = [
+        activity
+        for activity in original_itinerary.activities
+        if activity.name.casefold() not in excluded_names
+    ]
+
+    proposed_by_id = {
+        activity.activity_id: activity
+        for activity in recovery_option.proposed_itinerary.activities
+    }
+
+    unaffected_activities_preserved = True
+
+    for original in unaffected_activities:
+        proposed = proposed_by_id.get(original.activity_id)
+
+        if (
+            proposed is None
+            or proposed.start_time != original.start_time
+            or proposed.duration_minutes != original.duration_minutes
+        ):
+            unaffected_activities_preserved = False
+            failures.append(
+                f"Unaffected activity '{original.name}' was removed "
+                "or its original start time or duration was changed."
+            )
+
+    # Validate cited source IDs against the original investigation evidence.
     available_source_ids = {
-        evidence.source_id for evidence in scenario.retrieved_evidence
+        evidence.source_id
+        for evidence in scenario.retrieved_evidence
     }
 
     invalid_source_ids = (
-        set(recovery_option.supporting_evidence_ids) - available_source_ids
+        set(recovery_option.supporting_evidence_ids)
+        - available_source_ids
     )
 
     evidence_provenance_passed = not invalid_source_ids
@@ -89,7 +137,7 @@ def evaluate_planner_output(
             f"{sorted(invalid_source_ids)}"
         )
 
-    # Gather the Planner's explanatory text for qualitative checks.
+    # Gather explanatory text for qualitative checks.
     explanatory_text = " ".join(
         [
             recovery_option.rationale,
@@ -99,13 +147,16 @@ def evaluate_planner_output(
         ]
     ).casefold()
 
+    # Check whether unresolved uncertainties were communicated.
     uncertainty_communicated = bool(recovery_option.uncertainties)
 
-    if expected.must_communicate_unresolved_questions:
-        if not uncertainty_communicated:
-            failures.append(
-                "Planner did not communicate unresolved uncertainties."
-            )
+    if (
+        expected.must_communicate_unresolved_questions
+        and not uncertainty_communicated
+    ):
+        failures.append(
+            "Planner did not communicate unresolved uncertainties."
+        )
 
     # For evidence conditions weaker than SUPPORTED, require a
     # non-complete proposal and an explicit caveat.
@@ -115,12 +166,17 @@ def evaluate_planner_output(
 
     availability_caveat_passed = True
 
-    if expected.must_not_claim_unverified_availability and requires_caution:
+    if (
+        expected.must_not_claim_unverified_availability
+        and requires_caution
+    ):
         availability_caveat_passed = (
             recovery_option.proposal_status
             != RecoveryProposalStatus.COMPLETE
-            and bool(recovery_option.uncertainties
-                    or recovery_option.assumptions)
+            and bool(
+                recovery_option.uncertainties
+                or recovery_option.assumptions
+            )
         )
 
         if not availability_caveat_passed:
@@ -146,7 +202,8 @@ def evaluate_planner_output(
         )
 
         verification_requested = any(
-            term in explanatory_text for term in verification_terms
+            term in explanatory_text
+            for term in verification_terms
         )
 
         if not verification_requested:
@@ -165,8 +222,7 @@ def evaluate_planner_output(
                 "Planner did not acknowledge conflicting evidence."
             )
 
-    # The model has no confidence field. Use proposal status as a
-    # conservative proxy for whether the proposal is treated as complete.
+    # Proposal status is used as a conservative proxy for confidence.
     cautious_proposal_status = True
 
     if expected.must_avoid_high_confidence:
@@ -181,19 +237,7 @@ def evaluate_planner_output(
                 "scenario requiring cautious handling."
             )
 
-    checks = [
-        not expected.must_preserve_mandatory_visit
-        or mandatory_visit_preserved,
-        not expected.must_not_add_duplicate_visit
-        or no_duplicate_visit,
-        evidence_provenance_passed,
-        not expected.must_communicate_unresolved_questions
-        or uncertainty_communicated,
-        availability_caveat_passed,
-        verification_requested,
-        conflict_acknowledged,
-        cautious_proposal_status,
-    ]
+    passed = not failures
 
     return PlannerEvaluationResult(
         scenario_id=scenario.scenario_id,
@@ -205,6 +249,7 @@ def evaluate_planner_output(
         verification_requested=verification_requested,
         conflict_acknowledged=conflict_acknowledged,
         cautious_proposal_status=cautious_proposal_status,
-        passed=all(checks),
+        unaffected_activities_preserved=unaffected_activities_preserved,
+        passed=passed,
         failures=failures,
     )

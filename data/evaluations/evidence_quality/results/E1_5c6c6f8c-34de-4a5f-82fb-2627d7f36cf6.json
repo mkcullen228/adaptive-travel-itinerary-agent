@@ -1,0 +1,91 @@
+{
+  "run_id": "5c6c6f8c-34de-4a5f-82fb-2627d7f36cf6",
+  "scenario_id": "E1",
+  "scenario_name": "high_quality",
+  "model_name": "qwen3.5:4b",
+  "started_at": "2026-11-19T02:06:55.801831+00:00",
+  "completed_at": "2026-11-19T02:07:52.866946+00:00",
+  "workflow_status": "completed",
+  "current_stage": "completed",
+  "error_details": [],
+  "metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.72610166692175,
+        "input_tokens": 1356,
+        "output_tokens": 336
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 37.02517975005321,
+        "input_tokens": 3077,
+        "output_tokens": 1165
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 8.29675345798023,
+        "input_tokens": 3509,
+        "output_tokens": 178
+      }
+    },
+    "total_latency_seconds": 57.04803487495519,
+    "total_input_tokens": 7942,
+    "total_output_tokens": 1679,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E1",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E1",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "Planner did not explicitly qualify schedule feasibility in the main rationale.",
+      "The Planner's stated recovery action does not match the actual changes to the existing mandatory visit."
+    ],
+    "recovery_action_consistent": false,
+    "travel_claims_supported": true,
+    "rationale_uncertainty_communicated": false
+  },
+  "evaluation_skip_reason": null,
+  "audit_report": {
+    "assessment": "partially_supported",
+    "supported_claims": [],
+    "unsupported_claims": [],
+    "conflicting_claims": [],
+    "omitted_uncertainties": [],
+    "rationale_findings": [
+      "The proposal rationale correctly identifies the National Gallery of Art as unavailable based on the disruption scenario and utilizes the evidence from source_e1_001 to support rescheduling the National Museum of Natural History.",
+      "The claim that the itinerary end time remains at 14:30 is partially supported by the EvidenceBrief's unresolved questions regarding overall schedule feasibility, but lacks explicit confirmation in the evidence sources provided."
+    ],
+    "recommendations": [
+      "Acknowledge the missing travel estimates identified in deterministic_validation for all consecutive activity pairs.",
+      "Clarify that while the National Museum of Natural History can be extended, the feasibility of the entire rescheduled timeline (including walking times) remains unverified per EvidenceBrief warnings."
+    ]
+  },
+  "raw_responses": {
+    "researcher": "{\n  \"findings\": [\n    {\n      \"claim\": \"The existing mandatory National Museum of Natural History visit can be rescheduled or extended to accommodate the unavailable National Gallery of Art visit.\",\n      \"status\": \"supported\",\n      \"supporting_source_ids\": [\n        \"source_e1_001\"\n      ],\n      \"conflicting_source_ids\": [],\n      \"explanation\": \"The retrieved evidence explicitly states that the National Museum of Natural History has confirmed the existing visit can be extended to accommodate the proposed itinerary adjustment. This directly supports the claim regarding the rescheduling or extension of the National Museum visit.\",\n      \"source_quality_warnings\": [\n        \"The availability of the remaining original activities has not been independently verified.\",\n        \"Schedule feasibility after removing the unavailable National Gallery has not been assessed.\"\n      ]\n    }\n  ],\n  \"unresolved_questions\": [\n    \"Whether other original itinerary activities remain available and feasible after the removal of the National Gallery visit.\",\n    \"The overall schedule feasibility following the adjustment to remove the National Gallery and extend the National Museum visit.\"\n  ],\n  \"source_ids_reviewed\": [\n    \"source_e1_001\"\n  ],\n  \"overall_uncertainties\": [\n    \"While the National Museum of Natural History confirms it can be extended, the investigation warnings indicate that the availability and feasibility of other original activities in the itinerary have not been independently verified. Therefore, while the specific claim about extending the National Museum visit is supported, the broader impact on the full itinerary remains uncertain.\"\n  ]\n}",
+    "planner": "{\n  \"option_id\": \"recovery_proposal_dc_2026_11_07_v1\",\n  \"strategy\": \"best_overall_feasibility\",\n  \"proposed_itinerary\": {\n    \"itinerary_id\": \"dc_baseline_2026_11_07\",\n    \"destination\": \"Washington, DC\",\n    \"itinerary_date\": \"2026-11-07\",\n    \"activities\": [\n      {\n        \"activity_id\": \"american_history\",\n        \"attraction_id\": \"american_history\",\n        \"name\": \"National Museum of American History\",\n        \"location\": \"1300 Constitution Ave. NW, Washington, DC\",\n        \"start_time\": \"2026-11-07T09:00:00Z\",\n        \"duration_minutes\": 90,\n        \"mandatory\": false,\n        \"indoor\": true\n      },\n      {\n        \"activity_id\": \"natural_history\",\n        \"attraction_id\": \"natural_history\",\n        \"name\": \"National Museum of Natural History\",\n        \"location\": \"10th St. & Constitution Ave. NW, Washington, DC\",\n        \"start_time\": \"2026-11-07T10:50:00Z\",\n        \"duration_minutes\": 90,\n        \"mandatory\": true,\n        \"indoor\": true\n      },\n      {\n        \"activity_id\": \"wwii_memorial\",\n        \"attraction_id\": \"wwii_memorial\",\n        \"name\": \"World War II Memorial\",\n        \"location\": \"1750 Independence Ave. SW, Washington, DC\",\n        \"start_time\": \"2026-11-07T13:20:00Z\",\n        \"duration_minutes\": 30,\n        \"mandatory\": false,\n        \"indoor\": false\n      },\n      {\n        \"activity_id\": \"lincoln_memorial\",\n        \"attraction_id\": \"lincoln_memorial\",\n        \"name\": \"Lincoln Memorial\",\n        \"location\": \"2 Lincoln Memorial Circle NW, Washington, DC\",\n        \"start_time\": \"2026-11-07T14:00:00Z\",\n        \"duration_minutes\": 30,\n        \"mandatory\": false,\n        \"indoor\": false\n      }\n    ],\n    \"travel_legs\": [\n      {\n        \"origin_activity_id\": \"american_history\",\n        \"destination_activity_id\": \"natural_history\",\n        \"estimates\": [],\n        \"selected_mode\": \"walking\"\n      },\n      {\n        \"origin_activity_id\": \"natural_history\",\n        \"destination_activity_id\": \"wwii_memorial\",\n        \"estimates\": [],\n        \"selected_mode\": \"walking\"\n      },\n      {\n        \"origin_activity_id\": \"wwii_memorial\",\n        \"destination_activity_id\": \"lincoln_memorial\",\n        \"estimates\": [],\n        \"selected_mode\": \"walking\"\n      }\n    ],\n    \"routing_failures\": []\n  },\n  \"proposal_status\": \"partial\",\n  \"rationale\": \"The National Gallery of Art is confirmed unavailable for the scheduled visit on November 7, 2026. To maintain schedule feasibility while preserving the mandatory visit to the National Museum of Natural History, the proposed recovery removes the National Gallery of Art from the itinerary and shifts the start time of the National Museum of Natural History to immediately follow the National Museum of American History. This adjustment utilizes the confirmed flexibility of the National Museum of Natural History to accommodate the shift without extending the total duration beyond the original end time.\",\n  \"preserved_constraints\": [\n    \"Mandatory visit to National Museum of Natural History\",\n    \"Original itinerary date (2026-11-07)\",\n    \"Original end time (14:30)\"\n  ],\n  \"violated_constraints\": [],\n  \"trade_offs\": [\n    \"The National Gallery of Art visit is removed from the itinerary due to confirmed unavailability. This activity was originally optional.\",\n    \"The start time of the National Museum of Natural History is shifted earlier (from 13:20 to 10:50) to accommodate the removal of the National Gallery and the American History visit, ensuring the mandatory constraint is met without pushing the final schedule beyond the original end time.\"\n  ],\n  \"supporting_evidence_ids\": [\n    \"source_e1_001\"\n  ],\n  \"assumptions\": [\n    \"The walking travel estimates between the National Museum of American History and the National Museum of Natural History remain feasible without additional delay.\",\n    \"The National Museum of Natural History can accommodate the earlier start time without impacting other scheduled activities or violating internal venue constraints.\"\n  ],\n  \"uncertainties\": [\n    \"While the evidence confirms the National Museum of Natural History can be extended, the investigation warnings indicate that the availability and feasibility of other original activities in the itinerary have not been independently verified.\",\n    \"The overall schedule feasibility following the adjustment to remove the National Gallery has not been assessed beyond the specific claim regarding the National Museum extension.\"\n  ]\n}",
+    "auditor": "{\n  \"assessment\": \"partially_supported\",\n  \"rationale_findings\": [\n    \"The proposal rationale correctly identifies the National Gallery of Art as unavailable based on the disruption scenario and utilizes the evidence from source_e1_001 to support rescheduling the National Museum of Natural History.\",\n    \"The claim that the itinerary end time remains at 14:30 is partially supported by the EvidenceBrief's unresolved questions regarding overall schedule feasibility, but lacks explicit confirmation in the evidence sources provided.\"\n  ],\n  \"recommendations\": [\n    \"Acknowledge the missing travel estimates identified in deterministic_validation for all consecutive activity pairs.\",\n    \"Clarify that while the National Museum of Natural History can be extended, the feasibility of the entire rescheduled timeline (including walking times) remains unverified per EvidenceBrief warnings.\"\n  ]\n}"
+  },
+  "overall_evaluation_passed": false
+}

@@ -26,19 +26,16 @@
     }
   ],
   "expected_researcher_output": {
-    "status": "partially_supported",
-    "supporting_source_ids": [
-      "source_e3_001"
-    ],
-    "conflicting_source_ids": [],
-    "source_quality_warnings": [
-      "Source information is stale.",
-      "Historical information does not confirm current availability."
-    ],
-    "source_ids_reviewed": [
-      "source_e3_001"
-    ]
-  },
+  "status": "unsupported",
+  "supporting_source_ids": [],
+  "conflicting_source_ids": [],
+  "source_quality_warnings": [
+    "stale"
+  ],
+  "source_ids_reviewed": [
+    "source_e3_001"
+  ]
+},
   "expected_planner_behavior": {
     "may_recommend_recovery": true,
     "must_preserve_mandatory_visit": true,
