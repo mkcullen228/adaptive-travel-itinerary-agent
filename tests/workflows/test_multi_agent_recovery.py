@@ -5,14 +5,22 @@ from datetime import datetime, timezone, timedelta
 
 from src.models.agent_state import WorkflowStage, WorkflowStatus
 from src.models.multi_agent import EvidenceBrief, AuditReport
-from src.models.agent_workflow import RecoveryOption
-from src.models.validation import ValidationResult
+from src.models.agent_workflow import (
+    Constraint,
+    ConstraintPriority,
+    ConstraintType,
+)
+from src.models.validation import (
+    IssueType,
+    ValidationStatus,
+)
 from src.models.retrieved_evidence import RetrievedEvidence
 from src.models.source_reference import VerificationStatus
 from src.models.activity import Activity
 
 from src.workflows.multi_agent_recovery import (
     build_multi_agent_recovery_graph,
+    validate_mandatory_activity_preservation,
 )
 from tests.workflows.test_single_agent_recovery import make_state
 
@@ -637,3 +645,162 @@ def test_schedule_findings_exclude_disrupted_activity(
         finding["activity_id"] not in affected_ids
         for finding in schedule_findings
     )
+
+
+def test_mandatory_activity_must_be_preserved():
+    activity = Activity(
+        activity_id="activity_001",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=90,
+        mandatory=True,
+        indoor=True,
+    )
+
+    original = make_state()["original_itinerary"].model_copy(
+        update={"activities": [activity]}
+    )
+    proposed = original.model_copy(update={"activities": []})
+
+    result = validate_mandatory_activity_preservation(
+        original,
+        proposed,
+        [],
+    )
+
+    assert result.status == ValidationStatus.INVALID
+    assert result.issues[0].issue_type == (
+        IssueType.MANDATORY_ACTIVITY_NOT_PRESERVED
+    )
+
+
+def test_mandatory_activity_flag_cannot_be_relaxed():
+    activity = Activity(
+        activity_id="activity_001",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=90,
+        mandatory=True,
+        indoor=True,
+    )
+
+    relaxed_activity = activity.model_copy(
+        update={"mandatory": False}
+    )
+
+    original = make_state()["original_itinerary"].model_copy(
+        update={"activities": [activity]}
+    )
+    proposed = original.model_copy(
+        update={"activities": [relaxed_activity]}
+    )
+
+    result = validate_mandatory_activity_preservation(
+        original,
+        proposed,
+        [],
+    )
+
+    assert result.status == ValidationStatus.INVALID
+
+
+def test_mandatory_activity_constraint_accepts_exact_normalized_name():
+    activity = Activity(
+        activity_id="activity_001",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=90,
+        mandatory=False,
+        indoor=True,
+    )
+
+    itinerary = make_state()["original_itinerary"].model_copy(
+        update={"activities": [activity]}
+    )
+
+    constraint = Constraint(
+        constraint_id="constraint_001",
+        description="Visit the National Gallery",
+        constraint_type=ConstraintType.MANDATORY,
+        category="activity",
+        priority=ConstraintPriority.HIGH,
+        value="  national gallery of art  ",
+    )
+
+    result = validate_mandatory_activity_preservation(
+        itinerary,
+        itinerary,
+        [constraint],
+    )
+
+    assert result.status == ValidationStatus.VALID
+    assert result.issues == []
+
+
+def test_missing_mandatory_activity_constraint_is_invalid():
+    itinerary = make_state()["original_itinerary"]
+
+    constraint = Constraint(
+        constraint_id="constraint_001",
+        description="Visit the National Gallery",
+        constraint_type=ConstraintType.MANDATORY,
+        category="activity",
+        priority=ConstraintPriority.HIGH,
+        value="National Gallery of Art",
+    )
+
+    result = validate_mandatory_activity_preservation(
+        itinerary,
+        itinerary,
+        [constraint],
+    )
+
+    assert result.status == ValidationStatus.INVALID
+    assert "no exact match" in result.issues[0].description
+
+
+def test_ambiguous_mandatory_activity_constraint_is_invalid():
+    first = Activity(
+        activity_id="activity_001",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=60,
+        mandatory=False,
+        indoor=True,
+    )
+
+    second = Activity(
+        activity_id="activity_002",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 12, 0),
+        duration_minutes=60,
+        mandatory=False,
+        indoor=True,
+    )
+
+    itinerary = make_state()["original_itinerary"].model_copy(
+        update={"activities": [first, second]}
+    )
+
+    constraint = Constraint(
+        constraint_id="constraint_001",
+        description="Visit the National Gallery",
+        constraint_type=ConstraintType.MANDATORY,
+        category="activity",
+        priority=ConstraintPriority.HIGH,
+        value="National Gallery of Art",
+    )
+
+    result = validate_mandatory_activity_preservation(
+        itinerary,
+        itinerary,
+        [constraint],
+    )
+
+    assert result.status == ValidationStatus.INVALID
+    assert "ambiguous" in result.issues[0].description

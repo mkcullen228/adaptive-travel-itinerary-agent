@@ -10,16 +10,114 @@ from src.models.agent_state import (
     WorkflowStatus,
 )
 from src.models.agent_workflow import (
+    Constraint,
+    ConstraintType,
     ExecutionEvent,
     OptionValidation,
     RecoveryPlanningInput,
     RecoveryStrategy,
 )
-from src.recovery.audit import audit_recovery_proposal
+
+from src.models.validation import (
+    IssueType,
+    ValidationIssue,
+    ValidationResult,
+    ValidationStatus,
+)
+from src.recovery.audit import (
+    audit_recovery_proposal,
+    compare_mandatory_activities,
+)
 from src.recovery.generation import DEFAULT_MODEL
 from src.recovery.planning import plan_recovery
 from src.recovery.research import research_evidence
 from src.validation.schedule_validator import validate_itinerary
+
+
+def validate_mandatory_activity_preservation(
+    original_itinerary,
+    proposed_itinerary,
+    mandatory_constraints: list[Constraint],
+) -> ValidationResult:
+    """Deterministically check that mandatory activities are preserved."""
+
+    issues = []
+
+    # Check activities already marked mandatory in the original itinerary.
+    comparisons = compare_mandatory_activities(
+        original_itinerary=original_itinerary,
+        proposed_itinerary=proposed_itinerary,
+    )
+
+    for comparison in comparisons:
+        if not comparison["preserved"]:
+            issues.append(
+                ValidationIssue(
+                    issue_type=IssueType.MANDATORY_ACTIVITY_NOT_PRESERVED,
+                    description=(
+                        "Original mandatory activity "
+                        f"'{comparison['activity_name']}' "
+                        f"(ID: {comparison['activity_id']}) is missing "
+                        "or is no longer marked mandatory in the proposal."
+                    ),
+                    activity_ids=[comparison["activity_id"]],
+                )
+            )
+
+    # Check mandatory constraints that explicitly refer to activities.
+    for constraint in mandatory_constraints:
+        if constraint.constraint_type != ConstraintType.MANDATORY:
+            continue
+
+        if constraint.category.strip().casefold() != "activity":
+            continue
+
+        target = constraint.value.strip().casefold()
+
+        matches = [
+            activity
+            for activity in proposed_itinerary.activities
+            if target in {
+                activity.activity_id.strip().casefold(),
+                activity.name.strip().casefold(),
+            }
+        ]
+
+        if len(matches) == 0:
+            description = (
+                f"Mandatory activity constraint '{constraint.constraint_id}' "
+                f"('{constraint.value}') has no exact match in the proposal."
+            )
+            activity_ids = []
+
+        elif len(matches) > 1:
+            description = (
+                f"Mandatory activity constraint '{constraint.constraint_id}' "
+                f"('{constraint.value}') matches multiple proposed activities "
+                "and is ambiguous."
+            )
+            activity_ids = [
+                activity.activity_id for activity in matches
+            ]
+
+        else:
+            continue
+
+        issues.append(
+            ValidationIssue(
+                issue_type=IssueType.MANDATORY_ACTIVITY_NOT_PRESERVED,
+                description=description,
+                activity_ids=activity_ids,
+            )
+        )
+
+    status = (
+        ValidationStatus.INVALID
+        if issues
+        else ValidationStatus.VALID
+    )
+
+    return ValidationResult(status=status, issues=issues)
 
 
 def build_multi_agent_recovery_graph(
@@ -302,15 +400,59 @@ def build_multi_agent_recovery_graph(
                 option.proposed_itinerary
             )
 
+            mandatory_validation = validate_mandatory_activity_preservation(
+                original_itinerary=state["original_itinerary"],
+                proposed_itinerary=option.proposed_itinerary,
+                mandatory_constraints=state["mandatory_constraints"],
+            )
+
+            combined_issues = (
+                validation_result.issues
+                + mandatory_validation.issues
+            )
+            
+            if (
+                validation_result.status == ValidationStatus.INVALID
+                or mandatory_validation.status == ValidationStatus.INVALID
+            ):
+                combined_status = ValidationStatus.INVALID
+
+            elif validation_result.status == ValidationStatus.INCOMPLETE:
+                combined_status = ValidationStatus.INCOMPLETE
+
+            else:
+                combined_status = ValidationStatus.VALID
+
+            validation_result = ValidationResult(
+                status=combined_status,
+                issues=combined_issues,
+            )
+
             option_validation = OptionValidation(
                 option_id=option_id,
                 validation_result=validation_result,
             )
 
+            validation_warnings = []
+
+            if validation_result.status == ValidationStatus.INCOMPLETE:
+                validation_warnings.append(
+                    "The recovery proposal is incomplete. "
+                    "Review the unresolved validation issues before relying "
+                    "on its feasibility."
+                )
+                validation_warnings.extend(
+                    issue.description
+                    for issue in validation_result.issues
+                )
+
             event = make_event(
                 stage="validation",
                 event_type="proposal_validated",
-                description="Completed deterministic itinerary validation.",
+                description=(
+                    "Completed deterministic itinerary and mandatory "
+                    "activity validation."
+                ),
                 details={
                     "option_id": option_id,
                     "validation_status": validation_result.status.value,
@@ -321,6 +463,7 @@ def build_multi_agent_recovery_graph(
             return {
                 "validation_results": [option_validation],
                 "itinerary_validation_result": validation_result,
+                "warnings": validation_warnings,
                 "current_stage": WorkflowStage.VALIDATION,
                 "execution_trace": [event],
             }
@@ -331,6 +474,7 @@ def build_multi_agent_recovery_graph(
                 "validation",
                 error,
             )
+
 
     def audit_proposal(state: TravelAgentState):
         llm_call_attempted = False
@@ -424,17 +568,45 @@ def build_multi_agent_recovery_graph(
                 llm_call_attempted=llm_call_attempted,
             )
 
+
     def finalize_workflow(state: TravelAgentState):
+        """Finalize workflow metadata and preserve deterministic outcome."""
+        validation_result = state.get("itinerary_validation_result")
+
+        no_valid_recovery = (
+            validation_result is not None
+            and validation_result.status == ValidationStatus.INVALID
+        )
+
+        final_status = (
+            WorkflowStatus.NO_VALID_RECOVERY
+            if no_valid_recovery
+            else WorkflowStatus.COMPLETED
+        )
+
         event = make_event(
             stage="finalization",
-            event_type="workflow_completed",
+            event_type=(
+                "no_valid_recovery"
+                if no_valid_recovery
+                else "workflow_completed"
+            ),
             description=(
-                "Multi-agent recovery generation, validation, and audit "
+                "No valid recovery proposal was produced. "
+                "The proposal is retained for diagnosis but is not "
+                "presented as a valid recovery."
+                if no_valid_recovery
+                else "Multi-agent recovery generation, validation, and audit "
                 "completed. No user approval or execution is implied."
             ),
             details={
                 "llm_call_count": state["llm_call_count"],
                 "tool_call_count": state["total_tool_call_count"],
+                "validation_status": (
+                    validation_result.status.value
+                    if validation_result is not None
+                    else None
+                ),
             },
         )
 
@@ -445,14 +617,18 @@ def build_multi_agent_recovery_graph(
         ]
 
         completed_metadata = [
-            metadata for metadata in agent_metadata if metadata is not None
+            metadata
+            for metadata in agent_metadata
+            if metadata is not None
         ]
 
         input_tokens = [
-            metadata.get("input_tokens") for metadata in completed_metadata
+            metadata.get("input_tokens")
+            for metadata in completed_metadata
         ]
         output_tokens = [
-            metadata.get("output_tokens") for metadata in completed_metadata
+            metadata.get("output_tokens")
+            for metadata in completed_metadata
         ]
 
         total_input_tokens = (
@@ -496,7 +672,8 @@ def build_multi_agent_recovery_graph(
 
         return {
             "current_stage": WorkflowStage.COMPLETED,
-            "status": WorkflowStatus.COMPLETED,
+            "status": final_status,
+            "final_itinerary": None,
             "execution_trace": [event],
             "multi_agent_generation_metadata": aggregate_metadata,
         }

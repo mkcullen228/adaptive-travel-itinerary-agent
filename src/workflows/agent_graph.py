@@ -6,6 +6,9 @@ from src.models.agent_state import (
     WorkflowStatus,
 )
 from src.workflows.investigation_workflow import run_investigation
+from src.workflows.multi_agent_recovery import (
+    build_multi_agent_recovery_graph,
+)
 from src.workflows.routing_workflow import process_itinerary_routes
 
 
@@ -36,6 +39,7 @@ def normal_itinerary_node(state: TravelAgentState):
 
 
 def investigation_node(state: TravelAgentState):
+    """Investigate the disruption and store the resulting evidence."""
     result = run_investigation(
         itinerary=state["original_itinerary"],
         scenario=state["disruption_scenario"],
@@ -50,10 +54,23 @@ def investigation_node(state: TravelAgentState):
 
 
 def build_agent_graph():
+    """Build the primary itinerary workflow.
+
+    Normal itineraries follow the existing routing and validation path.
+    Disrupted itineraries are investigated before entering multi-agent
+    recovery.
+    """
     graph = StateGraph(TravelAgentState)
+
+    # Build the existing multi-agent workflow as a nested graph.
+    multi_agent_recovery_graph = build_multi_agent_recovery_graph()
 
     graph.add_node("normal_itinerary", normal_itinerary_node)
     graph.add_node("investigation", investigation_node)
+    graph.add_node(
+        "multi_agent_recovery",
+        multi_agent_recovery_graph,
+    )
 
     graph.add_conditional_edges(
         START,
@@ -65,6 +82,7 @@ def build_agent_graph():
     )
 
     graph.add_edge("normal_itinerary", END)
-    graph.add_edge("investigation", END)
+    graph.add_edge("investigation", "multi_agent_recovery")
+    graph.add_edge("multi_agent_recovery", END)
 
     return graph.compile()

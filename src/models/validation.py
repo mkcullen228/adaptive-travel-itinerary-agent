@@ -14,6 +14,7 @@ class IssueType(str, Enum):
     MISSING_TRAVEL_ESTIMATE = "missing_travel_estimate"
     ORPHANED_TRAVEL_LEG = "orphaned_travel_leg"
     DUPLICATE_TRAVEL_LEG = "duplicate_travel_leg"
+    MANDATORY_ACTIVITY_NOT_PRESERVED = "mandatory_activity_not_preserved"
 
 
 class ValidationIssue(BaseModel):
