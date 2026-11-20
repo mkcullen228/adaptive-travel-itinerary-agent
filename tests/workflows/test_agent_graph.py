@@ -3,7 +3,11 @@ from pathlib import Path
 from langgraph.graph import StateGraph, START, END
 
 from src.models.itinerary import Itinerary
-from src.models.agent_state import TravelAgentState
+from src.models.agent_state import (
+    TravelAgentState,
+    WorkflowStage,
+    WorkflowStatus,
+)
 from src.models.agent_workflow import ExecutionEvent
 from src.models.validation import ValidationResult, ValidationStatus
 from src.workflows.agent_graph import build_agent_graph
@@ -120,16 +124,38 @@ def test_investigation_node_calls_workflow_with_correct_inputs(monkeypatch):
 def test_agent_graph_runs_investigation_node(monkeypatch):
     # Arrange
     itinerary, disruption = make_test_inputs()
-
-    expected_result = object()
+    expected_investigation = object()
+    expected_audit_report = object()
 
     def mock_run_investigation(**kwargs):
-        return expected_result
+        return expected_investigation
+
+    def mock_build_multi_agent_recovery_graph():
+        def mock_recovery_node(state):
+            # Confirm the investigation result reaches recovery.
+            assert (
+                state["investigation_result"]
+                is expected_investigation
+            )
+
+            return {
+                "audit_report": expected_audit_report,
+                "current_stage": WorkflowStage.COMPLETED,
+                "status": WorkflowStatus.COMPLETED,
+            }
+
+        return mock_recovery_node
 
     monkeypatch.setattr(
         agent_graph,
         "run_investigation",
         mock_run_investigation,
+    )
+
+    monkeypatch.setattr(
+        agent_graph,
+        "build_multi_agent_recovery_graph",
+        mock_build_multi_agent_recovery_graph,
     )
 
     initial_state = initialize_agent_state(
@@ -146,9 +172,17 @@ def test_agent_graph_runs_investigation_node(monkeypatch):
     result = graph.invoke(initial_state)
 
     # Assert
-    assert result["investigation_result"] is expected_result
+    assert result["investigation_result"] is expected_investigation
+    assert result["audit_report"] is expected_audit_report
+
     assert result["original_itinerary"] is itinerary
     assert result["disruption_scenario"] is disruption
+
+    # Recovery generation must not finalize the itinerary.
+    assert result["final_itinerary"] is None
+
+    assert result["status"] == WorkflowStatus.COMPLETED
+    assert result["current_stage"] == WorkflowStage.COMPLETED
 
 
 def test_normal_itinerary_node_processes_copy(monkeypatch):

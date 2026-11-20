@@ -6,7 +6,8 @@ from src.models.disruption import (
     DisruptionType,
     DisruptionSeverity,
 )
-from src.models.agent_workflow import Constraint, ConstraintPriority, ConstraintType
+from src.models.agent_workflow import (Constraint, ConstraintPriority, 
+                                       ConstraintType, ApprovalStatus)
 from src.workflows.state_initialization import initialize_agent_state
 
 
@@ -57,6 +58,14 @@ def test_initialize_agent_state_defaults():
     assert state["planning_generation_metadata"] is None
     assert state["audit_report"] is None
     assert state["audit_generation_metadata"] is None
+    # Recovery must not be treated as approved or finalized at initialization.
+    assert state["approval_status"] == ApprovalStatus.NOT_REQUIRED
+    assert state["approval_history"] == []
+    assert state["approved_constraint_changes"] == []
+    assert state["final_itinerary"] is None
+
+    # Workflow timing starts when multi-agent recovery begins, not at initialization.
+    assert state["workflow_started_at"] is None
 
 
 def test_initialize_agent_state_with_user_inputs():

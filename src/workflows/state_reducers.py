@@ -1,21 +1,5 @@
+
 from src.models.agent_workflow import ExecutionEvent, ApprovalRecord
-
-
-def append_execution_events(
-    existing: list[ExecutionEvent],
-    updates: list[ExecutionEvent],
-) -> list[ExecutionEvent]:
-    """Append new execution events while preventing duplicate event IDs."""
-
-    existing_ids = {event.event_id for event in existing}
-
-    new_events = [
-        event
-        for event in updates
-        if event.event_id not in existing_ids
-    ]
-
-    return existing + new_events
 
 
 def append_execution_events(
