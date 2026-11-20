@@ -1,6 +1,7 @@
 
 from uuid import uuid4
 from time import perf_counter
+
 from langgraph.graph import StateGraph, START, END
 
 from src.models.agent_state import (
@@ -126,6 +127,7 @@ def build_multi_agent_recovery_graph(
 
     def research_context(state: TravelAgentState):
         llm_call_attempted = False
+
         try:
             investigation = state["investigation_result"]
             disruption = state["disruption_scenario"]
@@ -142,6 +144,18 @@ def build_multi_agent_recovery_graph(
                 model_name=model_name,
                 client=client,
             )
+
+            # Record the complete source inventory supplied to the
+            # Researcher. This is deterministic provenance metadata,
+            # not an LLM judgment about evidence quality.
+            expected_source_ids = sorted(
+                {
+                    evidence.source_id
+                    for evidence in investigation.retrieved_evidence
+                }
+            )
+
+            result.evidence_brief.source_ids_reviewed = expected_source_ids
 
             metadata = {
                 "model_name": result.model_name,
@@ -182,6 +196,7 @@ def build_multi_agent_recovery_graph(
 
     def generate_plan(state: TravelAgentState):
         llm_call_attempted = False
+
         try:
             planning_input = state["recovery_planning_input"]
             evidence_brief = state["evidence_brief"]
@@ -201,6 +216,29 @@ def build_multi_agent_recovery_graph(
             )
 
             option = result.recovery_option
+
+            investigation = state["investigation_result"]
+
+            if investigation is None:
+                raise ValueError(
+                    "Investigation result is required for evidence validation."
+                )
+
+            available_source_ids = {
+                evidence.source_id
+                for evidence in investigation.retrieved_evidence
+            }
+
+            invalid_source_ids = (
+                set(option.supporting_evidence_ids)
+                - available_source_ids
+            )
+
+            if invalid_source_ids:
+                raise ValueError(
+                    "Planner referenced evidence IDs not present in the "
+                    f"investigation: {sorted(invalid_source_ids)}"
+                )
 
             metadata = {
                 "model_name": result.model_name,
@@ -296,6 +334,7 @@ def build_multi_agent_recovery_graph(
 
     def audit_proposal(state: TravelAgentState):
         llm_call_attempted = False
+
         try:
             planning_input = state["recovery_planning_input"]
             evidence_brief = state["evidence_brief"]
@@ -322,11 +361,23 @@ def build_multi_agent_recovery_graph(
 
             validation_result = state["itinerary_validation_result"]
 
+
+            schedule_findings = assess_schedule_preservation(
+                original_itinerary=planning_input.original_itinerary,
+                proposed_itinerary=option.proposed_itinerary,
+                affected_activity_ids=(
+                    planning_input.disruption_scenario.affected_activity_ids
+                ),
+            )
+
             validation_data = (
                 validation_result.model_dump(mode="json")
                 if validation_result is not None
-                else None
+                else {}
             )
+
+            validation_data["schedule_preservation_findings"] = schedule_findings
+
 
             llm_call_attempted = True
             result = audit_recovery_proposal(
@@ -406,13 +457,15 @@ def build_multi_agent_recovery_graph(
 
         total_input_tokens = (
             sum(input_tokens)
-            if len(input_tokens) == 3 and all(value is not None for value in input_tokens)
+            if len(input_tokens) == 3
+            and all(value is not None for value in input_tokens)
             else None
         )
 
         total_output_tokens = (
             sum(output_tokens)
-            if len(output_tokens) == 3 and all(value is not None for value in output_tokens)
+            if len(output_tokens) == 3
+            and all(value is not None for value in output_tokens)
             else None
         )
 
@@ -429,7 +482,7 @@ def build_multi_agent_recovery_graph(
             if workflow_started_at is not None
             else None
         )
-        
+
         aggregate_metadata = {
             "agent_count": len(completed_metadata),
             "total_llm_calls": state.get("llm_call_count", 0),
@@ -448,10 +501,66 @@ def build_multi_agent_recovery_graph(
             "multi_agent_generation_metadata": aggregate_metadata,
         }
 
+
     def route_on_status(state: TravelAgentState):
         if state["status"] == WorkflowStatus.FAILED:
             return END
         return "continue"
+
+
+    def assess_schedule_preservation(
+            original_itinerary,
+            proposed_itinerary,
+            affected_activity_ids,
+        ):
+        """Identify schedule changes to retained activities."""
+        
+        original_by_id = {
+            activity.activity_id: activity
+            for activity in original_itinerary.activities
+        }
+        proposed_by_id = {
+            activity.activity_id: activity
+            for activity in proposed_itinerary.activities
+        }
+
+        findings = []
+        
+        affected_ids = set(affected_activity_ids)
+
+        for activity_id, original in original_by_id.items():
+            if activity_id in affected_ids:
+                continue
+
+            proposed = proposed_by_id.get(activity_id)
+
+            if proposed is None:
+                continue
+
+            changed = (
+                original.start_time != proposed.start_time
+                or original.duration_minutes != proposed.duration_minutes
+            )
+
+            if changed:
+                findings.append({
+                    "activity_id": activity_id,
+                    "activity_name": original.name,
+                    "original_start_time": original.start_time.isoformat(),
+                    "proposed_start_time": proposed.start_time.isoformat(),
+                    "original_duration_minutes": original.duration_minutes,
+                    "proposed_duration_minutes": proposed.duration_minutes,
+                    "reason": (
+                        "An existing activity's schedule changed. Review whether the "
+                        "change is necessary and supported by the disruption, evidence, "
+                        "and travel estimates. This finding alone does not establish "
+                        "that the change is unjustified."
+                    ),
+                })
+
+        return findings
+
+
 
     graph = StateGraph(TravelAgentState)
 

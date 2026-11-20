@@ -1,0 +1,91 @@
+{
+  "original_run_id": "732f91c0-b09a-4b2c-9d12-a9c7c01d8d3d",
+  "original_result_file": "E1_732f91c0-b09a-4b2c-9d12-a9c7c01d8d3d.json",
+  "scenario_id": "E1",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 11.350305458996445,
+        "input_tokens": 1268,
+        "output_tokens": 262
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 38.083507750183344,
+        "input_tokens": 3020,
+        "output_tokens": 1190
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 10.455610333010554,
+        "input_tokens": 3477,
+        "output_tokens": 234
+      }
+    },
+    "total_latency_seconds": 59.88942354219034,
+    "total_input_tokens": 7765,
+    "total_output_tokens": 1686,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E1",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": false,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": false,
+    "failures": [
+      "Reviewed source IDs do not match expected IDs."
+    ]
+  },
+  "planner_evaluation": {
+    "scenario_id": "E1",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "The Planner's stated recovery action does not match the actual changes to the existing mandatory visit."
+    ],
+    "recovery_action_consistent": false,
+    "travel_claims_supported": true,
+    "rationale_uncertainty_communicated": true,
+    "downstream_schedule_changes_qualified": true,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "schedule_validation_complete": false,
+    "schedule_validation_status": "INCOMPLETE",
+    "schedule_consistency_unresolved": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": true
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E1",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": true,
+    "passed": true,
+    "failures": []
+  },
+  "overall_evaluation_passed": false
+}

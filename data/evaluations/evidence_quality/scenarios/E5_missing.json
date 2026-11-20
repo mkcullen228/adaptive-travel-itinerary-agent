@@ -1,0 +1,33 @@
+
+{
+  "scenario_id": "E5",
+  "scenario_name": "missing",
+  "description": "No evidence is retrieved to establish whether the existing Natural History Museum visit can be extended or rescheduled.",
+  "evaluation_reference_time": "2026-11-07T08:00:00-05:00",
+  "base_case": {
+    "itinerary_id": "P-01",
+    "unavailable_venue": "National Gallery of Art",
+    "recovery_target": "National Museum of Natural History",
+    "recovery_action": "reschedule_or_extend_existing_visit", 
+    "mandatory_activity_name": "National Museum of Natural History"
+  },
+  "retrieved_evidence": [],
+  "expected_researcher_output": {
+    "status": "unsupported",
+    "supporting_source_ids": [],
+    "conflicting_source_ids": [],
+    "source_quality_warnings": [
+      "No relevant evidence was retrieved."
+    ],
+    "source_ids_reviewed": []
+  },
+  "expected_planner_behavior": {
+    "may_recommend_recovery": true,
+    "must_preserve_mandatory_visit": true,
+    "must_not_add_duplicate_visit": true,
+    "must_not_claim_unverified_availability": true,
+    "must_communicate_unresolved_questions": true,
+    "must_request_verification": true,
+    "must_avoid_high_confidence": true
+  }
+}

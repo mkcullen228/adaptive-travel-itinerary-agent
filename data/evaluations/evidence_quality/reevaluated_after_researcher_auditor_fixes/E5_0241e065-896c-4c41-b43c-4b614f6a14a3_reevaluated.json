@@ -1,0 +1,91 @@
+{
+  "original_run_id": "0241e065-896c-4c41-b43c-4b614f6a14a3",
+  "original_result_file": "E5_0241e065-896c-4c41-b43c-4b614f6a14a3.json",
+  "scenario_id": "E5",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 10.846951958024874,
+        "input_tokens": 1151,
+        "output_tokens": 265
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 47.60537295904942,
+        "input_tokens": 3157,
+        "output_tokens": 1311
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 14.657245124923065,
+        "input_tokens": 3592,
+        "output_tokens": 324
+      }
+    },
+    "total_latency_seconds": 73.10957004199736,
+    "total_input_tokens": 7900,
+    "total_output_tokens": 1900,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E5",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "passed": false,
+    "failures": [
+      "Planner made a travel-time or buffer claim, but the proposed itinerary does not contain complete selected-mode travel estimates."
+    ],
+    "recovery_action_consistent": true,
+    "travel_claims_supported": false,
+    "rationale_uncertainty_communicated": true,
+    "downstream_schedule_changes_qualified": true,
+    "schedule_consistency_passed": false,
+    "schedule_consistency_failures": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "schedule_validation_complete": false,
+    "schedule_validation_status": "INCOMPLETE",
+    "schedule_consistency_unresolved": [
+      "No walking estimate exists for travel between 'National Museum of American History' and 'National Museum of Natural History'.",
+      "No walking estimate exists for travel between 'National Museum of Natural History' and 'World War II Memorial'.",
+      "No walking estimate exists for travel between 'World War II Memorial' and 'Lincoln Memorial'."
+    ],
+    "rationale_schedule_times_consistent": true
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E5",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": false,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": true,
+    "passed": false,
+    "failures": [
+      "Auditor did not adequately acknowledge the evidence quality limitations or missing evidence."
+    ]
+  },
+  "overall_evaluation_passed": false
+}

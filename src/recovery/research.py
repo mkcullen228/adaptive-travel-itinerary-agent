@@ -10,10 +10,12 @@ import ollama
 from src.models.disruption import DisruptionScenario
 from src.models.investigation import InvestigationResult
 from src.models.multi_agent import EvidenceBrief
-from src.prompts.evidence_research import (
+# from src.prompts.evidence_research import (
+#     EVIDENCE_RESEARCH_SYSTEM_PROMPT,
+# )
+from src.prompts.evidence_research_experimental import (
     EVIDENCE_RESEARCH_SYSTEM_PROMPT,
 )
-
 
 @dataclass
 class EvidenceResearchResult:
@@ -52,6 +54,11 @@ def build_research_messages(
         "You may reference only IDs in allowed_source_ids. "
         "If allowed_source_ids is empty, do not invent or reference any "
         "source IDs. Report that no retrieved sources were available.\n\n"
+        "Your response must contain a top-level findings array with "
+        "exactly one EvidenceFinding object. Do not omit findings or "
+        "return an empty array. The finding must include claim, status, "
+        "supporting_source_ids, conflicting_source_ids, explanation, "
+        "and source_quality_warnings. "
         + json.dumps(research_context, indent=2)
     )
 
@@ -93,6 +100,24 @@ def validate_evidence_brief_sources(
         )
 
 
+def build_evidence_brief_schema() -> dict[str, Any]:
+    """Build a schema with required Researcher output fields."""
+
+    schema = EvidenceBrief.model_json_schema()
+
+    findings_schema = schema["properties"]["findings"]
+    findings_schema["minItems"] = 1
+    findings_schema["maxItems"] = 1
+
+    required_fields = schema.setdefault("required", [])
+
+    for field in ("findings", "source_ids_reviewed"):
+        if field not in required_fields:
+            required_fields.append(field)
+
+    return schema
+
+
 def research_evidence(
     investigation: InvestigationResult,
     disruption: DisruptionScenario,
@@ -115,7 +140,7 @@ def research_evidence(
         model=model_name,
         think=False,
         messages=messages,
-        format=EvidenceBrief.model_json_schema(),
+        format=build_evidence_brief_schema(),
         options={"temperature": 0},
     )
 
@@ -123,6 +148,8 @@ def research_evidence(
     raw_response = response.message.content
 
     brief = EvidenceBrief.model_validate_json(raw_response)
+
+    validate_evidence_brief_findings(brief)
 
     validate_evidence_brief_sources(
         brief=brief,
@@ -137,3 +164,14 @@ def research_evidence(
         input_tokens=getattr(response, "prompt_eval_count", None),
         output_tokens=getattr(response, "eval_count", None),
     )
+
+
+def validate_evidence_brief_findings(
+    brief: EvidenceBrief,
+) -> None:
+    """Enforce the structured finding requirement for the Researcher."""
+
+    if len(brief.findings) != 1:
+        raise ValueError(
+            "Researcher must return exactly one structured evidence finding."
+        )

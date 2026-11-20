@@ -12,11 +12,14 @@ from src.models.agent_workflow import (
     RecoveryPlanningInput,
     RecoveryStrategy,
 )
-from src.prompts.recovery_planning import RECOVERY_SYSTEM_PROMPT
 from src.prompts.strategy_instructions import (
     MINIMAL_DISRUPTION_INSTRUCTION,
     BEST_OVERALL_FEASIBILITY_INSTRUCTION,
     PREFERENCE_ORIENTED_INSTRUCTION,
+)
+from src.prompts.recovery_planning import RECOVERY_SYSTEM_PROMPT
+from src.prompts.recovery_planning_experimental import (
+    RECOVERY_SYSTEM_PROMPT as EXPERIMENTAL_RECOVERY_SYSTEM_PROMPT,
 )
 
 
@@ -59,11 +62,13 @@ def build_recovery_messages(
         planning_input.strategy
     ]
 
-    system_prompt = (
-        RECOVERY_SYSTEM_PROMPT
-        + "\n\n"
-        + strategy_instruction
+    base_prompt = (
+        EXPERIMENTAL_RECOVERY_SYSTEM_PROMPT
+        if evidence_brief is not None
+        else RECOVERY_SYSTEM_PROMPT
     )
+
+    system_prompt = base_prompt + "\n\n" + strategy_instruction
 
     planning_context = planning_input.model_dump(mode="json")
 
@@ -75,11 +80,57 @@ def build_recovery_messages(
 
     if evidence_brief is not None:
         user_prompt += (
+            "SCHEDULE FEASIBILITY AND RECOVERY ACTION RULES:\n"
+            "- Distinguish between evidence that supports a specific venue "
+            "adjustment and evidence that establishes the feasibility of "
+            "the entire revised itinerary.\n"
+            "- Do not describe the overall revised schedule as feasible, "
+            "confirmed, or achievable unless the available travel estimates "
+            "and remaining activity availability support that conclusion.\n"
+            "- If travel estimates or remaining activity availability have "
+            "not been verified, explicitly state in the main rationale that "
+            "overall schedule feasibility remains provisional or unverified.\n"
+            "- Include this qualification in the rationale itself, not only "
+            "in the uncertainties or assumptions lists.\n"
+            "- Clearly distinguish rescheduling an existing visit from "
+            "extending its duration. Only describe the visit as extended "
+            "if its actual duration is increased in the proposed itinerary.\n\n"
             "ADDITIONAL RESEARCHER EVIDENCE BRIEF\n"
             "The following brief is an interpretation of the original "
             "investigation evidence. Use it as additional context, but "
             "do not treat interpretations as stronger than the underlying "
             "evidence. The original investigation remains the source of truth.\n\n"
+            "EVIDENCE PROVENANCE RULES:\n"
+            "- Only use source IDs belonging to actual retrieved evidence records "
+            "in supporting_evidence_ids.\n"
+            "- Investigation IDs and disruption scenario IDs are contextual "
+            "identifiers, not evidence source IDs. Never include them in "
+            "supporting_evidence_ids.\n"
+            "- If no retrieved evidence records are supplied, return an empty "
+            "supporting_evidence_ids list.\n"
+            "- Do not treat the Researcher's interpretations, claims, or "
+            "evidence brief as independent evidence sources. Cite only "
+            "original retrieved evidence source IDs.\n\n"
+            "RESEARCHER EVIDENCE BRIEF:\n"
+            "- Follow the Researcher's evidence classification for the "
+            "specific claim. If the Researcher classifies a claim as "
+            "unsupported, do not cite its sources as supporting evidence "
+            "for that claim, even if those sources are valid retrieved "
+            "evidence records.\n"
+            "- A stale source may be discussed as historical context, "
+            "but must not substantiate current venue availability.\n"
+            "- Rescheduling changes an activity's start_time while preserving "
+            "its duration_minutes.\n"
+            "- Extending a visit increases that activity's duration_minutes.\n"
+            "- Never describe a visit as extended merely because its start "
+            "time changes or because another activity is moved.\n"
+            "- When evidence does not support extending a visit, do not "
+            "propose an extension as an established recovery action.\n"
+            "- When evidence is insufficient to establish that a proposed "
+            "schedule change is feasible, preserve the original mandatory "
+            "activity time and duration unless another change is independently "
+            "supported. Clearly identify the unresolved constraint rather "
+            "than presenting an unverified schedule change as a recovery.\n"
             + evidence_brief.model_dump_json(indent=2)
             + "\n\n"
         )

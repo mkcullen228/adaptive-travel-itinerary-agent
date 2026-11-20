@@ -36,7 +36,75 @@ Review the proposal for the following:
    - Flag claims that overstate certainty or imply that an unverified
      assumption has been confirmed.
 
-4. Recommendations
+4. Mandatory activity verification
+   - Compare the original and proposed activity lists directly.
+   - Use activity IDs, names, and mandatory flags to verify whether
+     an activity was retained, removed, or changed.
+   - Do not claim that a mandatory activity was removed if it
+     remains in the proposed itinerary.
+   - Distinguish between preserving an activity and preserving
+     its original scheduled time.
+   - Base all claims about itinerary changes on the supplied
+     original and proposed itinerary data.
+   - Treat mandatory_activity_comparison as the authoritative
+     deterministic comparison of original and proposed activities.
+   - Do not contradict its preserved or removed findings.
+   - If an activity is preserved but its scheduled time changed,
+     describe it as rescheduled, not removed.
+
+5. Deterministic validation review
+   - Review every issue in deterministic_validation.issues.
+   - Explicitly acknowledge each material validation issue
+     in rationale_findings.
+   - For missing travel estimates, identify the affected activity pair
+     and state that the travel duration cannot be verified.
+   - Explain how unresolved travel estimates affect schedule feasibility.
+   - Do not describe a deterministic validation failure
+     merely as a general assumption or uncertainty.
+   - Do not claim that a schedule is feasible when
+     deterministic validation identifies unresolved issues.
+   - Review every item in deterministic_validation.schedule_preservation_findings.
+   - Treat schedule_preservation_findings as changes requiring review,
+     not as automatic validation failures.
+   - Assess each change against the disruption, supplied evidence,
+     and travel estimates.
+   - Identify a change as unsupported only when the supplied information
+     does not justify it.
+   - Do not assume a change is justified merely because the Planner
+     describes it as minimizing travel or improving flow.
+   - Distinguish schedule changes from activity removals.
+   - Explain that preserving an activity does not necessarily mean
+     preserving its original schedule.
+   - If a schedule change is not adequately justified, classify the finding
+     according to what is missing:
+   - Use unsupported_claims when the Planner makes a claim that is not
+     supported by the supplied evidence.
+   - Use omitted_uncertainties when the available information is
+     insufficient to determine whether the change is necessary or feasible.
+   - Explain material schedule findings in rationale_findings.
+   - Do not modify the proposed itinerary.
+
+6. Structured audit output requirements
+   - Populate each AuditReport field consistently with your findings.
+   - supported_claims: include claims supported by the supplied
+     investigation evidence.
+   - unsupported_claims: include material claims that lack sufficient
+     supporting evidence.
+   - conflicting_claims: explicitly identify material claims for which
+     the supplied evidence contains contradictory information.
+   - If the EvidenceBrief identifies a CONFLICTING finding relevant
+     to the proposal, do not leave conflicting_claims empty.
+     Identify the disputed claim and explain the contradiction.
+   - omitted_uncertainties: identify material uncertainties that
+     the proposal does not adequately communicate.
+   - rationale_findings: explain the reasoning behind material findings,
+     including deterministic validation issues.
+   - Do not rely on rationale_findings alone when a finding belongs
+     in one of the dedicated structured fields.
+   - Do not populate a field with claims that its description does
+     not support.
+
+7. Recommendations
    - Provide concise recommendations for improving the proposal's
      evidence handling or explanation.
    - Do not create a replacement itinerary.
