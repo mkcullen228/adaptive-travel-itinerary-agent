@@ -1,5 +1,3 @@
-from unittest import result
-
 import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -20,6 +18,8 @@ from src.models.agent_workflow import (
 )
 from src.models.validation import (
     IssueType,
+    ValidationIssue,
+    ValidationResult,
     ValidationStatus,
 )
 
@@ -59,12 +59,45 @@ def test_multi_agent_graph_stops_when_research_fails(monkeypatch):
     assert result["research_raw_response"] is None
     assert result["planning_raw_response"] is None
     assert result["audit_raw_response"] is None
-    
 
 
 def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
+
     initialized_recovery_state = make_state()
-    evidence_brief = EvidenceBrief()
+
+    # Simulate two sources supplied to the Researcher.
+    initialized_recovery_state["investigation_result"].retrieved_evidence = [
+        RetrievedEvidence(
+            chunk_id="chunk_001",
+            content="Evidence source one.",
+            subject="Test subject one",
+            source_id="source_001",
+            source_url="https://example.com/source-1",
+            retrieved_at=datetime.now(timezone.utc),
+            similarity_distance=0.1,
+            reliability=0.95,
+            freshness_score=0.95,
+            verification_status=VerificationStatus.VERIFIED,
+        ),
+        RetrievedEvidence(
+            chunk_id="chunk_002",
+            content="Evidence source two.",
+            subject="Test subject two",
+            source_id="source_002",
+            source_url="https://example.com/source-2",
+            retrieved_at=datetime.now(timezone.utc),
+            similarity_distance=0.2,
+            reliability=0.90,
+            freshness_score=0.90,
+            verification_status=VerificationStatus.VERIFIED,
+        ),
+    ]
+
+    # Researcher reports reviewing only one of the two supplied sources.
+    evidence_brief = EvidenceBrief(
+        source_ids_reviewed=["source_001"]
+    )
+
     audit_report = AuditReport(
         assessment="partially_supported",
         supported_claims=[],
@@ -152,6 +185,7 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
 
     # Completing the three agents does not imply user approval or execution.
     assert result["final_itinerary"] is None
+    assert result["evidence_brief"].source_ids_reviewed == ["source_001"]
 
     # Explicit approval should finalize the proposed itinerary.
     approved_result = apply_approval_decision(
@@ -745,7 +779,7 @@ def test_mandatory_activity_constraint_accepts_exact_normalized_name():
         location="Washington, DC",
         start_time=datetime(2026, 11, 7, 10, 0),
         duration_minutes=90,
-        mandatory=False,
+        mandatory=True,
         indoor=True,
     )
 
@@ -838,120 +872,26 @@ def test_ambiguous_mandatory_activity_constraint_is_invalid():
     assert "ambiguous" in result.issues[0].description
 
 
-def test_multi_agent_graph_does_not_submit_invalid_proposal_for_approval(
-    monkeypatch,
-):
-    initialized_state = make_state()
-
-    mandatory_activity = Activity(
-        activity_id="mandatory_001",
-        name="National Gallery of Art",
-        location="Washington, DC",
-        start_time=datetime(2026, 11, 7, 10, 0),
-        duration_minutes=90,
-        mandatory=True,
-        indoor=True,
-    )
-
-    original_itinerary = initialized_state["original_itinerary"].model_copy(
-        update={"activities": [mandatory_activity]}
-    )
-
-    initialized_state["original_itinerary"] = original_itinerary
-
-    # The proposal removes the mandatory activity.
-    proposed_itinerary = original_itinerary.model_copy(
-        update={"activities": []}
-    )
-
-    recovery_option = Mock()
-    recovery_option.option_id = "invalid-option"
-    recovery_option.supporting_evidence_ids = []
-    recovery_option.rationale = "Test proposal that removes a mandatory activity."
-    recovery_option.proposed_itinerary = proposed_itinerary
-
-    audit_report = AuditReport(
-        assessment="partially_supported",
-        supported_claims=[],
-        unsupported_claims=[],
-        conflicting_claims=[],
-        omitted_uncertainties=[],
-        rationale_findings=[],
-        recommendations=[],
-    )
-
-    research_result = SimpleNamespace(
-        evidence_brief=EvidenceBrief(),
-        raw_response='{"findings": []}',
-        model_name="qwen3.5:4b",
-        latency_seconds=1.0,
-        input_tokens=100,
-        output_tokens=50,
-    )
-
-    planning_result = SimpleNamespace(
-        recovery_option=recovery_option,
-        raw_response='{"option_id": "invalid-option"}',
-        model_name="qwen3.5:4b",
-        latency_seconds=2.0,
-        input_tokens=200,
-        output_tokens=100,
-    )
-
-    audit_result = SimpleNamespace(
-        audit_report=audit_report,
-        raw_response='{"assessment": "partially_supported"}',
-        model_name="qwen3.5:4b",
-        latency_seconds=1.5,
-        input_tokens=150,
-        output_tokens=75,
-    )
-
-    monkeypatch.setattr(
-        "src.workflows.multi_agent_recovery.research_evidence",
-        Mock(return_value=research_result),
-    )
-    monkeypatch.setattr(
-        "src.workflows.multi_agent_recovery.plan_recovery",
-        Mock(return_value=planning_result),
-    )
-    monkeypatch.setattr(
-        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
-        Mock(return_value=audit_result),
-    )
-
-    graph = build_multi_agent_recovery_graph(client=Mock())
-    result = graph.invoke(initialized_state)
-
-    assert result["itinerary_validation_result"].status == (
-        ValidationStatus.INVALID
-    )
-    assert result["status"] == WorkflowStatus.NO_VALID_RECOVERY
-    assert result["current_stage"] == WorkflowStage.COMPLETED
-    assert result["approval_status"] == ApprovalStatus.NOT_REQUIRED
-    assert result["final_itinerary"] is None
-
-
 def test_revision_feedback_is_passed_to_planner(monkeypatch):
     initialized_state = make_state()
+
+    # Simulate an incomplete first proposal followed by a valid revision.
+    validation_mock = Mock(
+        side_effect=[
+            ValidationResult(status=ValidationStatus.INCOMPLETE),
+            ValidationResult(status=ValidationStatus.VALID),
+        ]
+    )
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.validate_itinerary",
+        validation_mock,
+    )
 
     feedback = (
         "Keep the National Gallery visit and avoid moving "
         "the afternoon activities."
     )
-
-    initialized_state["approval_history"] = [
-        ApprovalRecord(
-            option_id="previous-option",
-            status=ApprovalStatus.REVISION_REQUESTED,
-            timestamp=datetime.now(timezone.utc),
-            user_feedback=feedback,
-        )
-    ]
-    initialized_state["approval_status"] = ApprovalStatus.REVISION_REQUESTED
-    initialized_state["revision_count"] = 1
-    initialized_state["status"] = WorkflowStatus.IN_PROGRESS
-    initialized_state["current_stage"] = WorkflowStage.RECOVERY_PLANNING
 
     recovery_option = Mock()
     recovery_option.option_id = "revised-option"
@@ -1010,15 +950,295 @@ def test_revision_feedback_is_passed_to_planner(monkeypatch):
         "src.workflows.multi_agent_recovery.audit_recovery_proposal",
         Mock(return_value=audit_result),
     )
+
     graph = build_multi_agent_recovery_graph(
         client=Mock(),
         additional_instructions="Prefer minimal changes.",
     )
 
-    graph.invoke(initialized_state)
+    # First invocation: generate a proposal for user review.
+    pending_state = graph.invoke(initialized_state)
+
+    assert pending_state["approval_status"] == ApprovalStatus.PENDING
+    assert (
+        pending_state["itinerary_validation_result"].status
+        == ValidationStatus.INCOMPLETE
+    )
+    assert any(
+        "recovery proposal is incomplete" in warning
+        for warning in pending_state["current_proposal_warnings"]
+    )
+    assert pending_state["status"] == WorkflowStatus.AWAITING_APPROVAL
+
+    # Capture the current count so the test does not assume
+    # that make_state() initializes revision_count to zero.
+    expected_revision_count = pending_state.get("revision_count", 0) + 1
+
+    # Apply an explicit user request for revision.
+    revision_update = apply_approval_decision(
+        pending_state,
+        decision=ApprovalStatus.REVISION_REQUESTED,
+        user_feedback=feedback,
+    )
+
+    assert revision_update["revision_count"] == expected_revision_count
+    assert revision_update["final_itinerary"] is None
+
+    # Simulate applying the returned state update.
+    revised_state = {**pending_state, **revision_update}
+
+    # The approval_history reducer appends the new record.
+    revised_state["approval_history"] = (
+        pending_state.get("approval_history", [])
+        + revision_update["approval_history"]
+    )
+
+    # Second invocation: verify that revision feedback reaches the Planner.
+    revised_result = graph.invoke(revised_state)
+
+    assert (
+        revised_result["itinerary_validation_result"].status
+        == ValidationStatus.VALID
+    )
+
+    # The revised proposal is valid, so it has no current warnings.
+    assert not any(
+        "recovery proposal is incomplete" in warning
+        for warning in revised_result["current_proposal_warnings"]
+    )
+
+    # The historical workflow warning should still be retained.
+    assert any(
+        "recovery proposal is incomplete" in warning
+        for warning in revised_result["warnings"]
+    )
 
     planning_input = planning_mock.call_args.kwargs["planning_input"]
 
-    assert planning_input.revision_count == 1
+    assert planning_input.revision_count == expected_revision_count
     assert feedback in planning_input.additional_instructions
     assert "Prefer minimal changes." in planning_input.additional_instructions
+
+
+def test_mandatory_activity_constraint_rejects_relaxed_mandatory_flag():
+    activity = Activity(
+        activity_id="activity_001",
+        name="National Gallery of Art",
+        location="Washington, DC",
+        start_time=datetime(2026, 11, 7, 10, 0),
+        duration_minutes=90,
+        mandatory=False,
+        indoor=True,
+    )
+
+    itinerary = make_state()["original_itinerary"].model_copy(
+        update={"activities": [activity]}
+    )
+
+    constraint = Constraint(
+        constraint_id="constraint_001",
+        description="Visit the National Gallery",
+        constraint_type=ConstraintType.MANDATORY,
+        category="activity",
+        priority=ConstraintPriority.HIGH,
+        value="National Gallery of Art",
+    )
+
+    result = validate_mandatory_activity_preservation(
+        itinerary,
+        itinerary,
+        [constraint],
+    )
+
+    assert result.status == ValidationStatus.INVALID
+    assert result.issues[0].issue_type == (
+        IssueType.MANDATORY_ACTIVITY_NOT_PRESERVED
+    )
+    assert result.issues[0].activity_ids == ["activity_001"]
+    assert "not marked mandatory" in result.issues[0].description
+
+
+def test_failed_revision_does_not_retain_stale_proposal(monkeypatch):
+    initialized_state = make_state()
+
+    recovery_option = Mock()
+    recovery_option.option_id = "first-option"
+    recovery_option.supporting_evidence_ids = []
+    recovery_option.rationale = "Initial recovery proposal"
+    recovery_option.proposed_itinerary = initialized_state[
+        "original_itinerary"
+    ]
+
+    research_result = SimpleNamespace(
+        evidence_brief=EvidenceBrief(),
+        raw_response='{"findings": []}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.0,
+        input_tokens=100,
+        output_tokens=50,
+    )
+
+    planning_result = SimpleNamespace(
+        recovery_option=recovery_option,
+        raw_response='{"option_id": "first-option"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=2.0,
+        input_tokens=200,
+        output_tokens=100,
+    )
+
+    audit_result = SimpleNamespace(
+        audit_report=AuditReport(
+            assessment="partially_supported",
+            supported_claims=[],
+            unsupported_claims=[],
+            conflicting_claims=[],
+            omitted_uncertainties=[],
+            rationale_findings=[],
+            recommendations=[],
+        ),
+        raw_response='{"assessment": "partially_supported"}',
+        model_name="qwen3.5:4b",
+        latency_seconds=1.5,
+        input_tokens=150,
+        output_tokens=75,
+    )
+
+    research_mock = Mock(
+        side_effect=[
+            research_result,
+            ValueError("Research failed during revision"),
+        ]
+    )
+
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.research_evidence",
+        research_mock,
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.plan_recovery",
+        Mock(return_value=planning_result),
+    )
+    monkeypatch.setattr(
+        "src.workflows.multi_agent_recovery.audit_recovery_proposal",
+        Mock(return_value=audit_result),
+    )
+
+    graph = build_multi_agent_recovery_graph(client=Mock())
+
+    # First run: produce a proposal awaiting approval.
+    pending_state = graph.invoke(initialized_state)
+
+    assert pending_state["status"] == WorkflowStatus.AWAITING_APPROVAL
+    assert pending_state["recovery_options"]
+
+    # Request a revision.
+    revision_update = apply_approval_decision(
+        pending_state,
+        decision=ApprovalStatus.REVISION_REQUESTED,
+        user_feedback="Please revise the proposal.",
+    )
+
+    revised_state = {**pending_state, **revision_update}
+    revised_state["approval_history"] = (
+        pending_state.get("approval_history", [])
+        + revision_update["approval_history"]
+    )
+
+    # Second run: Researcher fails.
+    failed_revision = graph.invoke(revised_state)
+
+    assert failed_revision["status"] == WorkflowStatus.FAILED
+    assert failed_revision["current_stage"] == WorkflowStage.INVESTIGATION
+    assert any(
+        "Research failed during revision" in error
+        for error in failed_revision["error_details"]
+    )
+
+    # The failed revision must not expose the previous proposal as current.
+    assert failed_revision["recovery_options"] == []
+    assert failed_revision["selected_option_id"] is None
+    assert failed_revision["itinerary_validation_result"] is None
+    assert failed_revision["validation_results"] == []
+    assert failed_revision["audit_report"] is None
+    assert failed_revision["current_proposal_warnings"] == []
+    assert failed_revision["final_itinerary"] is None
+
+    assert research_mock.call_count == 2
+
+
+def test_invalid_proposal_cannot_be_approved():
+    state = make_state()
+
+    option = Mock()
+    option.option_id = "invalid-option"
+    option.proposed_itinerary = state["original_itinerary"]
+
+    state["approval_status"] = ApprovalStatus.PENDING
+    state["status"] = WorkflowStatus.AWAITING_APPROVAL
+    state["selected_option_id"] = "invalid-option"
+    state["recovery_options"] = [option]
+    state["itinerary_validation_result"] = ValidationResult(
+        status=ValidationStatus.INVALID
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="This proposal is not eligible for approval",
+    ):
+        apply_approval_decision(
+            state,
+            decision=ApprovalStatus.APPROVED,
+        )
+
+
+def test_approving_incomplete_proposal_preserves_validation_details():
+    state = make_state()
+
+    option = Mock()
+    option.option_id = "incomplete-option"
+    option.proposed_itinerary = state["original_itinerary"]
+
+    validation_issue = ValidationIssue(
+        issue_type=IssueType.MISSING_TRAVEL_ESTIMATE,
+        description="Travel feasibility is unverified.",
+    )
+
+    validation_result = ValidationResult(
+        status=ValidationStatus.INCOMPLETE,
+        issues=[validation_issue],
+    )
+
+    current_warnings = [
+        "The recovery proposal is incomplete.",
+        "Travel feasibility is unverified.",
+    ]
+    historical_warnings = [
+        "Earlier investigation warning."
+    ]
+
+    state.update({
+        "approval_status": ApprovalStatus.PENDING,
+        "status": WorkflowStatus.AWAITING_APPROVAL,
+        "selected_option_id": "incomplete-option",
+        "recovery_options": [option],
+        "itinerary_validation_result": validation_result,
+        "current_proposal_warnings": current_warnings,
+        "warnings": historical_warnings,
+    })
+
+    result = apply_approval_decision(
+        state,
+        decision=ApprovalStatus.APPROVED,
+    )
+
+    assert result["approval_status"] == ApprovalStatus.APPROVED
+    assert result["status"] == WorkflowStatus.COMPLETED
+    assert result["final_itinerary"] is option.proposed_itinerary
+
+    assert result["itinerary_validation_result"] == validation_result
+    assert result["itinerary_validation_result"].status == ValidationStatus.INCOMPLETE
+    assert result["itinerary_validation_result"].issues == [validation_issue]
+
+    assert result["current_proposal_warnings"] == current_warnings
+    assert result["warnings"] == historical_warnings

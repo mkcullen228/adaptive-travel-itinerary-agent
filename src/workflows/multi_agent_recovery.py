@@ -102,7 +102,18 @@ def validate_mandatory_activity_preservation(
             ]
 
         else:
-            continue
+            matched_activity = matches[0]
+
+            if matched_activity.mandatory:
+                continue
+
+            description = (
+                f"Mandatory activity constraint '{constraint.constraint_id}' "
+                f"('{constraint.value}') matches activity "
+                f"'{matched_activity.name}', but the proposed activity "
+                "is not marked mandatory."
+            )
+            activity_ids = [matched_activity.activity_id]
 
         issues.append(
             ValidationIssue(
@@ -223,6 +234,9 @@ def apply_approval_decision(
             "itinerary_validation_result"
         ),
         "warnings": state.get("warnings", []),
+        "current_proposal_warnings": state.get(
+            "current_proposal_warnings", []
+        ),
     }
 
     if decision == ApprovalStatus.REVISION_REQUESTED:
@@ -338,12 +352,37 @@ def build_multi_agent_recovery_graph(
                 details={"strategy": strategy.value},
             )
 
+
             return {
                 "recovery_planning_input": planning_input,
                 "workflow_started_at": workflow_started_at,
                 "current_stage": WorkflowStage.INVESTIGATION,
                 "execution_trace": [event],
+
+                # Clear outputs from the previous proposal before starting a new attempt.
+                "evidence_brief": None,
+                "research_generation_metadata": None,
+                "research_raw_response": None,
+
+                "recovery_options": [],
+                "selected_option_id": None,
+                "planning_rationale": "",
+                "planning_generation_metadata": None,
+                "planning_raw_response": None,
+                "recovery_generation_metadata": None,
+
+                "validation_results": [],
+                "itinerary_validation_result": None,
+                "current_proposal_warnings": [],
+
+                "audit_report": None,
+                "audit_generation_metadata": None,
+                "audit_raw_response": None,
+
+                "final_itinerary": None,
+                "multi_agent_generation_metadata": None,
             }
+
 
         except Exception as error:
             return record_failure(
@@ -371,18 +410,6 @@ def build_multi_agent_recovery_graph(
                 model_name=model_name,
                 client=client,
             )
-
-            # Record the complete source inventory supplied to the
-            # Researcher. This is deterministic provenance metadata,
-            # not an LLM judgment about evidence quality.
-            expected_source_ids = sorted(
-                {
-                    evidence.source_id
-                    for evidence in investigation.retrieved_evidence
-                }
-            )
-
-            result.evidence_brief.source_ids_reviewed = expected_source_ids
 
             metadata = {
                 "model_name": result.model_name,
@@ -595,6 +622,7 @@ def build_multi_agent_recovery_graph(
                 "warnings": validation_warnings,
                 "current_stage": WorkflowStage.VALIDATION,
                 "execution_trace": [event],
+                "current_proposal_warnings": validation_warnings,
             }
 
         except Exception as error:
