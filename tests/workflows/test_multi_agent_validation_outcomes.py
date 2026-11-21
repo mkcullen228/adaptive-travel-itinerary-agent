@@ -4,14 +4,15 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from src.models.activity import Activity
-from src.models.agent_state import WorkflowStatus
+from src.models.agent_state import WorkflowStage, WorkflowStatus
+from src.models.multi_agent import EvidenceBrief, AuditReport
+from src.models.validation import ValidationStatus
 from src.models.agent_workflow import (
     Constraint,
     ConstraintPriority,
     ConstraintType,
+    ApprovalStatus
 )
-from src.models.multi_agent import EvidenceBrief, AuditReport
-from src.models.validation import ValidationStatus
 from src.workflows.multi_agent_recovery import (
     build_multi_agent_recovery_graph,
 )
@@ -176,9 +177,9 @@ def test_incomplete_proposal_remains_available_with_warnings(
     assert result["itinerary_validation_result"].status == (
         ValidationStatus.INCOMPLETE
     )
-
-    assert result["status"] == WorkflowStatus.COMPLETED
-
+    assert result["status"] == WorkflowStatus.AWAITING_APPROVAL
+    assert result["approval_status"] == ApprovalStatus.PENDING
+    assert result["current_stage"] == WorkflowStage.APPROVAL
     assert result["final_itinerary"] is None
 
     assert result["recovery_options"]

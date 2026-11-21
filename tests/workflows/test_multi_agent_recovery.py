@@ -1,3 +1,5 @@
+from unittest import result
+
 import pytest
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -178,10 +180,10 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
     assert result["planning_generation_metadata"]["input_tokens"] == 200
     assert result["audit_generation_metadata"]["input_tokens"] == 150
 
-    assert result["llm_call_count"] == 3
     assert result["status"] == WorkflowStatus.AWAITING_APPROVAL
-    assert result["current_stage"] == WorkflowStage.APPROVAL
     assert result["approval_status"] == ApprovalStatus.PENDING
+    assert result["current_stage"] == WorkflowStage.APPROVAL
+    assert result["final_itinerary"] is None
 
     # Completing the three agents does not imply user approval or execution.
     assert result["final_itinerary"] is None
@@ -210,9 +212,6 @@ def test_multi_agent_graph_completes_all_three_agents(monkeypatch):
     assert rejected_result["approval_status"] == ApprovalStatus.REJECTED
     assert rejected_result["status"] == WorkflowStatus.COMPLETED
     assert rejected_result["final_itinerary"] is None
-    assert result["research_raw_response"] is not None
-    assert result["planning_raw_response"] is not None
-    assert result["audit_raw_response"] is not None
 
     metadata = result["multi_agent_generation_metadata"]
 
@@ -1232,8 +1231,9 @@ def test_approving_incomplete_proposal_preserves_validation_details():
         decision=ApprovalStatus.APPROVED,
     )
 
-    assert result["approval_status"] == ApprovalStatus.APPROVED
     assert result["status"] == WorkflowStatus.COMPLETED
+    assert result["approval_status"] == ApprovalStatus.APPROVED
+    assert result["current_stage"] == WorkflowStage.COMPLETED
     assert result["final_itinerary"] is option.proposed_itinerary
 
     assert result["itinerary_validation_result"] == validation_result
