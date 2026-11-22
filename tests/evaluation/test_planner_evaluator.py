@@ -314,17 +314,46 @@ def test_conflicting_evidence_must_be_acknowledged():
     assert result.conflict_acknowledged is False
 
 
-def test_moving_unaffected_activity_fails():
+@pytest.mark.parametrize(
+    "rationale",
+    [
+        "The sources disagree about current availability.",
+        "The reports contain contradictory information.",
+        "The available evidence is inconsistent.",
+        "There is a disagreement between the sources.",
+    ],
+)
+def test_equivalent_conflict_language_is_accepted(rationale):
+    scenario = load_scenarios(
+        SCENARIO_DIR,
+        scenario_ids=["E4"],
+    )[0]
+
+    original = make_original_itinerary()
+    option = make_recovery_option(
+        original,
+        scenario,
+        rationale=rationale,
+    )
+
+    result = evaluate_planner_output(scenario, original, option)
+
+    assert result.conflict_acknowledged is True
+
+
+def test_moving_unaffected_activity_passes():
     scenario = load_scenarios(
         SCENARIO_DIR,
         scenario_ids=["E3"],
     )[0]
 
     original = make_original_itinerary()
+    option = make_recovery_option(
+        original,
+        scenario,
+        rationale="The venue's current availability should be confirmed.",
+    )
 
-    option = make_recovery_option(original, scenario)
-
-    # Move an unaffected activity from its original time.
     for index, activity in enumerate(
         option.proposed_itinerary.activities
     ):
@@ -339,5 +368,105 @@ def test_moving_unaffected_activity_fails():
 
     result = evaluate_planner_output(scenario, original, option)
 
-    assert result.passed is False
+    assert result.unaffected_activities_preserved is True
+    assert result.passed is True
+
+
+def test_rescheduling_unaffected_activity_is_allowed():
+    scenario = load_scenarios(
+        SCENARIO_DIR,
+        scenario_ids=["E3"],
+    )[0]
+
+    original = make_original_itinerary()
+    option = make_recovery_option(original, scenario)
+
+    # Move an unaffected activity to a different start time.
+    for index, activity in enumerate(
+        option.proposed_itinerary.activities
+    ):
+        if activity.name == "American History":
+            option.proposed_itinerary.activities[index] = (
+                activity.model_copy(
+                    update={
+                        "start_time": datetime(2026, 11, 7, 9, 0)
+                    }
+                )
+            )
+
+    result = evaluate_planner_output(scenario, original, option)
+
+    assert result.unaffected_activities_preserved is True
+
+
+def test_changing_unaffected_activity_duration_fails():
+    scenario = load_scenarios(
+        SCENARIO_DIR,
+        scenario_ids=["E3"],
+    )[0]
+
+    original = make_original_itinerary()
+    option = make_recovery_option(original, scenario)
+
+    # Change the duration of an unaffected activity.
+    for index, activity in enumerate(
+        option.proposed_itinerary.activities
+    ):
+        if activity.name == "American History":
+            option.proposed_itinerary.activities[index] = (
+                activity.model_copy(
+                    update={"duration_minutes": 60}
+                )
+            )
+
+    result = evaluate_planner_output(scenario, original, option)
+
     assert result.unaffected_activities_preserved is False
+
+
+@pytest.mark.parametrize(
+    "rationale",
+    [
+        "Additional confirmation from the venue is needed.",
+        "The venue's current availability should be confirmed.",
+        "Contact the venue to establish its operating status.",
+        "Reach out to the venue before relying on its availability.",
+        "The revised plan remains subject to confirmation.",
+    ],
+)
+def test_equivalent_verification_language_is_accepted(rationale):
+    scenario = load_scenarios(
+        SCENARIO_DIR,
+        scenario_ids=["E3"],
+    )[0]
+
+    original = make_original_itinerary()
+    option = make_recovery_option(
+        original,
+        scenario,
+        rationale=rationale,
+        uncertainties=["The venue's current operating status remains unknown."],
+    )
+
+    result = evaluate_planner_output(scenario, original, option)
+
+    assert result.verification_requested is True
+
+
+def test_uncertainty_alone_does_not_count_as_verification_request():
+    scenario = load_scenarios(
+        SCENARIO_DIR,
+        scenario_ids=["E3"],
+    )[0]
+
+    original = make_original_itinerary()
+    option = make_recovery_option(
+        original,
+        scenario,
+        rationale="The venue's current operating status remains unknown.",
+        uncertainties=["The venue's current operating status remains unknown."],
+    )
+
+    result = evaluate_planner_output(scenario, original, option)
+
+    assert result.verification_requested is False

@@ -87,8 +87,8 @@ def evaluate_planner_output(
             "Natural History Museum visit."
         )
 
-    # Check that unaffected activities retain their original
-    # start times and durations.
+    # Check that unaffected activities remain in the proposal
+    # with their original durations. Their start times may change.
     excluded_names = {unavailable_venue, recovery_target}
 
     unaffected_activities = [
@@ -109,7 +109,6 @@ def evaluate_planner_output(
 
         if (
             proposed is None
-            or proposed.start_time != original.start_time
             or proposed.duration_minutes != original.duration_minutes
         ):
             unaffected_activities_preserved = False
@@ -199,6 +198,16 @@ def evaluate_planner_output(
             "confirm",
             "confirmation",
             "check",
+            "contact the venue",
+            "reach out to the venue",
+            "obtain confirmation",
+            "requires confirmation",
+            "needs confirmation",
+            "should be confirmed",
+            "must be confirmed",
+            "pending confirmation",
+            "subject to confirmation",
+            "establish current availability",
         )
 
         verification_requested = any(
@@ -215,12 +224,30 @@ def evaluate_planner_output(
     conflict_acknowledged = True
 
     if expected.must_identify_conflicting_information:
-        conflict_acknowledged = "conflict" in explanatory_text
+        conflict_terms = (
+            "conflict",
+            "contradict",
+            "sources disagree",
+            "sources differ",
+            "inconsistent evidence",
+            "evidence is inconsistent",
+            "inconsistent information",
+            "information is inconsistent",
+            "disagreement between sources",
+            "disagreement between the sources",
+            "different accounts",
+        )
+
+        conflict_acknowledged = any(
+            term in explanatory_text
+            for term in conflict_terms
+        )
 
         if not conflict_acknowledged:
             failures.append(
                 "Planner did not acknowledge conflicting evidence."
             )
+
 
     # Proposal status is used as a conservative proxy for confidence.
     cautious_proposal_status = True

@@ -247,3 +247,23 @@ def test_runner_does_not_save_results_when_workflow_fails(
     assert not output_path.with_name("P-01.audit.json").exists()
     assert not output_path.with_name("P-01.metadata.json").exists()
 
+
+def test_runner_saves_pending_proposal_without_approval(benchmark_setup):
+    setup = benchmark_setup
+
+    setup.result["status"] = WorkflowStatus.AWAITING_APPROVAL
+    setup.result["current_stage"] = SimpleNamespace(value="approval")
+
+    result = runner.run_multi_agent_benchmark(setup.config_path)
+
+    output_path = setup.tmp_path / setup.config.output_path
+    metadata_path = output_path.with_name("P-01.metadata.json")
+
+    assert result["status"] == WorkflowStatus.AWAITING_APPROVAL
+    assert output_path.exists()
+    assert metadata_path.exists()
+
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+
+    assert metadata["workflow_status"] == "awaiting_approval"
+    assert metadata["current_stage"] == "approval"

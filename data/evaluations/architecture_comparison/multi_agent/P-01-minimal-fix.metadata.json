@@ -1,0 +1,65 @@
+{
+  "benchmark_id": "P-01-MULTI-AGENT-MINIMAL-FIX",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "prompt_version": "multi_agent_v1",
+  "config_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/src/evaluation/configs/p01_multi_agent_rerun.json",
+  "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07.json",
+  "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_investigation_context.json",
+  "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_disruption_scenario.json",
+  "workflow_status": "awaiting_approval",
+  "current_stage": "approval",
+  "llm_call_count": 3,
+  "tool_call_count": 0,
+  "research_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 9.527472832938656,
+    "input_tokens": 956,
+    "output_tokens": 212
+  },
+  "planning_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 48.76621924992651,
+    "input_tokens": 3689,
+    "output_tokens": 1551
+  },
+  "audit_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 16.89637012500316,
+    "input_tokens": 5008,
+    "output_tokens": 426
+  },
+  "aggregate_generation_metadata": {
+    "agent_count": 3,
+    "total_llm_calls": 3,
+    "total_latency_seconds": 75.19006220786832,
+    "total_input_tokens": 9653,
+    "total_output_tokens": 2189,
+    "input_tokens_complete": true,
+    "output_tokens_complete": true,
+    "total_workflow_latency_seconds": 75.2083427500911
+  },
+  "deterministic_validation_status": "valid",
+  "deterministic_validation_issues": [],
+  "audit_report": {
+    "assessment": "partially_supported",
+    "supported_claims": [],
+    "unsupported_claims": [],
+    "conflicting_claims": [],
+    "omitted_uncertainties": [],
+    "rationale_findings": [
+      "The proposal correctly identifies the National Gallery as unavailable based on the disruption scenario and EvidenceBrief. However, it fails to acknowledge that the EvidenceBrief explicitly states 'No retrieved evidence establishes replacement venue availability' and lists 'Replacement venue availability has not been verified' as an unresolved uncertainty.",
+      "The proposal removes the National Gallery activity but does not provide a replacement activity. The EvidenceBrief confirms no evidence supports the availability of a replacement venue, yet the proposal reduces the itinerary from five to four activities without offering a viable alternative or explaining why this reduction is acceptable without verification.",
+      "The proposal reschedules all subsequent activities (American History, Natural History, WWII Memorial, Lincoln Memorial) by shifting them forward by 1 hour and 30 minutes. The EvidenceBrief explicitly lists 'Schedule feasibility after removing the unavailable National Gallery and rescheduling subsequent activities has not been assessed' as an unresolved uncertainty. The proposal assumes these venues are open at the new times without supporting evidence.",
+      "The deterministic_validation.schedule_preservation_findings indicate that four activities have changed their start times. While the rationale acknowledges this change requires review, it does not explicitly flag the lack of evidence confirming venue availability for these rescheduled times as a material unsupported claim in the structured output fields.",
+      "The proposal assumes walking travel estimates are sufficient to bridge gaps without conflict. The EvidenceBrief notes 'Schedule feasibility... has not been assessed,' implying that travel feasibility is also unverified. The proposal treats these estimates as confirmed facts rather than provisional data."
+    ],
+    "recommendations": [
+      "Explicitly state in the rationale that no replacement venue was added because the EvidenceBrief confirms no evidence supports such availability.",
+      "Clarify that rescheduling subsequent activities relies on unverified assumptions regarding venue operating hours at the new times, as flagged by the EvidenceBrief's unresolved uncertainties.",
+      "Do not present the schedule as feasible; instead, label it as provisional pending verification of remaining venue availability."
+    ]
+  },
+  "completed_at_utc": "2026-11-22T03:20:31.858560+00:00"
+}

@@ -136,3 +136,4 @@ class TravelAgentState(TypedDict):
     ] | None
 
     workflow_started_at: float | None
+    current_proposal_warnings: list[str]

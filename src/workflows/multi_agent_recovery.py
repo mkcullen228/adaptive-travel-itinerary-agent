@@ -1,7 +1,7 @@
 
 from uuid import uuid4
 from time import perf_counter
-
+from datetime import datetime, timezone
 from langgraph.graph import StateGraph, START, END
 
 from src.models.agent_state import (
@@ -10,6 +10,8 @@ from src.models.agent_state import (
     WorkflowStatus,
 )
 from src.models.agent_workflow import (
+    ApprovalRecord,
+    ApprovalStatus,
     Constraint,
     ConstraintType,
     ExecutionEvent,
@@ -17,7 +19,6 @@ from src.models.agent_workflow import (
     RecoveryPlanningInput,
     RecoveryStrategy,
 )
-
 from src.models.validation import (
     IssueType,
     ValidationIssue,
@@ -101,7 +102,18 @@ def validate_mandatory_activity_preservation(
             ]
 
         else:
-            continue
+            matched_activity = matches[0]
+
+            if matched_activity.mandatory:
+                continue
+
+            description = (
+                f"Mandatory activity constraint '{constraint.constraint_id}' "
+                f"('{constraint.value}') matches activity "
+                f"'{matched_activity.name}', but the proposed activity "
+                "is not marked mandatory."
+            )
+            activity_ids = [matched_activity.activity_id]
 
         issues.append(
             ValidationIssue(
@@ -118,6 +130,119 @@ def validate_mandatory_activity_preservation(
     )
 
     return ValidationResult(status=status, issues=issues)
+
+
+def is_approval_eligible(
+    validation_result: ValidationResult | None,
+) -> bool:
+    """Return whether a recovery proposal can be submitted for approval.
+
+    INCOMPLETE proposals are eligible, but their validation issues
+    must remain available to the user.
+    INVALID proposals are never eligible.
+    """
+    if validation_result is None:
+        return False
+
+    return validation_result.status in {
+        ValidationStatus.VALID,
+        ValidationStatus.INCOMPLETE,
+    }
+
+
+def apply_approval_decision(
+    state: TravelAgentState,
+    decision: ApprovalStatus,
+    user_feedback: str | None = None,
+) -> dict:
+    """Apply an explicit user decision to a pending recovery proposal."""
+
+    if (
+        state.get("approval_status") != ApprovalStatus.PENDING
+        or state.get("status") != WorkflowStatus.AWAITING_APPROVAL
+    ):
+        raise ValueError(
+            "The workflow is not awaiting approval."
+        )
+
+    allowed_decisions = {
+        ApprovalStatus.APPROVED,
+        ApprovalStatus.REJECTED,
+        ApprovalStatus.REVISION_REQUESTED,
+    }
+
+    if decision not in allowed_decisions:
+        raise ValueError(
+            f"Unsupported approval decision: {decision}"
+        )
+
+    selected_option_id = state.get("selected_option_id")
+
+    option = next(
+        (
+            item
+            for item in state.get("recovery_options", [])
+            if item.option_id == selected_option_id
+        ),
+        None,
+    )
+
+    if option is None:
+        raise ValueError(
+            "The selected recovery proposal could not be found."
+        )
+
+    if decision == ApprovalStatus.APPROVED:
+        validation_result = state.get("itinerary_validation_result")
+
+        if not is_approval_eligible(validation_result):
+            raise ValueError(
+                "This proposal is not eligible for approval."
+            )
+
+        final_status = WorkflowStatus.COMPLETED
+        final_stage = WorkflowStage.COMPLETED
+        final_itinerary = option.proposed_itinerary
+
+    elif decision == ApprovalStatus.REJECTED:
+        final_status = WorkflowStatus.COMPLETED
+        final_stage = WorkflowStage.COMPLETED
+        final_itinerary = None
+
+    else:  # REVISION_REQUESTED
+        final_status = WorkflowStatus.IN_PROGRESS
+        final_stage = WorkflowStage.RECOVERY_PLANNING
+        final_itinerary = None
+
+    approval_record = ApprovalRecord(
+        option_id=selected_option_id,
+        status=decision,
+        timestamp=datetime.now(timezone.utc),
+        user_feedback=user_feedback,
+    )
+
+    result = {
+        "approval_status": decision,
+        "status": final_status,
+        "current_stage": final_stage,
+        "final_itinerary": final_itinerary,
+        "approval_history": [approval_record],
+
+        # Preserve validation details so approval does not imply
+        # that an incomplete proposal became fully validated.
+        "itinerary_validation_result": state.get(
+            "itinerary_validation_result"
+        ),
+        "warnings": state.get("warnings", []),
+        "current_proposal_warnings": state.get(
+            "current_proposal_warnings", []
+        ),
+    }
+
+    if decision == ApprovalStatus.REVISION_REQUESTED:
+        result["revision_count"] = state.get("revision_count", 0) + 1
+
+    return result
 
 
 def build_multi_agent_recovery_graph(
@@ -189,6 +314,24 @@ def build_multi_agent_recovery_graph(
                     "An investigation result is required for recovery."
                 )
 
+            revision_feedback = [
+            record.user_feedback
+            for record in state.get("approval_history", [])
+                if (
+                    record.status == ApprovalStatus.REVISION_REQUESTED
+                    and record.user_feedback
+                )
+            ]
+
+            combined_instructions = "\n\n".join(
+                instruction
+                for instruction in [
+                    additional_instructions,
+                    *revision_feedback,
+                ]
+                if instruction.strip()
+            )
+
             planning_input = RecoveryPlanningInput(
                 original_itinerary=state["original_itinerary"],
                 disruption_scenario=disruption,
@@ -199,7 +342,7 @@ def build_multi_agent_recovery_graph(
                 strategy=strategy,
                 revision_count=state["revision_count"],
                 rejected_options=state["rejected_options"],
-                additional_instructions=additional_instructions,
+                additional_instructions=combined_instructions,
             )
 
             event = make_event(
@@ -209,12 +352,37 @@ def build_multi_agent_recovery_graph(
                 details={"strategy": strategy.value},
             )
 
+
             return {
                 "recovery_planning_input": planning_input,
                 "workflow_started_at": workflow_started_at,
                 "current_stage": WorkflowStage.INVESTIGATION,
                 "execution_trace": [event],
+
+                # Clear outputs from the previous proposal before starting a new attempt.
+                "evidence_brief": None,
+                "research_generation_metadata": None,
+                "research_raw_response": None,
+
+                "recovery_options": [],
+                "selected_option_id": None,
+                "planning_rationale": "",
+                "planning_generation_metadata": None,
+                "planning_raw_response": None,
+                "recovery_generation_metadata": None,
+
+                "validation_results": [],
+                "itinerary_validation_result": None,
+                "current_proposal_warnings": [],
+
+                "audit_report": None,
+                "audit_generation_metadata": None,
+                "audit_raw_response": None,
+
+                "final_itinerary": None,
+                "multi_agent_generation_metadata": None,
             }
+
 
         except Exception as error:
             return record_failure(
@@ -242,18 +410,6 @@ def build_multi_agent_recovery_graph(
                 model_name=model_name,
                 client=client,
             )
-
-            # Record the complete source inventory supplied to the
-            # Researcher. This is deterministic provenance metadata,
-            # not an LLM judgment about evidence quality.
-            expected_source_ids = sorted(
-                {
-                    evidence.source_id
-                    for evidence in investigation.retrieved_evidence
-                }
-            )
-
-            result.evidence_brief.source_ids_reviewed = expected_source_ids
 
             metadata = {
                 "model_name": result.model_name,
@@ -466,6 +622,7 @@ def build_multi_agent_recovery_graph(
                 "warnings": validation_warnings,
                 "current_stage": WorkflowStage.VALIDATION,
                 "execution_trace": [event],
+                "current_proposal_warnings": validation_warnings,
             }
 
         except Exception as error:
@@ -568,36 +725,46 @@ def build_multi_agent_recovery_graph(
                 llm_call_attempted=llm_call_attempted,
             )
 
-
+   
     def finalize_workflow(state: TravelAgentState):
-        """Finalize workflow metadata and preserve deterministic outcome."""
+        """Prepare workflow outcome and pause eligible proposals for approval."""
+
         validation_result = state.get("itinerary_validation_result")
 
-        no_valid_recovery = (
-            validation_result is not None
-            and validation_result.status == ValidationStatus.INVALID
-        )
+        # Determine whether the proposal can be submitted for approval.
+        # VALID and INCOMPLETE are eligible; INVALID and missing results are not.
+        approval_eligible = is_approval_eligible(validation_result)
+
+        no_valid_recovery = not approval_eligible
 
         final_status = (
             WorkflowStatus.NO_VALID_RECOVERY
             if no_valid_recovery
-            else WorkflowStatus.COMPLETED
+            else WorkflowStatus.AWAITING_APPROVAL
+        )
+
+        final_stage = (
+            WorkflowStage.COMPLETED
+            if no_valid_recovery
+            else WorkflowStage.APPROVAL
         )
 
         event = make_event(
-            stage="finalization",
+            stage="finalization" if no_valid_recovery else "approval",
             event_type=(
                 "no_valid_recovery"
                 if no_valid_recovery
-                else "workflow_completed"
+                else "proposal_awaiting_approval"
             ),
             description=(
-                "No valid recovery proposal was produced. "
-                "The proposal is retained for diagnosis but is not "
-                "presented as a valid recovery."
+                "No eligible recovery proposal was produced. "
+                "The proposal is retained for diagnosis but cannot "
+                "be approved."
                 if no_valid_recovery
-                else "Multi-agent recovery generation, validation, and audit "
-                "completed. No user approval or execution is implied."
+                else
+                "Recovery proposal generation, validation, and audit "
+                "are complete. The proposal is awaiting explicit user "
+                "approval. No approval or execution is implied."
             ),
             details={
                 "llm_call_count": state["llm_call_count"],
@@ -607,9 +774,11 @@ def build_multi_agent_recovery_graph(
                     if validation_result is not None
                     else None
                 ),
+                "approval_eligible": approval_eligible,
             },
         )
 
+        # Aggregate metadata from the three agents.
         agent_metadata = [
             state.get("research_generation_metadata"),
             state.get("planning_generation_metadata"),
@@ -626,6 +795,7 @@ def build_multi_agent_recovery_graph(
             metadata.get("input_tokens")
             for metadata in completed_metadata
         ]
+
         output_tokens = [
             metadata.get("output_tokens")
             for metadata in completed_metadata
@@ -671,8 +841,13 @@ def build_multi_agent_recovery_graph(
         }
 
         return {
-            "current_stage": WorkflowStage.COMPLETED,
+            "current_stage": final_stage,
             "status": final_status,
+            "approval_status": (
+                ApprovalStatus.NOT_REQUIRED
+                if no_valid_recovery
+                else ApprovalStatus.PENDING
+            ),
             "final_itinerary": None,
             "execution_trace": [event],
             "multi_agent_generation_metadata": aggregate_metadata,

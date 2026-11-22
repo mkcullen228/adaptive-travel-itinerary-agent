@@ -338,3 +338,40 @@ def test_separate_runs_do_not_overwrite_results(
     assert first["overall_evaluation_passed"] is True
     assert second["overall_evaluation_passed"] is True
     assert len(list(tmp_path.glob("E1_*.json"))) == 2
+
+
+def test_run_scenario_evaluates_pending_proposal(
+    monkeypatch,
+    tmp_path,
+    fake_scenario,
+    completed_state,
+):
+    monkeypatch.setattr(
+        run_evaluation,
+        "load_evaluation_inputs",
+        lambda scenario_id: (fake_scenario, {}),
+    )
+
+    mock_successful_evaluators(monkeypatch)
+
+    pending_state = {
+        **completed_state,
+        "status": WorkflowStatus.AWAITING_APPROVAL,
+        "current_stage": WorkflowStage.APPROVAL,
+    }
+
+    graph = Mock()
+    graph.invoke.return_value = pending_state
+
+    result = run_evaluation.run_scenario(
+        scenario_id="E1",
+        output_directory=tmp_path,
+        graph=graph,
+    )
+
+    assert result["workflow_status"] == "awaiting_approval"
+    assert result["researcher_evaluation"]["passed"] is True
+    assert result["planner_evaluation"]["passed"] is True
+    assert result["auditor_evaluation"]["passed"] is True
+    assert result["overall_evaluation_passed"] is True
+    assert result["evaluation_skip_reason"] is None

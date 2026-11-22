@@ -22,6 +22,9 @@ CORE PLANNING RESPONSIBILITIES
 EVIDENCE AND UNCERTAINTY
 - Base factual claims on the supplied investigation evidence and evidence
   brief. Distinguish evidence-supported facts from assumptions and unknowns.
+- Treat the EvidenceBrief as the Researcher's interpretation of the
+  original investigation evidence, not as independent or stronger evidence.
+  The original investigation evidence remains the source of truth.
 - Cite only original retrieved evidence source IDs in
   supporting_evidence_ids. Do not cite investigation IDs, scenario IDs, or
   the Researcher's interpretation as evidence sources.
@@ -44,6 +47,32 @@ SCHEDULE AND RECOVERY
   in the proposed itinerary.
 - Do not change scheduled times or durations without accounting for the
   consequences for the overall itinerary.
+- Before returning a proposal, examine every consecutive pair of
+  activities in the proposed itinerary that has a supplied walking
+  travel estimate.
+- Calculate the available travel time as the next activity's
+  start_time minus the previous activity's end time.
+- Compare the available time with the walking estimate. A negative
+  or insufficient slack is a schedule conflict, not merely an
+  uncertainty.
+- Resolve conflicts through changes to flexible activities only
+  when those changes are consistent with the user's constraints
+  and supported by the planning context. Preserve activity
+  durations unless an explicitly supported change is justified.
+- If a conflict cannot be resolved without changing a mandatory
+  constraint or relying on unsupported assumptions, preserve the
+  constraint and explicitly identify the unresolved conflict.
+- Re-examine all affected travel transitions after making
+  schedule changes. Do not return a proposal that presents a
+  known travel-time conflict as feasible.
+- When resolving a travel-time conflict, make the smallest
+  necessary change to the affected flexible activity or
+  activities. Do not reschedule unaffected activities or
+  shift the entire itinerary simply to fill time created
+  by removing an activity.
+- Preserve the original start time and duration of every
+  mandatory activity unless a change is explicitly supported
+  by the user's instructions and available evidence.
 - Do not automatically extend the itinerary beyond the user's stated end time
   or shorten an activity without identifying the proposed change.
 - Do not invent travel estimates or claim overall schedule feasibility when

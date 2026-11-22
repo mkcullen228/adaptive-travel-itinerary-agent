@@ -1,0 +1,25 @@
+{
+  "findings": [
+    {
+      "claim": "A replacement venue is available and feasible for the affected itinerary.",
+      "status": "unsupported",
+      "supporting_source_ids": [],
+      "conflicting_source_ids": [],
+      "explanation": "No retrieved evidence establishes replacement venue availability. The investigation confirms the National Gallery of Art is unavailable from 9:00 AM to 10:30 AM, but no verified information regarding alternative venues or schedule feasibility was retrieved. Absence of evidence does not establish availability.",
+      "source_quality_warnings": [
+        "No retrieved evidence establishes replacement venue availability."
+      ]
+    }
+  ],
+  "unresolved_questions": [
+    "What specific replacement venues are available for the National Gallery visit?",
+    "Has the schedule feasibility after removing the unavailable National Gallery been assessed?",
+    "Are the remaining original activities independently verified as unaffected?"
+  ],
+  "source_ids_reviewed": [],
+  "overall_uncertainties": [
+    "Replacement venue availability has not been verified.",
+    "The availability of the remaining original activities has not been independently verified.",
+    "Schedule feasibility after removing the unavailable National Gallery has not been assessed."
+  ]
+}

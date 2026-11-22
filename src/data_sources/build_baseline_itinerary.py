@@ -1,3 +1,4 @@
+
 import json
 from pathlib import Path
 from datetime import date, datetime
@@ -5,6 +6,9 @@ from datetime import date, datetime
 from src.models.activity import Activity
 from src.models.itinerary import Itinerary
 from src.models.travel import TravelLeg
+from src.data_sources.build_travel_legs import (
+    add_travel_legs_to_itinerary,
+)
 
 
 activities = [
@@ -60,6 +64,9 @@ activities = [
     ),
 ]
 
+
+# Initial travel-leg relationships.
+# Walking estimates are populated by the routing implementation below.
 travel_legs = [
     TravelLeg(
         origin_activity_id="national_gallery",
@@ -87,6 +94,7 @@ travel_legs = [
     ),
 ]
 
+
 baseline_itinerary = Itinerary(
     itinerary_id="dc_baseline_2026_11_07",
     destination="Washington, DC",
@@ -96,26 +104,85 @@ baseline_itinerary = Itinerary(
 )
 
 
-def save_baseline_itinerary(itinerary: Itinerary):
-    output_path = Path("data/itineraries/dc_baseline_2026_11_07.json")
+def save_baseline_itinerary(itinerary: Itinerary) -> None:
+    """Save the baseline itinerary, including walking estimates."""
+
+    output_path = Path(
+        "data/itineraries/dc_baseline_2026_11_07.json"
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with output_path.open("w", encoding="utf-8") as file:
         json.dump(
             itinerary.model_dump(mode="json"),
             file,
-            indent=2
+            indent=2,
         )
 
 
 if __name__ == "__main__":
-    print(baseline_itinerary)
-    print(f"\nNumber of activities: {len(baseline_itinerary.activities)}")
-    print(
-        "\nMandatory activities:",
-        [activity.name for activity in baseline_itinerary.activities if activity.mandatory]
-    )
-    print(f"Travel legs: {len(baseline_itinerary.travel_legs)}")
+    print("Generating baseline itinerary...")
 
-    save_baseline_itinerary(baseline_itinerary)
-    print("\nBaseline itinerary saved.")
+    print(f"Number of activities: {len(baseline_itinerary.activities)}")
+
+    print(
+        "Mandatory activities:",
+        [
+            activity.name
+            for activity in baseline_itinerary.activities
+            if activity.mandatory
+        ],
+    )
+
+    # Populate walking estimates using the existing routing implementation.
+    # This makes routing requests before the canonical JSON is overwritten.
+    updated_itinerary = add_travel_legs_to_itinerary(
+        baseline_itinerary
+    )
+
+    # Validate the generated travel legs before saving.
+    expected_leg_count = len(updated_itinerary.activities) - 1
+
+    if len(updated_itinerary.travel_legs) != expected_leg_count:
+        raise RuntimeError(
+            f"Expected {expected_leg_count} travel legs, "
+            f"but generated {len(updated_itinerary.travel_legs)}."
+        )
+
+    for leg in updated_itinerary.travel_legs:
+        if not leg.estimates:
+            raise RuntimeError(
+                f"Missing walking estimate for "
+                f"{leg.origin_activity_id} -> "
+                f"{leg.destination_activity_id}."
+            )
+
+        if not any(
+            estimate.mode == "walking"
+            for estimate in leg.estimates
+        ):
+            raise RuntimeError(
+                f"No walking estimate for "
+                f"{leg.origin_activity_id} -> "
+                f"{leg.destination_activity_id}."
+            )
+
+    print(f"Generated travel legs: {len(updated_itinerary.travel_legs)}")
+
+    for leg in updated_itinerary.travel_legs:
+        estimate = next(
+            estimate
+            for estimate in leg.estimates
+            if estimate.mode == "walking"
+        )
+
+        print(
+            f"{leg.origin_activity_id} -> "
+            f"{leg.destination_activity_id}: "
+            f"{estimate.duration_minutes} minutes, "
+            f"{estimate.distance_meters:.1f} meters"
+        )
+
+    save_baseline_itinerary(updated_itinerary)
+
+    print("\nBaseline itinerary saved successfully.")

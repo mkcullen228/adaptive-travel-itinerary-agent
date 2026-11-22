@@ -1,0 +1,62 @@
+{
+  "benchmark_id": "P-01-MULTI-AGENT-BASELINE-FIX",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "prompt_version": "multi_agent_v1",
+  "config_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/src/evaluation/configs/p01_multi_agent_rerun.json",
+  "baseline_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/data/itineraries/dc_baseline_2026_11_07.json",
+  "investigation_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_investigation_context.json",
+  "disruption_path": "/Users/maura.cullen28gmail.com/Documents/Workdir/adaptive-travel-itinerary-agent/tests/fixtures/p01_disruption_scenario.json",
+  "workflow_status": "awaiting_approval",
+  "current_stage": "approval",
+  "llm_call_count": 3,
+  "tool_call_count": 0,
+  "research_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 11.178371457848698,
+    "input_tokens": 956,
+    "output_tokens": 267
+  },
+  "planning_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 57.975855542114004,
+    "input_tokens": 3653,
+    "output_tokens": 1866
+  },
+  "audit_generation_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 15.512454624986276,
+    "input_tokens": 5367,
+    "output_tokens": 368
+  },
+  "aggregate_generation_metadata": {
+    "agent_count": 3,
+    "total_llm_calls": 3,
+    "total_latency_seconds": 84.66668162494898,
+    "total_input_tokens": 9976,
+    "total_output_tokens": 2501,
+    "input_tokens_complete": true,
+    "output_tokens_complete": true,
+    "total_workflow_latency_seconds": 84.68645720882341
+  },
+  "deterministic_validation_status": "valid",
+  "deterministic_validation_issues": [],
+  "audit_report": {
+    "assessment": "partially_supported",
+    "supported_claims": [],
+    "unsupported_claims": [],
+    "conflicting_claims": [],
+    "omitted_uncertainties": [],
+    "rationale_findings": [
+      "The proposal correctly identifies the National Gallery as unavailable based on the disruption scenario and EvidenceBrief. However, it removes this activity without proposing a replacement venue, which aligns with the EvidenceBrief's finding that 'No retrieved evidence establishes replacement venue availability.'\n\nThe proposal reschedules four activities (American History, Natural History, WWII Memorial, Lincoln Memorial) to fill the gap created by removing the National Gallery. The deterministic_validation.schedule_preservation_findings flag these as changes requiring review. While the rationale acknowledges the lack of verification for early hours and travel feasibility, it fails to explicitly state that the schedule change is unsupported due to missing evidence regarding venue availability at the new times.\n\nSpecifically:\n- The claim that rescheduling is necessary because 'the original schedule would result in a gap or conflict' is an assumption not supported by evidence. The EvidenceBrief explicitly states: 'Has the schedule feasibility after removing the unavailable National Gallery been assessed?' and 'The availability of the remaining original activities has not been independently verified.'\n- The proposal assumes the American History museum is open at 9:00 AM and the Natural History museum is open at 10:50 AM. These are unverified assumptions that contradict the EvidenceBrief's unresolved questions regarding schedule feasibility.\n\nThe mandatory_activity_comparison confirms the National Museum of Natural History remains mandatory, which the proposal preserves correctly. However, the removal of the National Gallery activity itself is a significant change where no evidence supports the feasibility of proceeding without it.",
+      "supported_claims",
+      "unsupported_claims",
+      "conflicting_claims",
+      "omitted_uncertainties",
+      "recommendations"
+    ],
+    "recommendations": []
+  },
+  "completed_at_utc": "2026-11-22T03:06:38.838345+00:00"
+}

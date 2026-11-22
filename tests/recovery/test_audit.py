@@ -178,9 +178,12 @@ def test_build_audit_messages_requires_mandatory_activity_comparison():
     system_prompt = messages[0]["content"]
 
     assert "Mandatory activity verification" in system_prompt
-    assert "activity IDs, names, and mandatory flags" in system_prompt
-    assert "remains in the proposed itinerary" in system_prompt
-
+    assert (
+        "mandatory_activity_comparison as the authoritative"
+        in system_prompt
+    )
+    assert "remain present and mandatory" in system_prompt
+    assert "removed from one that remains" in system_prompt
 
 def test_compare_mandatory_activities_identifies_preserved_activity():
     original = make_test_itinerary()
