@@ -227,7 +227,10 @@ def apply_approval_decision(
         "status": final_status,
         "current_stage": final_stage,
         "final_itinerary": final_itinerary,
-        "approval_history": [approval_record],
+        "approval_history": [
+            *state.get("approval_history", []),
+            approval_record,
+        ],
 
         # Preserve validation details so approval does not imply
         # that an incomplete proposal became fully validated.
