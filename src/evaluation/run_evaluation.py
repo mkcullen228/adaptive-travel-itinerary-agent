@@ -107,18 +107,21 @@ def run_scenario(
 
     workflow_status = final_state.get("status")
 
-    completed = (
-        workflow_status == WorkflowStatus.COMPLETED
-        or getattr(workflow_status, "value", workflow_status)
-        == WorkflowStatus.COMPLETED.value
+    workflow_status_value = getattr(
+    workflow_status, "value", workflow_status
     )
+
+    evaluable = workflow_status_value in {
+        WorkflowStatus.COMPLETED.value,
+        WorkflowStatus.AWAITING_APPROVAL.value,
+    }
 
     researcher_evaluation = None
     planner_evaluation = None
     auditor_evaluation = None
     evaluation_skip_reason = None
 
-    if completed:
+    if evaluable:
         evidence_brief = final_state.get("evidence_brief")
         recovery_options = final_state.get("recovery_options") or []
 
@@ -168,6 +171,13 @@ def run_scenario(
                     audit_report=audit_report,
                     deterministic_validation=deterministic_validation,
                 )
+    
+    if not evaluable:
+        evaluation_skip_reason = (
+            f"Workflow status '{workflow_status_value}' "
+            "is not eligible for evaluation."
+        )
+
 
     result = {
         "run_id": run_id,

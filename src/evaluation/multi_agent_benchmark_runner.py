@@ -78,7 +78,12 @@ def run_multi_agent_benchmark(config_path: str | Path):
 
     result = graph.invoke(initial_state)
 
-    if result["status"] != WorkflowStatus.COMPLETED:
+    accepted_statuses = {
+        WorkflowStatus.COMPLETED,
+        WorkflowStatus.AWAITING_APPROVAL,
+    }
+
+    if result["status"] not in accepted_statuses:
         raise RuntimeError(
             "Multi-agent benchmark did not complete successfully. "
             f"Status: {result['status']}. "

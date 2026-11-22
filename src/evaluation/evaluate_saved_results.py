@@ -70,29 +70,15 @@ def evaluate_saved_run(result_path: Path) -> dict:
         scenario,
         initial_state["original_itinerary"],
         recovery_option,
-        evidence_brief=evidence_brief,
     )
 
     auditor_evaluation = None
 
     if audit_report is not None:
-        schedule_failures = list(
-            planner_evaluation.schedule_consistency_failures
+        deterministic_validation = saved_result.get(
+            "deterministic_validation"
         )
-
-        schedule_failures.extend(
-            failure
-            for failure in planner_evaluation.failures
-            if (
-                "schedule time" in failure.casefold()
-                or "time mismatch" in failure.casefold()
-            )
-        )
-
-        deterministic_validation = {
-            "failures": schedule_failures
-        }
-
+        
         auditor_evaluation = evaluate_auditor_output(
             scenario=scenario,
             original_itinerary=initial_state["original_itinerary"],
@@ -119,8 +105,10 @@ def evaluate_saved_run(result_path: Path) -> dict:
             else None
         ),
         "overall_evaluation_passed": (
-            researcher_evaluation.passed
+            auditor_evaluation is not None
+            and researcher_evaluation.passed
             and planner_evaluation.passed
+            and auditor_evaluation.passed
         ),
     }
 

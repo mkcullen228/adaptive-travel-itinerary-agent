@@ -1,0 +1,119 @@
+{
+  "option_id": "recovery_proposal_001",
+  "strategy": "minimal_disruption",
+  "proposed_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "american_history",
+        "attraction_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T09:00:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "attraction_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "attraction_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T13:20:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "attraction_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T14:50:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 5,
+            "duration_seconds": 299.5,
+            "distance_meters": 416.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 17,
+            "duration_seconds": 985.9,
+            "distance_meters": 1369.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 694.1,
+            "distance_meters": 964.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      }
+    ]
+  },
+  "proposal_status": "partial",
+  "rationale": "The National Gallery of Art is confirmed unavailable from 9:00 AM to 10:30 AM. To address this disruption while adhering to the 'minimal_disruption' strategy, the National Gallery activity has been removed from the itinerary. The remaining four activities (National Museum of American History, National Museum of Natural History, World War II Memorial, and Lincoln Memorial) have been rescheduled sequentially to fill the time previously occupied by the National Gallery.\n\nSpecific changes include:\n- **Rescheduling**: The start time for the National Museum of American History has been moved from 10:50 AM to 9:00 AM. The start times for the subsequent activities (Natural History, WWII Memorial, and Lincoln Memorial) have been shifted forward by 90 minutes (the duration of the removed National Gallery visit) to maintain their relative sequence.\n- **Duration**: No activity durations were extended; all remain at their original values.\n\n**Critical Feasibility Warning**: The overall schedule feasibility is **provisional and unverified**. While the rescheduling mathematically fits within the day, several critical constraints cannot be confirmed:\n1.  **National Museum of American History Availability**: This activity was originally scheduled to start at 10:50 AM. By moving it to 9:00 AM, we are assuming it is open and operational at that time. The investigation explicitly states that the availability of remaining original activities has not been independently verified. There is no evidence confirming the National Museum of American History will be open at 9:00 AM.\n2.  **National Museum of Natural History Availability**: This activity is marked as mandatory with a start time of 13:20 PM in the original itinerary. By shifting it to 10:50 AM, we are assuming it is open and operational at that earlier time. There is no evidence confirming its hours or capacity for an early slot.\n3.  **Travel Feasibility**: The proposed travel leg from the National Museum of American History (originally 10:50 start) to the National Museum of Natural History (originally 13:20 start) has a walking estimate of 5 minutes. In the proposed itinerary, this leg now spans from 9:00 AM to 10:50 AM, leaving exactly 50 minutes for travel and transition. This is feasible based on the provided estimate, but it relies entirely on the assumption that the American History museum is open at 9:00 AM.\n\n**Trade-offs**: Removing the National Gallery reduces the total number of activities from 5 to 4. The user loses the opportunity to visit the National Gallery of Art during this window. However, this allows the itinerary to proceed without assuming unverified availability for other museums at non-standard hours.\n\n**Required User Approval**: This proposal requires explicit approval to remove the National Gallery and to accept the rescheduling of subsequent activities based on unverified availability assumptions. It is a partial recovery plan awaiting further investigation into the operational status of the remaining venues."
+  ,
+  "preserved_constraints": [
+    "Original start times and durations for unaffected activities were preserved where possible, but shifted due to the removal of the National Gallery.",
+    "Mandatory constraint for National Museum of Natural History was preserved in terms of activity inclusion, though its start time was adjusted."
+  ],
+  "violated_constraints": [],
+  "trade_offs": [
+    "Loss of National Gallery visit vs. ability to proceed with remaining activities without assuming unverified early hours.",
+    "Rescheduling subsequent activities based on unverified availability vs. maintaining original schedule which would result in a gap or conflict."
+  ],
+  "supporting_evidence_ids": [],
+  "assumptions": [
+    "The National Museum of American History is open and operational at 9:00 AM.",
+    "The National Museum of Natural History is open and operational at 10:50 AM.",
+    "No other disruptions affect the remaining activities."
+  ],
+  "uncertainties": [
+    "Replacement venue availability has not been verified (National Gallery removed, no alternative proposed).",
+    "The availability of the National Museum of American History at 9:00 AM is unverified.",
+    "The availability of the National Museum of Natural History at 10:50 AM is unverified.",
+    "Schedule feasibility after removing the unavailable National Gallery has not been assessed."
+  ]
+}

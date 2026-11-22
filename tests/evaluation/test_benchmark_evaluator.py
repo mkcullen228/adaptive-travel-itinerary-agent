@@ -1,5 +1,6 @@
 
 from datetime import date, datetime
+from unittest.mock import Mock
 
 from src.models.activity import Activity
 from src.models.itinerary import Itinerary
@@ -94,3 +95,77 @@ def test_benchmark_evaluator_does_not_modify_inputs():
 
     assert original.model_dump(mode="json") == original_before
     assert proposed.model_dump(mode="json") == proposed_before
+
+
+def test_benchmark_evaluator_delegates_to_all_evaluators(monkeypatch):
+    import src.evaluation.benchmark_evaluator as evaluator
+
+    original = make_itinerary([
+        make_activity("activity_1", "National Gallery", 9, 0),
+    ])
+    proposed = make_itinerary([
+        make_activity("activity_1", "National Gallery", 9, 0),
+    ])
+
+    scenario = DisruptionScenario.model_construct(
+        scenario_id="TEST-01",
+        affected_activity_ids=[],
+    )
+    proposal = RecoveryOption.model_construct(
+        option_id="OPTION-01",
+        proposed_itinerary=proposed,
+        rationale="The National Gallery is scheduled for 9:00 AM.",
+    )
+
+    validation = Mock()
+    validation.model_dump.return_value = {"status": "VALID"}
+
+    expected_results = {
+        "recovery_consistency": {"passed": True},
+        "schedule_comparison": {"changes": []},
+        "schedule_robustness": {"score": 1.0},
+        "narrative_consistency": {"passed": True},
+    }
+
+    mocks = {
+        "validate_itinerary": Mock(return_value=validation),
+        "evaluate_recovery_consistency": Mock(
+            return_value=expected_results["recovery_consistency"]
+        ),
+        "compare_itineraries": Mock(
+            return_value=expected_results["schedule_comparison"]
+        ),
+        "calculate_schedule_robustness": Mock(
+            return_value=expected_results["schedule_robustness"]
+        ),
+        "evaluate_narrative_consistency": Mock(
+            return_value=expected_results["narrative_consistency"]
+        ),
+    }
+
+    for name, mock in mocks.items():
+        monkeypatch.setattr(evaluator, name, mock)
+
+    result = evaluator.evaluate_benchmark_case(
+        original,
+        scenario,
+        proposal,
+    )
+
+    mocks["validate_itinerary"].assert_called_once_with(proposed)
+    mocks["evaluate_recovery_consistency"].assert_called_once_with(
+        original, scenario, proposal
+    )
+    mocks["compare_itineraries"].assert_called_once_with(
+        original, proposed
+    )
+    mocks["calculate_schedule_robustness"].assert_called_once_with(
+        proposed
+    )
+    mocks["evaluate_narrative_consistency"].assert_called_once_with(
+        original, proposal
+    )
+
+    assert result["deterministic_validation"] == {"status": "VALID"}
+    for section, expected in expected_results.items():
+        assert result[section] == expected
