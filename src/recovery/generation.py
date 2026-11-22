@@ -149,6 +149,60 @@ def build_recovery_messages(
     ]
 
 
+def align_proposal_timestamps(recovery_option, original_itinerary):
+    """
+    Align proposed activity timezone awareness with the original itinerary.
+
+    This MVP uses local wall-clock times for its single-destination itinerary.
+    The original activity timestamp determines the expected timezone format.
+    """
+    original_by_id = {
+        activity.activity_id: activity
+        for activity in original_itinerary.activities
+    }
+
+    normalized_activities = []
+
+    for proposed_activity in recovery_option.proposed_itinerary.activities:
+        original_activity = original_by_id.get(
+            proposed_activity.activity_id
+        )
+
+        if original_activity is None:
+            normalized_activities.append(proposed_activity)
+            continue
+
+        original_time = original_activity.start_time
+        proposed_time = proposed_activity.start_time
+
+        original_is_aware = original_time.utcoffset() is not None
+        proposed_is_aware = proposed_time.utcoffset() is not None
+
+        if original_is_aware and not proposed_is_aware:
+            normalized_time = proposed_time.replace(
+                tzinfo=original_time.tzinfo
+            )
+        elif not original_is_aware and proposed_is_aware:
+            normalized_time = proposed_time.replace(tzinfo=None)
+        else:
+            normalized_time = proposed_time
+
+        if normalized_time != proposed_time:
+            proposed_activity = proposed_activity.model_copy(
+                update={"start_time": normalized_time}
+            )
+
+        normalized_activities.append(proposed_activity)
+
+    normalized_itinerary = recovery_option.proposed_itinerary.model_copy(
+        update={"activities": normalized_activities}
+    )
+
+    return recovery_option.model_copy(
+        update={"proposed_itinerary": normalized_itinerary}
+    )
+
+
 def generate_recovery_option(
     planning_input: RecoveryPlanningInput,
     model_name: str = DEFAULT_MODEL,
@@ -186,6 +240,11 @@ def generate_recovery_option(
 
     recovery_option = RecoveryOption.model_validate_json(
         raw_response
+    )
+
+    recovery_option = align_proposal_timestamps(
+        recovery_option,
+        planning_input.original_itinerary,
     )
 
     return RecoveryGenerationResult(

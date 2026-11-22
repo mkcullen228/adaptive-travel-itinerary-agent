@@ -32,6 +32,7 @@ from src.recovery.audit import (
 from src.recovery.generation import DEFAULT_MODEL
 from src.recovery.planning import plan_recovery
 from src.recovery.research import research_evidence
+from src.data_sources.build_travel_legs import add_travel_legs_to_itinerary
 from src.validation.schedule_validator import validate_itinerary
 
 
@@ -297,6 +298,7 @@ def build_multi_agent_recovery_graph(
             "execution_trace": [event],
         }
 
+    
     def prepare_recovery_input(state: TravelAgentState):
         workflow_started_at = perf_counter()
 
@@ -314,9 +316,20 @@ def build_multi_agent_recovery_graph(
                     "An investigation result is required for recovery."
                 )
 
+            # Create an independent copy so the original itinerary remains
+            # unchanged. The Planner needs walking estimates before generating
+            # its proposal so it can account for travel time when scheduling.
+            planning_itinerary = state["original_itinerary"].model_copy(
+                deep=True
+            )
+
+            planning_itinerary = add_travel_legs_to_itinerary(
+                planning_itinerary
+            )
+
             revision_feedback = [
-            record.user_feedback
-            for record in state.get("approval_history", [])
+                record.user_feedback
+                for record in state.get("approval_history", [])
                 if (
                     record.status == ApprovalStatus.REVISION_REQUESTED
                     and record.user_feedback
@@ -333,7 +346,7 @@ def build_multi_agent_recovery_graph(
             )
 
             planning_input = RecoveryPlanningInput(
-                original_itinerary=state["original_itinerary"],
+                original_itinerary=planning_itinerary,
                 disruption_scenario=disruption,
                 investigation_result=investigation,
                 mandatory_constraints=state["mandatory_constraints"],
@@ -348,10 +361,20 @@ def build_multi_agent_recovery_graph(
             event = make_event(
                 stage="recovery_planning",
                 event_type="input_prepared",
-                description="Prepared shared recovery planning input.",
-                details={"strategy": strategy.value},
+                description=(
+                    "Prepared shared recovery planning input with "
+                    "walking estimates for the original itinerary."
+                ),
+                details={
+                    "strategy": strategy.value,
+                    "travel_leg_count": len(
+                        planning_itinerary.travel_legs
+                    ),
+                    "routing_failure_count": len(
+                        planning_itinerary.routing_failures
+                    ),
+                },
             )
-
 
             return {
                 "recovery_planning_input": planning_input,
@@ -359,7 +382,8 @@ def build_multi_agent_recovery_graph(
                 "current_stage": WorkflowStage.INVESTIGATION,
                 "execution_trace": [event],
 
-                # Clear outputs from the previous proposal before starting a new attempt.
+                # Clear outputs from the previous proposal before starting
+                # a new attempt.
                 "evidence_brief": None,
                 "research_generation_metadata": None,
                 "research_raw_response": None,
@@ -383,13 +407,13 @@ def build_multi_agent_recovery_graph(
                 "multi_agent_generation_metadata": None,
             }
 
-
         except Exception as error:
             return record_failure(
                 state,
                 "initialization",
                 error,
             )
+
 
     def research_context(state: TravelAgentState):
         llm_call_attempted = False
@@ -448,6 +472,7 @@ def build_multi_agent_recovery_graph(
                 llm_call_attempted=llm_call_attempted,
             )
 
+    
     def generate_plan(state: TravelAgentState):
         llm_call_attempted = False
 
@@ -471,6 +496,7 @@ def build_multi_agent_recovery_graph(
 
             option = result.recovery_option
 
+            # Validate evidence references before performing routing requests.
             investigation = state["investigation_result"]
 
             if investigation is None:
@@ -494,6 +520,12 @@ def build_multi_agent_recovery_graph(
                     f"investigation: {sorted(invalid_source_ids)}"
                 )
 
+            # Rebuild walking estimates only after the proposal passes
+            # evidence-reference validation.
+            option.proposed_itinerary = add_travel_legs_to_itinerary(
+                option.proposed_itinerary
+            )
+
             metadata = {
                 "model_name": result.model_name,
                 "latency_seconds": result.latency_seconds,
@@ -509,6 +541,12 @@ def build_multi_agent_recovery_graph(
                     "option_id": option.option_id,
                     "model_name": result.model_name,
                     "latency_seconds": result.latency_seconds,
+                    "travel_leg_count": len(
+                        option.proposed_itinerary.travel_legs
+                    ),
+                    "routing_failure_count": len(
+                        option.proposed_itinerary.routing_failures
+                    ),
                 },
             )
 
@@ -530,6 +568,7 @@ def build_multi_agent_recovery_graph(
                 error,
                 llm_call_attempted=llm_call_attempted,
             )
+
 
     def validate_proposal(state: TravelAgentState):
         try:

@@ -58,57 +58,25 @@
     {
       "origin_activity_id": "national_gallery",
       "destination_activity_id": "american_history",
-      "estimates": [
-        {
-          "mode": "walking",
-          "duration_minutes": 12,
-          "duration_seconds": 683.5,
-          "distance_meters": 949.3,
-          "source": "OpenRouteService"
-        }
-      ],
+      "estimates": [],
       "selected_mode": "walking"
     },
     {
       "origin_activity_id": "american_history",
       "destination_activity_id": "natural_history",
-      "estimates": [
-        {
-          "mode": "walking",
-          "duration_minutes": 5,
-          "duration_seconds": 299.5,
-          "distance_meters": 416.0,
-          "source": "OpenRouteService"
-        }
-      ],
+      "estimates": [],
       "selected_mode": "walking"
     },
     {
       "origin_activity_id": "natural_history",
       "destination_activity_id": "wwii_memorial",
-      "estimates": [
-        {
-          "mode": "walking",
-          "duration_minutes": 17,
-          "duration_seconds": 985.9,
-          "distance_meters": 1369.3,
-          "source": "OpenRouteService"
-        }
-      ],
+      "estimates": [],
       "selected_mode": "walking"
     },
     {
       "origin_activity_id": "wwii_memorial",
       "destination_activity_id": "lincoln_memorial",
-      "estimates": [
-        {
-          "mode": "walking",
-          "duration_minutes": 12,
-          "duration_seconds": 694.1,
-          "distance_meters": 964.0,
-          "source": "OpenRouteService"
-        }
-      ],
+      "estimates": [],
       "selected_mode": "walking"
     }
   ],
