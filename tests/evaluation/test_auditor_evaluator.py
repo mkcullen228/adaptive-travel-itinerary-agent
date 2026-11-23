@@ -519,4 +519,196 @@ def test_auditor_recognizes_cannot_verify_current_availability():
         audit_text,
         deterministic_validation=None,
     )
-    
+
+
+def test_auditor_recognizes_e2_uncertainty_language():
+    scenario = load_scenario("E2")
+
+    audit_text = (
+        "The proposal's claim lacks explicit evidentiary support. "
+        "The source has a low reliability score (0.35) and "
+        "verification status of unverified. The proposed time gaps "
+        "cannot be guaranteed to allow sufficient arrival times. "
+        "The opening hours assumption is a critical uncertainty "
+        "requiring verification. Missing travel estimates mean "
+        "schedule feasibility cannot be guaranteed."
+    )
+
+    deterministic_validation = {
+        "status": "incomplete",
+        "issues": [
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": "Missing selected travel estimate between consecutive activities.",
+            }
+        ],
+    }
+
+    assert _auditor_covers_uncertainties(
+        scenario,
+        audit_text,
+        deterministic_validation,
+    )
+
+
+def test_e3_actual_auditor_response_acknowledges_uncertainty_but_not_stale_evidence():
+    scenario = load_scenario("E3")
+    itinerary = make_itinerary()
+
+    report = make_report(
+        supported_claims=[
+            "The proposal correctly identifies the National Gallery of Art "
+            "as unavailable based on the disruption scenario and removes it "
+            "from the itinerary.",
+            "The proposal preserves the mandatory visit to the National "
+            "Museum of Natural History at its original scheduled time.",
+            "The proposal acknowledges that travel estimates have not been "
+            "verified and remaining activity availability has not been "
+            "independently confirmed."
+        ],
+        omitted_uncertainties=[
+            "The proposal fails to explicitly quantify the feasibility risk "
+            "regarding the specific travel duration between American History "
+            "and Natural History.",
+            "The proposal assumes the National Museum of American History "
+            "is open at 09:00 without providing evidence."
+        ],
+        rationale_findings=[
+            "The proposal overstates certainty by stating schedule feasibility "
+            "remains provisional while listing constraints as preserved "
+            "without verifying travel time.",
+            "The deterministic validation issues confirm that travel estimates "
+            "are missing for all legs.",
+            "The assumption about travel time is not supported by evidence."
+        ],
+        recommendations=[
+            "Explicitly state that feasibility depends on an unverified travel "
+            "duration between American History and Natural History.",
+            "Clarify that the assumption regarding the National Museum of "
+            "American History's availability at 09:00 is speculative.",
+            "Do not claim schedule feasibility without addressing missing "
+            "travel estimates."
+        ]
+    )
+
+    deterministic_validation = {
+        "status": "incomplete",
+        "issues": [
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+        ],
+    }
+
+    result = evaluate(
+        scenario,
+        itinerary,
+        itinerary,
+        report,
+        deterministic_validation,
+    )
+
+    assert result.mandatory_activity_accuracy is True
+    assert result.evidence_limitation_recognition is False
+    assert result.schedule_accuracy is True
+    assert result.uncertainty_coverage is True
+    assert result.passed is False
+
+
+def test_e5_actual_auditor_response_recognizes_missing_evidence_and_uncertainty():
+    scenario = load_scenario("E5")
+    itinerary = make_itinerary()
+
+    report = make_report(
+        supported_claims=[
+            "The proposal correctly identifies the National Gallery of Art "
+            "as unavailable based on the disruption scenario description, "
+            "despite the lack of independent evidence verification.",
+            "The proposal accurately reflects that the mandatory visit to "
+            "the National Museum of Natural History is preserved."
+        ],
+        unsupported_claims=[
+            "The claim that schedule feasibility after removing the unavailable "
+            "activity has not been assessed is partially unsupported because "
+            "the proposal proceeds with a specific time shift without verifying "
+            "whether subsequent activities can still be met.",
+            "The assumption that walking time between American History and "
+            "Natural History is negligible is unsupported by travel estimate data."
+        ],
+        omitted_uncertainties=[
+            "The proposal fails to explicitly quantify the risk of the National "
+            "Museum of Natural History being closed.",
+            "The proposal does not address the potential cascading delay if "
+            "walking time exceeds the available 90-minute window."
+        ],
+        rationale_findings=[
+            "The proposal rationale acknowledges that no retrieved sources "
+            "were available to verify the claim and that schedule feasibility "
+            "has not been assessed.",
+            "The deterministic validation results indicate three instances "
+            "of missing travel estimates.",
+            "The proposal treats missing travel estimates as negligible "
+            "without acknowledging that schedule feasibility is incomplete."
+        ],
+        recommendations=[
+            "The proposal should explicitly state that recovery actions are "
+            "provisional pending verification of travel times.",
+            "The rationale must directly reference deterministic validation "
+            "issues regarding missing travel estimates.",
+            "The proposal should clarify that the scheduled time for the "
+            "mandatory activity has changed, introducing additional uncertainty."
+        ]
+    )
+
+    deterministic_validation = {
+        "status": "incomplete",
+        "issues": [
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+            {
+                "issue_type": "missing_travel_estimate",
+                "description": (
+                    "Missing selected travel estimate between consecutive activities."
+                ),
+            },
+        ],
+    }
+
+    result = evaluate(
+        scenario,
+        itinerary,
+        itinerary,
+        report,
+        deterministic_validation,
+    )
+
+    assert result.mandatory_activity_accuracy is True
+    assert result.evidence_limitation_recognition is True
+    assert result.schedule_accuracy is True
+    assert result.uncertainty_coverage is True
+    assert result.passed is True

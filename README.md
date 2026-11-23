@@ -4,7 +4,7 @@ An agentic system that investigates travel disruptions, proposes itinerary adjus
 
 ## Project Overview
 
-This project is a Carnegie Mellon Agentic AI Certification Program capstone. It demonstrates how a multi-agent workflow can support travel itinerary recovery while maintaining explicit controls over evidence, uncertainty, and user approval.
+This project was created originally as part of the CMU Agentic AI Certification Program capstone. It demonstrates how a multi-agent workflow can support travel itinerary recovery while maintaining explicit controls over evidence, uncertainty, and user approval. Scope of the project was initially kept small and focused for this reason. 
 
 The application uses a Washington, DC itinerary and evaluates recovery under predefined disruption scenarios.
 

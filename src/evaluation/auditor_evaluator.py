@@ -257,10 +257,10 @@ def _auditor_covers_uncertainties(
     Check whether the Auditor communicates the uncertainties relevant
     to the scenario and any deterministic validation failures.
 
-    This intentionally checks for acknowledgment, not identical wording.
+    This checks for meaningful acknowledgment rather than identical wording.
     """
-    audit_text = audit_text.casefold()
 
+    audit_text = audit_text.casefold()
     expected = scenario.expected_planner_behavior
 
     # Missing or incomplete evidence should remain an explicit uncertainty.
@@ -272,38 +272,93 @@ def _auditor_covers_uncertainties(
             "cannot confirm",
             "cannot verify",
             "requires verification",
+            "requiring verification",
             "requires further verification",
             "needs verification",
             "further verification",
             "additional information",
             "additional evidence",
+            "not independently verified",
+            "not independently confirmed",
+            "no retrieved sources",
+            "no evidence records",
+            "no evidence",
+            "has not been assessed",
+            "has not been verified",
+            "has not been confirmed",
+            "without verifying",
+            "unverified",
+            "speculative",
+            "provisional",
         )
 
         if not _contains_any(audit_text, unresolved_terms):
             return False
 
-    # Low-reliability evidence should not be treated as conclusive.
+    # General verification requirements apply to missing or insufficient
+    # evidence. They do not necessarily require current/up-to-date evidence.
+    if getattr(expected, "must_request_verification", False):
+        verification_request_terms = (
+            "pending verification",
+            "requires verification",
+            "requiring verification",
+            "requires further verification",
+            "needs verification",
+            "needs to be verified",
+            "should be verified",
+            "must be verified",
+            "verification is needed",
+            "verification is required",
+            "verify the",
+            "verify whether",
+            "verify availability",
+            "verify travel",
+            "further verification",
+        )
+
+        if not _contains_any(audit_text, verification_request_terms):
+            return False
+
+    # High-confidence conclusions should not be drawn from insufficient
+    # or unreliable evidence.
     if getattr(expected, "must_avoid_high_confidence", False):
         confidence_terms = (
             "low confidence",
             "limited confidence",
+            "low reliability",
             "not conclusive",
             "not sufficient to confirm",
             "cannot establish",
+            "cannot be established",
+            "cannot be guaranteed",
+            "cannot be confirmed",
             "should not be treated as confirmed",
             "requires verification",
+            "requiring verification",
             "requires further verification",
             "needs further verification",
             "overstates certainty",
             "unsupported by evidence",
+            "partially unsupported",
+            "not supported by evidence",
             "lacks supporting evidence",
+            "lacks explicit evidentiary support",
+            "insufficient evidence",
+            "has not been assessed",
+            "has not been verified",
+            "unverified",
             "unverified assumption",
+            "not independently verified",
+            "not independently confirmed",
+            "speculative",
+            "provisional",
         )
 
         if not _contains_any(audit_text, confidence_terms):
             return False
 
     # Stale evidence cannot establish current availability.
+    # Keep this requirement separate from general verification.
     if getattr(expected, "must_request_current_verification", False):
         current_verification_terms = (
             "current verification",
@@ -317,6 +372,7 @@ def _auditor_covers_uncertainties(
             "not independently verified",
             "not independently confirmed",
             "does not apply to the target date",
+            "remaining activity availability has not been independently confirmed",
         )
 
         if not _contains_any(audit_text, current_verification_terms):
@@ -339,8 +395,7 @@ def _auditor_covers_uncertainties(
         if not _contains_any(audit_text, conflict_resolution_terms):
             return False
 
-    # Any deterministic validation issue is also an uncertainty or limitation
-    # that the Auditor should communicate.
+    # Deterministic validation issues must also be communicated.
     validation_failures = _validation_failure_texts(
         deterministic_validation
     )

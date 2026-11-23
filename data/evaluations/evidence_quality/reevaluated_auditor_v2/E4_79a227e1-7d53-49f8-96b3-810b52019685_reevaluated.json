@@ -1,0 +1,70 @@
+{
+  "original_run_id": "79a227e1-7d53-49f8-96b3-810b52019685",
+  "original_result_file": "E4_79a227e1-7d53-49f8-96b3-810b52019685.json",
+  "scenario_id": "E4",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 17.510309791890904,
+        "input_tokens": 1216,
+        "output_tokens": 592
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 42.20828895899467,
+        "input_tokens": 3848,
+        "output_tokens": 1379
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 20.957312332931906,
+        "input_tokens": 4286,
+        "output_tokens": 636
+      }
+    },
+    "total_latency_seconds": 80.67591108381748,
+    "total_input_tokens": 9350,
+    "total_output_tokens": 2607,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E4",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E4",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "unaffected_activities_preserved": true,
+    "passed": true,
+    "failures": []
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E4",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": true,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": true,
+    "passed": true,
+    "failures": []
+  },
+  "overall_evaluation_passed": true
+}

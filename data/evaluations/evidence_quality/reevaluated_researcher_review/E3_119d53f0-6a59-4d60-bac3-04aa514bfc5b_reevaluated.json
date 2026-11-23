@@ -1,0 +1,73 @@
+{
+  "original_run_id": "119d53f0-6a59-4d60-bac3-04aa514bfc5b",
+  "original_result_file": "E3_119d53f0-6a59-4d60-bac3-04aa514bfc5b.json",
+  "scenario_id": "E3",
+  "model_name": "qwen3.5:4b",
+  "original_metadata": {
+    "agents": {
+      "researcher": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 7.830332625191659,
+        "input_tokens": 1027,
+        "output_tokens": 261
+      },
+      "planner": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 41.00742116710171,
+        "input_tokens": 3356,
+        "output_tokens": 1304
+      },
+      "auditor": {
+        "model_name": "qwen3.5:4b",
+        "latency_seconds": 20.418956625042483,
+        "input_tokens": 3877,
+        "output_tokens": 614
+      }
+    },
+    "total_latency_seconds": 69.25671041733585,
+    "total_input_tokens": 8260,
+    "total_output_tokens": 2179,
+    "llm_call_count": 3
+  },
+  "researcher_evaluation": {
+    "scenario_id": "E3",
+    "finding_count": 1,
+    "finding_count_passed": true,
+    "status_passed": true,
+    "supporting_sources_passed": true,
+    "conflicting_sources_passed": true,
+    "source_review_passed": true,
+    "source_quality_warnings_passed": true,
+    "provenance_passed": true,
+    "passed": true,
+    "failures": []
+  },
+  "planner_evaluation": {
+    "scenario_id": "E3",
+    "mandatory_visit_preserved": true,
+    "no_duplicate_visit": true,
+    "evidence_provenance_passed": true,
+    "uncertainty_communicated": true,
+    "availability_caveat_passed": true,
+    "verification_requested": true,
+    "conflict_acknowledged": true,
+    "cautious_proposal_status": true,
+    "unaffected_activities_preserved": true,
+    "passed": true,
+    "failures": []
+  },
+  "auditor_evaluation": {
+    "scenario_id": "E3",
+    "mandatory_activity_accuracy": true,
+    "evidence_conflict_recognition": true,
+    "evidence_limitation_recognition": false,
+    "schedule_accuracy": true,
+    "uncertainty_coverage": false,
+    "passed": false,
+    "failures": [
+      "Auditor did not adequately acknowledge evidence quality limitations or missing evidence.",
+      "Auditor did not adequately communicate the relevant uncertainties or unresolved issues."
+    ]
+  },
+  "overall_evaluation_passed": false
+}
