@@ -10,9 +10,6 @@ import ollama
 from src.models.disruption import DisruptionScenario
 from src.models.investigation import InvestigationResult
 from src.models.multi_agent import EvidenceBrief
-# from src.prompts.evidence_research import (
-#     EVIDENCE_RESEARCH_SYSTEM_PROMPT,
-# )
 from src.prompts.evidence_research_experimental import (
     EVIDENCE_RESEARCH_SYSTEM_PROMPT,
 )
@@ -118,6 +115,44 @@ def build_evidence_brief_schema() -> dict[str, Any]:
     return schema
 
 
+def remove_out_of_scope_routing_uncertainties(
+    brief: EvidenceBrief,
+) -> EvidenceBrief:
+    """
+    Remove routing and schedule-feasibility claims from the Researcher's
+    uncertainties because the Researcher does not receive routing data.
+
+    Routing feasibility is evaluated separately using structured
+    itinerary travel estimates and deterministic validation.
+    """
+    routing_terms = (
+        "travel estimate",
+        "travel estimates",
+        "walking estimate",
+        "walking estimates",
+        "walking time",
+        "walking times",
+        "routing",
+        "schedule feasibility",
+        "travel feasibility",
+    )
+
+    filtered_uncertainties = [
+        uncertainty
+        for uncertainty in brief.overall_uncertainties
+        if not any(
+            term in uncertainty.lower()
+            for term in routing_terms
+        )
+    ]
+
+    return brief.model_copy(
+        update={
+            "overall_uncertainties": filtered_uncertainties
+        }
+    )
+
+
 def research_evidence(
     investigation: InvestigationResult,
     disruption: DisruptionScenario,
@@ -147,7 +182,34 @@ def research_evidence(
     latency_seconds = time.perf_counter() - start_time
     raw_response = response.message.content
 
-    brief = EvidenceBrief.model_validate_json(raw_response)
+    # Parse the original response before applying deterministic
+    # provenance rules.
+    brief_data = json.loads(raw_response)
+
+    # Without retrieved evidence, no finding can be classified as
+    # supported by retrieved sources. Contextual investigation data
+    # remains available to inform the explanation and implications.
+    if not investigation.retrieved_evidence:
+        brief_data["source_ids_reviewed"] = []
+
+        for finding in brief_data.get("findings", []):
+            finding["status"] = "unsupported"
+            finding["supporting_source_ids"] = []
+            finding["conflicting_source_ids"] = []
+
+            warnings = finding.setdefault(
+                "source_quality_warnings", []
+            )
+            warning = (
+                "No retrieved evidence sources were available; "
+                "this finding is based on supplied context only."
+            )
+            if warning not in warnings:
+                warnings.append(warning)
+
+    brief = EvidenceBrief.model_validate(brief_data)
+
+    brief = remove_out_of_scope_routing_uncertainties(brief)
 
     validate_evidence_brief_findings(brief)
 

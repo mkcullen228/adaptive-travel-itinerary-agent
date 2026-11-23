@@ -23,6 +23,22 @@ EVIDENCE INTERPRETATION
 - Cite only source IDs belonging to retrieved evidence records.
 - Treat investigation and scenario IDs as contextual identifiers,
   not evidence sources.
+- Distinguish retrieved evidence from other supplied investigation
+  context, including structured data, scenario descriptions,
+  metadata, and warnings. Contextual inputs may inform your
+  interpretation, but must not be represented as retrieved sources.
+- A finding marked supported must identify at least one retrieved
+  source that directly supports its claim.
+- A finding marked conflicting must identify both supporting and
+  conflicting retrieved sources.
+- Do not assign supported or conflicting status when the required
+  source references are unavailable.
+- When no retrieved sources are available, do not invent source IDs
+  or treat contextual inputs as retrieved evidence. Use unsupported
+  status for claims that lack retrieved source support, and explain
+  what the supplied context does and does not establish.
+- When evidence provides only partial support, use partially
+  supported status and clearly explain the limitations.
 
 DISRUPTION CONTEXT
 
@@ -37,13 +53,17 @@ OUTPUT
 
 Return a structured EvidenceBrief compatible with the supplied schema.
 
+Produce exactly one EvidenceFinding addressing the primary recovery
+question identified in the supplied investigation and disruption
+context.
+
 Include relevant evidence findings, source references, source quality
 warnings, disruption implications, unresolved questions, reviewed
 source IDs, and overall uncertainties.
 
-Review every supplied evidence source. Populate source_ids_reviewed
-with the IDs of all sources reviewed, or an empty list when no
-retrieved evidence is supplied.
+Review every supplied retrieved evidence source. Populate
+source_ids_reviewed with the IDs of all sources reviewed, or an empty
+list when no retrieved evidence is supplied.
 
 Your assessment informs recovery planning. It does not independently
 establish venue availability or replace the original investigation.

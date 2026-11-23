@@ -1,0 +1,138 @@
+{
+  "scenario_id": "P-01",
+  "proposal_id": "recovery_proposal_001",
+  "deterministic_validation": {
+    "status": "invalid",
+    "issues": [
+      {
+        "issue_type": "insufficient_travel_time",
+        "description": "Insufficient time to travel between consecutive activities using the selected transportation mode.",
+        "activity_ids": [
+          "wwii_memorial",
+          "lincoln_memorial"
+        ]
+      }
+    ]
+  },
+  "recovery_consistency": {
+    "affected_activities": [
+      {
+        "activity_id": "national_gallery",
+        "status": "removed"
+      }
+    ],
+    "mandatory_activities": [
+      {
+        "activity_id": "natural_history",
+        "preserved": true
+      }
+    ],
+    "removed_activity_ids": [
+      "national_gallery"
+    ],
+    "added_activity_ids": [],
+    "rescheduled_activity_ids": [
+      "american_history",
+      "lincoln_memorial",
+      "natural_history",
+      "wwii_memorial"
+    ],
+    "unresolved_affected_activity_ids": [],
+    "all_mandatory_activities_preserved": true,
+    "all_affected_activities_addressed": true
+  },
+  "schedule_comparison": {
+    "retained_activities": [],
+    "removed_activities": [
+      "national_gallery"
+    ],
+    "added_activities": [],
+    "rescheduled_activities": [
+      {
+        "activity_id": "american_history",
+        "original_start": "2026-11-07T10:50:00",
+        "proposed_start": "2026-11-07T09:00:00",
+        "change_minutes": -110
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "original_start": "2026-11-07T15:50:00",
+        "proposed_start": "2026-11-07T13:20:00",
+        "change_minutes": -150
+      },
+      {
+        "activity_id": "natural_history",
+        "original_start": "2026-11-07T13:20:00",
+        "proposed_start": "2026-11-07T10:50:00",
+        "change_minutes": -150
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "original_start": "2026-11-07T15:10:00",
+        "proposed_start": "2026-11-07T12:40:00",
+        "change_minutes": -150
+      }
+    ]
+  },
+  "schedule_robustness": {
+    "status": "complete",
+    "minimum_slack_minutes": -2,
+    "average_slack_minutes": 5.33,
+    "low_slack_leg_count": 1,
+    "infeasible_leg_count": 1,
+    "missing_estimate_count": 0,
+    "legs": [
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "available_gap_minutes": 20,
+        "travel_duration_minutes": 5,
+        "slack_minutes": 15,
+        "selected_mode": "walking",
+        "travel_source": "OpenRouteService",
+        "status": "feasible"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "available_gap_minutes": 20,
+        "travel_duration_minutes": 17,
+        "slack_minutes": 3,
+        "selected_mode": "walking",
+        "travel_source": "OpenRouteService",
+        "status": "low_slack"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "available_gap_minutes": 10,
+        "travel_duration_minutes": 12,
+        "slack_minutes": -2,
+        "selected_mode": "walking",
+        "travel_source": "OpenRouteService",
+        "status": "infeasible"
+      }
+    ]
+  },
+  "narrative_consistency": {
+    "status": "inconsistent",
+    "checked_claims": [
+      {
+        "activity_id": "american_history",
+        "activity_name": "National Museum of American History",
+        "claimed_start_time": "09:00 AM",
+        "actual_start_time": "9:00 AM"
+      }
+    ],
+    "inconsistent_claims": [
+      {
+        "activity_id": "american_history",
+        "activity_name": "National Museum of American History",
+        "claimed_start_time": "09:00 AM",
+        "actual_start_time": "9:00 AM"
+      }
+    ],
+    "checked_claim_count": 1,
+    "inconsistent_claim_count": 1
+  }
+}

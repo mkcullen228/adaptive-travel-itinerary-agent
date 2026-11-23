@@ -1,0 +1,82 @@
+{
+  "run_id": "run_01",
+  "architecture": "multi_agent",
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "controlled_prompt_version": "shared_standard_planner_v1",
+  "auditor_prompt_version": "auditor_schedule_robustness_v2",
+  "planner_system_prompt_sha256": "a4bbadea4d7c8ea8d015d49a1f68949e17f49d6431dbef308b8e76fa5e4bbe62",
+  "planner_user_prompt_sha256": "3cd2a440bb9000c46625bd200f8587c577dd24e804e54bd3bdce1511fe39e677",
+  "auditor_system_prompt_sha256": "140320e036961fa17f21b93ae5e1ef7b829953255a69ba6e568a625371fb6b3b",
+  "auditor_user_prompt_sha256": "44b71e6de0c772bfe89a0e8a4a50cad4daa083d687013da8496123a99eb2e0e8",
+  "planning_input_sha256": "232d34b3f3bfdd299901cb0b12e757811315f14f036843a883f24bca0ce64947",
+  "llm_call_count": 3,
+  "llm_latency_seconds": 81.4985257491935,
+  "workflow_wall_latency_seconds": 81.51195700000972,
+  "input_tokens": 9746,
+  "output_tokens": 2365,
+  "researcher_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 7.28044354217127,
+    "input_tokens": 1154,
+    "output_tokens": 212
+  },
+  "planner_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 49.12340979115106,
+    "input_tokens": 3062,
+    "output_tokens": 1496
+  },
+  "auditor_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 25.094672415871173,
+    "input_tokens": 5530,
+    "output_tokens": 657
+  },
+  "researcher_assessment": [
+    {
+      "claim": "A replacement venue is available and feasible for the affected itinerary.",
+      "status": "unsupported",
+      "supporting_source_ids": [],
+      "conflicting_source_ids": [],
+      "explanation": "No retrieved evidence sources were available to verify the availability or feasibility of a replacement venue. The investigation explicitly states that no verified replacement venue information was retrieved, and the absence of evidence does not establish availability. Furthermore, schedule feasibility after removing the unavailable National Gallery has not been assessed.",
+      "source_quality_warnings": [
+        "No retrieved evidence establishes replacement venue availability.",
+        "No retrieved evidence sources were available; this finding is based on supplied context only."
+      ]
+    }
+  ],
+  "auditor_assessment": {
+    "assessment": "unsupported",
+    "supported_claims": [
+      "The removal of the 'national_gallery' activity is a necessary response to the confirmed disruption where this venue is unavailable."
+    ],
+    "unsupported_claims": [
+      "The proposal claims that subsequent activities were shifted forward by exactly 90 minutes (the duration of the removed activity) to preserve chronological flow. This calculation is mathematically incorrect based on the proposed start times.",
+      "The proposal states that schedule feasibility has been assessed and that travel estimates remain valid after time shifts. The deterministic validation explicitly identifies an infeasible leg, contradicting this claim."
+    ],
+    "conflicting_claims": [
+      "The proposal rationale claims activities were shifted forward by 90 minutes, but the proposed itinerary shows 'american_history' starting at 09:00 (earlier than original 10:50) and 'natural_history' starting at 10:50 (earlier than original 13:20). This contradicts the claim of forward shifting.",
+      "The proposal rationale states that travel estimates remain valid, but deterministic_validation identifies an infeasible leg between wwii_memorial and lincoln_memorial with -2 minutes slack."
+    ],
+    "omitted_uncertainties": [
+      "The proposal fails to acknowledge the critical uncertainty regarding the feasibility of the final leg (wwii_memorial to lincoln_memorial), which has negative slack (-2 minutes) and is marked infeasible by schedule_robustness.",
+      "The proposal does not address the potential impact of the shifted start times on user preferences or other constraints, despite listing it as a trade-off."
+    ],
+    "rationale_findings": [
+      "The proposed rationale contains significant mathematical errors. It claims activities were shifted forward by 90 minutes, but the actual data shows 'american_history' was moved back to 09:00 and 'natural_history' to 10:50. This misrepresentation of the schedule change undermines the claim of preserving chronological flow.",
+      "The proposal asserts that travel estimates remain valid after time shifts. However, deterministic_validation identifies an infeasible leg between wwii_memorial and lincoln_memorial with -2 minutes slack. This indicates the proposed itinerary is not feasible as stated.",
+      "The schedule_robustness data confirms one leg (wwii_memorial to lincoln_memorial) is infeasible due to insufficient travel time relative to available gaps. The proposal ignores this critical failure point, presenting an infeasible schedule as a viable option."
+    ],
+    "recommendations": [
+      "Remove the claim that activities were shifted forward by 90 minutes; instead accurately describe the actual start times provided in the proposed itinerary.",
+      "Explicitly acknowledge the infeasible leg between wwii_memorial and lincoln_memorial (slack: -2 minutes) rather than asserting travel estimates remain valid.",
+      "Do not present the itinerary as feasible without addressing the negative slack value identified by schedule_robustness."
+    ]
+  },
+  "proposal_id": "recovery_proposal_dc_2026_11_07_v1",
+  "proposal_status": "partial",
+  "completed_at_utc": "2026-11-23T01:59:10.226302+00:00"
+}

@@ -1,0 +1,125 @@
+{
+  "option_id": "recovery_proposal_001",
+  "strategy": "minimal_disruption",
+  "proposed_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "american_history",
+        "attraction_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T09:00:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "attraction_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00-05:00",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "attraction_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T12:40:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "attraction_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T13:20:00-05:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 5,
+            "duration_seconds": 299.5,
+            "distance_meters": 416.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 17,
+            "duration_seconds": 985.9,
+            "distance_meters": 1369.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 694.1,
+            "distance_meters": 964.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      }
+    ],
+    "routing_failures": []
+  },
+  "proposal_status": "partial",
+  "rationale": "The original itinerary has been modified to accommodate the confirmed disruption where the National Gallery of Art is unavailable. To minimize disruption, the National Gallery activity was removed from the sequence. The remaining activities were rescheduled to maintain logical flow and travel feasibility based on existing estimates. Specifically, the start time for the National Museum of American History was adjusted to 9:00 AM (originally scheduled after the gallery), followed by the National Museum of Natural History at 10:50 AM. Subsequent outdoor activities were shifted accordingly to account for the removed duration.",
+  "preserved_constraints": [
+    "Original itinerary date (2026-11-07)",
+    "Destination (Washington, DC)",
+    "Mandatory constraint: National Museum of Natural History must be visited",
+    "Travel mode preference: Walking between all activities"
+  ],
+  "violated_constraints": [
+    "Original activity sequence preserved only where feasible; the National Gallery was removed due to confirmed unavailability."
+  ],
+  "trade_offs": [
+    "Trade-off: Removal of the National Gallery reduces the total number of planned activities from 5 to 4. This is necessary due to the confirmed high-severity disruption.",
+    "Trade-off: The start time for the National Museum of American History was shifted forward by 90 minutes (from 10:50 AM to 9:00 AM) to fill the gap left by the removed activity. This assumes the user can begin the day at 9:00 AM without conflict with other commitments.",
+    "Trade-off: The National Museum of Natural History start time was shifted forward by 80 minutes (from 13:20 PM to 10:50 AM) due to the removal of the preceding activity. This assumes the user can arrive at this location earlier than originally planned."
+  ],
+  "supporting_evidence_ids": [],
+  "assumptions": [
+    "The National Museum of American History is open and operational at 9:00 AM on 2026-11-07.",
+    "The National Museum of Natural History is open and operational at 10:50 AM on 2026-11-07.",
+    "The user can tolerate the shift in start times for subsequent activities without impacting other plans.",
+    "Walking travel estimates remain valid despite the change in activity sequence."
+  ],
+  "uncertainties": [
+    "No verified replacement venue availability information was retrieved for the National Gallery slot. The absence of evidence does not confirm any alternative indoor or outdoor venues are available at that time.",
+    "The availability of the remaining original activities (National Museum of American History, National Museum of Natural History) has not been independently verified beyond their presence in the original itinerary.",
+    "Schedule feasibility after removing the unavailable National Gallery and rescheduling subsequent activities has not been fully assessed for potential conflicts with other user commitments or venue-specific restrictions.",
+    "Potential replacement candidates for the National Gallery slot include alternative museums or cultural sites in Washington, DC, but these remain unverified suggestions due to lack of availability data."
+  ]
+}
