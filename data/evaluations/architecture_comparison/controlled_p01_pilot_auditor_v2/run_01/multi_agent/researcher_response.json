@@ -1,0 +1,20 @@
+{
+  "findings": [
+    {
+      "claim": "A replacement venue is available and feasible for the affected itinerary.",
+      "status": "unsupported",
+      "supporting_source_ids": [],
+      "conflicting_source_ids": [],
+      "explanation": "No retrieved evidence sources were available to verify the availability or feasibility of a replacement venue. The investigation explicitly states that no verified replacement venue information was retrieved, and the absence of evidence does not establish availability. Furthermore, schedule feasibility after removing the unavailable National Gallery has not been assessed.",
+      "source_quality_warnings": [
+        "No retrieved evidence establishes replacement venue availability."
+      ]
+    }
+  ],
+  "source_ids_reviewed": [],
+  "overall_uncertainties": [
+    "Replacement venue availability has not been verified.",
+    "The availability of the remaining original activities has not been independently verified.",
+    "Schedule feasibility after removing the unavailable National Gallery has not been assessed."
+  ]
+}

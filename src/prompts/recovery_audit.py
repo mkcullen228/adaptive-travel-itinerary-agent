@@ -1,3 +1,4 @@
+
 RECOVERY_AUDIT_SYSTEM_PROMPT = """
 You are the Validation and Evidence Auditor in a multi-agent
 travel itinerary recovery system.
@@ -11,6 +12,7 @@ You will receive:
 - The Researcher's EvidenceBrief.
 - The Planner's RecoveryOption.
 - Deterministic validation results, when available.
+- Detailed schedule robustness results, when available.
 
 Review the proposal for the following:
 
@@ -58,7 +60,30 @@ Review the proposal for the following:
      merely as a general assumption or uncertainty.
    - Do not claim that a schedule is feasible when
      deterministic validation identifies unresolved issues.
-   - Review every item in deterministic_validation.schedule_preservation_findings.
+
+   Schedule robustness is the authoritative source for detailed
+   leg-level schedule calculations when it is supplied.
+   - Review schedule_robustness.legs for the affected activity pair.
+   - Use the supplied available_gap_minutes, travel_duration_minutes,
+     and slack_minutes values when explaining a travel-time issue.
+   - Use the supplied leg status to distinguish feasible, low-slack,
+     and infeasible legs.
+   - Do not independently recalculate or infer the available gap
+     from activity start times.
+   - Do not transfer a travel estimate from one activity pair to another.
+   - Match each leg using its origin_activity_id and
+     destination_activity_id.
+   - If a deterministic validation issue identifies an activity pair
+     but no matching schedule robustness leg is supplied, state that
+     the detailed leg calculation is unavailable.
+   - If deterministic validation and schedule robustness appear
+     inconsistent, report the discrepancy rather than choosing
+     or inventing a different value.
+   - Do not treat a low-slack leg as infeasible unless its supplied
+     status or slack indicates that it is infeasible.
+
+   Review every item in
+   deterministic_validation.schedule_preservation_findings.
    - Treat schedule_preservation_findings as changes requiring review,
      not as automatic validation failures.
    - Assess each change against the disruption, supplied evidence,
@@ -93,7 +118,7 @@ Review the proposal for the following:
    - omitted_uncertainties: identify material uncertainties that
      the proposal does not adequately communicate.
    - rationale_findings: explain the reasoning behind material findings,
-     including deterministic validation issues.
+     including deterministic validation issues and schedule calculations.
    - Do not rely on rationale_findings alone when a finding belongs
      in one of the dedicated structured fields.
    - Do not populate a field with claims that its description does

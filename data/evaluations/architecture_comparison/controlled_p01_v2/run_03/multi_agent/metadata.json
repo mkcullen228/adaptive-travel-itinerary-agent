@@ -1,0 +1,86 @@
+{
+  "run_id": "run_03",
+  "architecture": "multi_agent",
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "controlled_prompt_version": "shared_standard_planner_v1",
+  "auditor_prompt_version": "auditor_schedule_robustness_v2",
+  "planner_system_prompt_sha256": "a4bbadea4d7c8ea8d015d49a1f68949e17f49d6431dbef308b8e76fa5e4bbe62",
+  "planner_user_prompt_sha256": "26b452cd11b070b41d0cd7e43a901e19ee6c2a7f7d1009008397afbc8b15a740",
+  "auditor_system_prompt_sha256": "140320e036961fa17f21b93ae5e1ef7b829953255a69ba6e568a625371fb6b3b",
+  "auditor_user_prompt_sha256": "d50c16eef01f92b68d09ac07266f47eaf1577136473db21a389aadddac941987",
+  "planning_input_sha256": "b465145d9a97007b4dc43559d8686033af0e6746b2d493cb6f675d4f137b55e0",
+  "llm_call_count": 3,
+  "llm_latency_seconds": 104.34633179195225,
+  "workflow_wall_latency_seconds": 104.36095108301379,
+  "input_tokens": 9752,
+  "output_tokens": 2970,
+  "researcher_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 8.678442667005584,
+    "input_tokens": 1154,
+    "output_tokens": 212
+  },
+  "planner_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 48.775298667140305,
+    "input_tokens": 3062,
+    "output_tokens": 1502
+  },
+  "auditor_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 46.892590457806364,
+    "input_tokens": 5536,
+    "output_tokens": 1256
+  },
+  "researcher_assessment": [
+    {
+      "claim": "A replacement venue is available and feasible for the affected itinerary.",
+      "status": "unsupported",
+      "supporting_source_ids": [],
+      "conflicting_source_ids": [],
+      "explanation": "No retrieved evidence sources were available to verify the availability or feasibility of a replacement venue. The investigation explicitly states that no verified replacement venue information was retrieved, and the absence of evidence does not establish availability. Furthermore, schedule feasibility after removing the unavailable National Gallery has not been assessed.",
+      "source_quality_warnings": [
+        "No retrieved evidence establishes replacement venue availability.",
+        "No retrieved evidence sources were available; this finding is based on supplied context only."
+      ]
+    }
+  ],
+  "auditor_assessment": {
+    "assessment": "unsupported",
+    "supported_claims": [
+      "The removal of the 'national_gallery' activity is a direct response to the confirmed disruption scenario where this venue is unavailable."
+    ],
+    "unsupported_claims": [
+      "The proposal claims that subsequent activities were shifted forward by the duration of the removed activity (90 minutes) to maintain chronological flow. This claim is unsupported because the schedule_preservation_findings show that the start times were not simply shifted by a fixed 90-minute block; rather, they were compressed into earlier slots without explicit justification for this specific rescheduling logic in the evidence.",
+      "The proposal states that 'schedule feasibility after removing the unavailable National Gallery and shifting subsequent activities has not been assessed' as an uncertainty, yet it presents a schedule with negative slack (-2 minutes) which indicates infeasibility. The claim that the schedule is feasible or that the shift is acceptable contradicts the deterministic validation results showing an infeasible leg.",
+      "The proposal lists 'Schedule feasibility after removing... has not been assessed' as an uncertainty, but the provided data (schedule_robustness) explicitly calculates this and finds it infeasible. Presenting this as an unknown uncertainty while simultaneously providing calculation results creates a contradiction between the claim of unassessed feasibility and the actual state of the schedule."
+    ],
+    "conflicting_claims": [
+      "The EvidenceBrief identifies 'Schedule feasibility after removing the unavailable National Gallery and shifting subsequent activities has not been assessed' as an unresolved uncertainty. However, the deterministic_validation.schedule_robustness provides specific leg-level calculations showing that the final leg (wwii_memorial to lincoln_memorial) is infeasible with -2 minutes of slack. The proposal's rationale implies a successful rescheduling ('ensuring they can be visited within the scheduled day') which directly conflicts with the deterministic finding of infeasibility.",
+      "The EvidenceBrief notes that 'The availability of the remaining original activities... has not been independently verified.' The proposal's rationale assumes these activities are open and accessible without acknowledging this uncertainty, despite the EvidenceBrief explicitly flagging it as unresolved."
+    ],
+    "omitted_uncertainties": [
+      "The proposal fails to acknowledge the critical uncertainty regarding the availability of the remaining original activities (american_history, natural_history, wwii_memorial, lincoln_memorial) on 2026-11-07, which is explicitly flagged in the EvidenceBrief.",
+      "The proposal does not communicate the severity of the schedule infeasibility found by deterministic validation. Specifically, the leg from 'wwii_memorial' to 'lincoln_memorial' has -2 minutes of slack, making it impossible to complete both activities as scheduled without arriving late or missing the second activity entirely.",
+      "The proposal does not address whether the user can tolerate the compressed schedule resulting from the removal of the National Gallery and the subsequent rescheduling, which is a key trade-off mentioned in the rationale but lacks evidence support."
+    ],
+    "rationale_findings": [
+      "The deterministic_validation.issues report identifies 'Insufficient time to travel between consecutive activities' for the pair ['wwii_memorial', 'lincoln_memorial']. The schedule_robustness.legs data confirms this with an available_gap_minutes of 10 and a travel_duration_minutes of 12, resulting in a slack_minutes of -2 and a status of 'infeasible'. This means the proposed itinerary cannot be executed as planned; the user will arrive at the Lincoln Memorial after its scheduled end time or miss it entirely.",
+      "The schedule_preservation_findings indicate that four activities have had their start times changed. The proposal rationale claims these were shifted forward by 90 minutes to preserve flow, but the actual changes are: american_history moved from 10:50 to 09:00; natural_history moved from 13:20 to 10:50; wwii_memorial moved from 15:10 to 12:40; lincoln_memorial moved from 15:50 to 13:20. These are not simple shifts but a compression of the schedule. The proposal fails to justify why this aggressive rescheduling is necessary or supported by the evidence, as the EvidenceBrief explicitly states that availability has not been verified.",
+      "The proposal lists 'Schedule feasibility... has not been assessed' as an uncertainty. This is factually incorrect given the provided data. The schedule_robustness module has already performed the assessment and found the schedule infeasible (minimum_slack_minutes: -2). By listing this as an uncertainty, the proposal obscures the definitive finding that the schedule is unworkable.",
+      "The mandatory_activity_comparison confirms that 'natural_history' remains mandatory. The proposal preserves this activity but shifts its start time significantly earlier (from 13:20 to 10:50). While preserving the activity is correct, the rescheduling without verifying venue availability or user tolerance for the new time creates a risk of conflict with other constraints not present in the original itinerary."
+    ],
+    "recommendations": [
+      "Do not present the schedule as feasible. Explicitly state that the deterministic validation found an infeasible leg (wwii_memorial to lincoln_memorial) with -2 minutes of slack, meaning the proposed times cannot be met.",
+      "Acknowledge the EvidenceBrief's finding that the availability of the remaining original activities has not been verified. Do not assume they are open without evidence.",
+      "Re-evaluate the rescheduling strategy. The current proposal compresses the schedule significantly; a more robust recovery might involve delaying subsequent activities to align with realistic arrival times or removing multiple activities if the schedule cannot be made feasible.",
+      "Do not list 'schedule feasibility' as an uncertainty when detailed calculations (schedule_robustness) are available and show infeasibility. Report the specific findings from those calculations instead."
+    ]
+  },
+  "proposal_id": "recovery_proposal_dc_2026_11_07_v1",
+  "proposal_status": "partial",
+  "completed_at_utc": "2026-11-23T02:12:02.991503+00:00"
+}

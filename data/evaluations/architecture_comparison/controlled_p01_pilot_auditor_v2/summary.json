@@ -1,0 +1,201 @@
+{
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "controlled_prompt_version": "shared_standard_planner_v1",
+  "auditor_prompt_version": "auditor_schedule_robustness_v2",
+  "runs": 1,
+  "input_snapshot": {
+    "benchmark_id": "P-01",
+    "scenario_id": "P-01",
+    "model_name": "qwen3.5:4b",
+    "strategy": "minimal_disruption",
+    "controlled_prompt_version": "shared_standard_planner_v1",
+    "prepared_at_utc": "2026-11-23T01:56:58.267346+00:00",
+    "planning_input_sha256": "232d34b3f3bfdd299901cb0b12e757811315f14f036843a883f24bca0ce64947",
+    "original_itinerary_sha256": "f5307df49bcb3b281267bc12d80142229c5487aaadd99fba995ab149ec575a9b",
+    "investigation_sha256": "144955dc39c7eb67250c416e3a61d2813822c21ec69fa9c1d7994799a2099eef",
+    "disruption_sha256": "305d4823a53df68b903415166463a2c2fe99a62da4b6981aa688166f411084d0",
+    "walking_travel_leg_count": 4,
+    "routing_failure_count": 0,
+    "travel_legs": [
+      {
+        "origin_activity_id": "national_gallery",
+        "destination_activity_id": "american_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 683.5,
+            "distance_meters": 949.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 5,
+            "duration_seconds": 299.5,
+            "distance_meters": 416.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 17,
+            "duration_seconds": 985.9,
+            "distance_meters": 1369.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 694.1,
+            "distance_meters": 964.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      }
+    ],
+    "routing_failures": []
+  },
+  "paired_results": [
+    {
+      "run_id": "run_01",
+      "execution_order": [
+        "single_agent",
+        "multi_agent"
+      ],
+      "single_agent": {
+        "run_id": "run_01",
+        "architecture": "single_agent",
+        "benchmark_id": "P-01",
+        "scenario_id": "P-01",
+        "model_name": "qwen3.5:4b",
+        "strategy": "minimal_disruption",
+        "controlled_prompt_version": "shared_standard_planner_v1",
+        "planner_system_prompt_sha256": "a4bbadea4d7c8ea8d015d49a1f68949e17f49d6431dbef308b8e76fa5e4bbe62",
+        "planner_user_prompt_sha256": "211ab6fa9077904056c56072634d2d6d0e3b4e17c4e6612318fd64794456276b",
+        "planning_input_sha256": "232d34b3f3bfdd299901cb0b12e757811315f14f036843a883f24bca0ce64947",
+        "llm_call_count": 1,
+        "llm_latency_seconds": 50.425089166965336,
+        "workflow_wall_latency_seconds": 50.42943337513134,
+        "input_tokens": 2788,
+        "output_tokens": 1478,
+        "planner_metadata": {
+          "model_name": "qwen3.5:4b",
+          "latency_seconds": 50.425089166965336,
+          "input_tokens": 2788,
+          "output_tokens": 1478
+        },
+        "proposal_id": "recovery_proposal_dc_2026_11_07_p01",
+        "proposal_status": "partial",
+        "completed_at_utc": "2026-11-23T01:57:48.703058+00:00"
+      },
+      "multi_agent": {
+        "run_id": "run_01",
+        "architecture": "multi_agent",
+        "benchmark_id": "P-01",
+        "scenario_id": "P-01",
+        "model_name": "qwen3.5:4b",
+        "strategy": "minimal_disruption",
+        "controlled_prompt_version": "shared_standard_planner_v1",
+        "auditor_prompt_version": "auditor_schedule_robustness_v2",
+        "planner_system_prompt_sha256": "a4bbadea4d7c8ea8d015d49a1f68949e17f49d6431dbef308b8e76fa5e4bbe62",
+        "planner_user_prompt_sha256": "3cd2a440bb9000c46625bd200f8587c577dd24e804e54bd3bdce1511fe39e677",
+        "auditor_system_prompt_sha256": "140320e036961fa17f21b93ae5e1ef7b829953255a69ba6e568a625371fb6b3b",
+        "auditor_user_prompt_sha256": "44b71e6de0c772bfe89a0e8a4a50cad4daa083d687013da8496123a99eb2e0e8",
+        "planning_input_sha256": "232d34b3f3bfdd299901cb0b12e757811315f14f036843a883f24bca0ce64947",
+        "llm_call_count": 3,
+        "llm_latency_seconds": 81.4985257491935,
+        "workflow_wall_latency_seconds": 81.51195700000972,
+        "input_tokens": 9746,
+        "output_tokens": 2365,
+        "researcher_metadata": {
+          "model_name": "qwen3.5:4b",
+          "latency_seconds": 7.28044354217127,
+          "input_tokens": 1154,
+          "output_tokens": 212
+        },
+        "planner_metadata": {
+          "model_name": "qwen3.5:4b",
+          "latency_seconds": 49.12340979115106,
+          "input_tokens": 3062,
+          "output_tokens": 1496
+        },
+        "auditor_metadata": {
+          "model_name": "qwen3.5:4b",
+          "latency_seconds": 25.094672415871173,
+          "input_tokens": 5530,
+          "output_tokens": 657
+        },
+        "researcher_assessment": [
+          {
+            "claim": "A replacement venue is available and feasible for the affected itinerary.",
+            "status": "unsupported",
+            "supporting_source_ids": [],
+            "conflicting_source_ids": [],
+            "explanation": "No retrieved evidence sources were available to verify the availability or feasibility of a replacement venue. The investigation explicitly states that no verified replacement venue information was retrieved, and the absence of evidence does not establish availability. Furthermore, schedule feasibility after removing the unavailable National Gallery has not been assessed.",
+            "source_quality_warnings": [
+              "No retrieved evidence establishes replacement venue availability.",
+              "No retrieved evidence sources were available; this finding is based on supplied context only."
+            ]
+          }
+        ],
+        "auditor_assessment": {
+          "assessment": "unsupported",
+          "supported_claims": [
+            "The removal of the 'national_gallery' activity is a necessary response to the confirmed disruption where this venue is unavailable."
+          ],
+          "unsupported_claims": [
+            "The proposal claims that subsequent activities were shifted forward by exactly 90 minutes (the duration of the removed activity) to preserve chronological flow. This calculation is mathematically incorrect based on the proposed start times.",
+            "The proposal states that schedule feasibility has been assessed and that travel estimates remain valid after time shifts. The deterministic validation explicitly identifies an infeasible leg, contradicting this claim."
+          ],
+          "conflicting_claims": [
+            "The proposal rationale claims activities were shifted forward by 90 minutes, but the proposed itinerary shows 'american_history' starting at 09:00 (earlier than original 10:50) and 'natural_history' starting at 10:50 (earlier than original 13:20). This contradicts the claim of forward shifting.",
+            "The proposal rationale states that travel estimates remain valid, but deterministic_validation identifies an infeasible leg between wwii_memorial and lincoln_memorial with -2 minutes slack."
+          ],
+          "omitted_uncertainties": [
+            "The proposal fails to acknowledge the critical uncertainty regarding the feasibility of the final leg (wwii_memorial to lincoln_memorial), which has negative slack (-2 minutes) and is marked infeasible by schedule_robustness.",
+            "The proposal does not address the potential impact of the shifted start times on user preferences or other constraints, despite listing it as a trade-off."
+          ],
+          "rationale_findings": [
+            "The proposed rationale contains significant mathematical errors. It claims activities were shifted forward by 90 minutes, but the actual data shows 'american_history' was moved back to 09:00 and 'natural_history' to 10:50. This misrepresentation of the schedule change undermines the claim of preserving chronological flow.",
+            "The proposal asserts that travel estimates remain valid after time shifts. However, deterministic_validation identifies an infeasible leg between wwii_memorial and lincoln_memorial with -2 minutes slack. This indicates the proposed itinerary is not feasible as stated.",
+            "The schedule_robustness data confirms one leg (wwii_memorial to lincoln_memorial) is infeasible due to insufficient travel time relative to available gaps. The proposal ignores this critical failure point, presenting an infeasible schedule as a viable option."
+          ],
+          "recommendations": [
+            "Remove the claim that activities were shifted forward by 90 minutes; instead accurately describe the actual start times provided in the proposed itinerary.",
+            "Explicitly acknowledge the infeasible leg between wwii_memorial and lincoln_memorial (slack: -2 minutes) rather than asserting travel estimates remain valid.",
+            "Do not present the itinerary as feasible without addressing the negative slack value identified by schedule_robustness."
+          ]
+        },
+        "proposal_id": "recovery_proposal_dc_2026_11_07_v1",
+        "proposal_status": "partial",
+        "completed_at_utc": "2026-11-23T01:59:10.226302+00:00"
+      }
+    }
+  ],
+  "completed_at_utc": "2026-11-23T01:59:10.231727+00:00",
+  "interpretation_note": "The Planner system prompt and generation settings are shared. The multi-agent Planner additionally receives the Researcher's EvidenceBrief. The multi-agent condition also includes separate Researcher and Auditor calls. This comparison measures the incremental value and resource cost of those components under the controlled Planner prompt."
+}

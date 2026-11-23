@@ -1,0 +1,170 @@
+{
+  "original_itinerary": {
+    "itinerary_id": "dc_baseline_2026_11_07",
+    "destination": "Washington, DC",
+    "itinerary_date": "2026-11-07",
+    "activities": [
+      {
+        "activity_id": "national_gallery",
+        "attraction_id": "national_gallery",
+        "name": "National Gallery of Art",
+        "location": "6th Street and Constitution Avenue NW, Washington, DC",
+        "start_time": "2026-11-07T09:00:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "american_history",
+        "attraction_id": "american_history",
+        "name": "National Museum of American History",
+        "location": "1300 Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T10:50:00",
+        "duration_minutes": 90,
+        "mandatory": false,
+        "indoor": true
+      },
+      {
+        "activity_id": "natural_history",
+        "attraction_id": "natural_history",
+        "name": "National Museum of Natural History",
+        "location": "10th St. & Constitution Ave. NW, Washington, DC",
+        "start_time": "2026-11-07T13:20:00",
+        "duration_minutes": 90,
+        "mandatory": true,
+        "indoor": true
+      },
+      {
+        "activity_id": "wwii_memorial",
+        "attraction_id": "wwii_memorial",
+        "name": "World War II Memorial",
+        "location": "1750 Independence Ave. SW, Washington, DC",
+        "start_time": "2026-11-07T15:10:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      },
+      {
+        "activity_id": "lincoln_memorial",
+        "attraction_id": "lincoln_memorial",
+        "name": "Lincoln Memorial",
+        "location": "2 Lincoln Memorial Circle NW, Washington, DC",
+        "start_time": "2026-11-07T15:50:00",
+        "duration_minutes": 30,
+        "mandatory": false,
+        "indoor": false
+      }
+    ],
+    "travel_legs": [
+      {
+        "origin_activity_id": "national_gallery",
+        "destination_activity_id": "american_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 683.5,
+            "distance_meters": 949.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "american_history",
+        "destination_activity_id": "natural_history",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 5,
+            "duration_seconds": 299.5,
+            "distance_meters": 416.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "natural_history",
+        "destination_activity_id": "wwii_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 17,
+            "duration_seconds": 985.9,
+            "distance_meters": 1369.3,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      },
+      {
+        "origin_activity_id": "wwii_memorial",
+        "destination_activity_id": "lincoln_memorial",
+        "estimates": [
+          {
+            "mode": "walking",
+            "duration_minutes": 12,
+            "duration_seconds": 694.1,
+            "distance_meters": 964.0,
+            "source": "OpenRouteService"
+          }
+        ],
+        "selected_mode": "walking"
+      }
+    ],
+    "routing_failures": []
+  },
+  "disruption_scenario": {
+    "scenario_id": "P-01",
+    "scenario_type": "venue_unavailable",
+    "description": "The National Gallery of Art is unavailable during its scheduled visit from 9:00 AM to 10:30 AM.",
+    "affected_activity_ids": [
+      "national_gallery"
+    ],
+    "affected_travel_leg_ids": [],
+    "severity": "high",
+    "source_references": [],
+    "additional_duration_minutes": null,
+    "additional_duration_percent": null,
+    "weather_condition": null,
+    "affected_time_start": null,
+    "affected_time_end": null
+  },
+  "investigation_result": {
+    "investigation_id": "p01_controlled_test",
+    "scenario_id": "P-01",
+    "created_at": "2026-11-23T01:42:35.106937Z",
+    "weather_result": null,
+    "retrieved_evidence": [],
+    "evidence_assessments": [
+      {
+        "claim": "A replacement venue is available and feasible for the affected itinerary.",
+        "status": "unsupported",
+        "relevance": "relevant",
+        "coverage": "none",
+        "source_quality_assessed": false,
+        "source_quality_warnings": [
+          "No retrieved evidence establishes replacement venue availability."
+        ],
+        "consistency_assessed": false,
+        "supporting_source_ids": [],
+        "conflicting_source_ids": [],
+        "explanation": "No verified replacement venue availability information was retrieved. Absence of evidence does not establish availability."
+      }
+    ],
+    "routing_validation": null,
+    "investigation_warnings": [
+      "Replacement venue availability has not been verified.",
+      "The availability of the remaining original activities has not been independently verified.",
+      "Schedule feasibility after removing the unavailable National Gallery has not been assessed."
+    ]
+  },
+  "mandatory_constraints": [],
+  "flexible_preferences": [],
+  "user_instructions": "Recover the itinerary after the confirmed National Gallery unavailability.",
+  "strategy": "minimal_disruption",
+  "revision_count": 0,
+  "rejected_options": [],
+  "additional_instructions": "Preserve all unaffected original activities provisionally. Remove the confirmed unavailable National Gallery. Do not imply that the remaining venues are available. Do not claim schedule feasibility has been established. Do not invent replacement activities. Explain all remaining uncertainties."
+}

@@ -1,0 +1,26 @@
+{
+  "run_id": "run_01",
+  "architecture": "single_agent",
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "controlled_prompt_version": "shared_standard_planner_v1",
+  "planner_system_prompt_sha256": "a4bbadea4d7c8ea8d015d49a1f68949e17f49d6431dbef308b8e76fa5e4bbe62",
+  "planner_user_prompt_sha256": "fbfddba97d6f5ee73d323a2e628fd65bee1aee402c70af42d6ab71c966019655",
+  "planning_input_sha256": "b465145d9a97007b4dc43559d8686033af0e6746b2d493cb6f675d4f137b55e0",
+  "llm_call_count": 1,
+  "llm_latency_seconds": 50.913491250015795,
+  "workflow_wall_latency_seconds": 50.91892729210667,
+  "input_tokens": 2788,
+  "output_tokens": 1466,
+  "planner_metadata": {
+    "model_name": "qwen3.5:4b",
+    "latency_seconds": 50.913491250015795,
+    "input_tokens": 2788,
+    "output_tokens": 1466
+  },
+  "proposal_id": "recovery_proposal_001",
+  "proposal_status": "partial",
+  "completed_at_utc": "2026-11-23T02:06:05.378430+00:00"
+}

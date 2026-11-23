@@ -1,0 +1,73 @@
+{
+  "benchmark_id": "P-01",
+  "scenario_id": "P-01",
+  "model_name": "qwen3.5:4b",
+  "strategy": "minimal_disruption",
+  "controlled_prompt_version": "shared_standard_planner_v1",
+  "prepared_at_utc": "2026-11-23T01:56:58.267346+00:00",
+  "planning_input_sha256": "232d34b3f3bfdd299901cb0b12e757811315f14f036843a883f24bca0ce64947",
+  "original_itinerary_sha256": "f5307df49bcb3b281267bc12d80142229c5487aaadd99fba995ab149ec575a9b",
+  "investigation_sha256": "144955dc39c7eb67250c416e3a61d2813822c21ec69fa9c1d7994799a2099eef",
+  "disruption_sha256": "305d4823a53df68b903415166463a2c2fe99a62da4b6981aa688166f411084d0",
+  "walking_travel_leg_count": 4,
+  "routing_failure_count": 0,
+  "travel_legs": [
+    {
+      "origin_activity_id": "national_gallery",
+      "destination_activity_id": "american_history",
+      "estimates": [
+        {
+          "mode": "walking",
+          "duration_minutes": 12,
+          "duration_seconds": 683.5,
+          "distance_meters": 949.3,
+          "source": "OpenRouteService"
+        }
+      ],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "american_history",
+      "destination_activity_id": "natural_history",
+      "estimates": [
+        {
+          "mode": "walking",
+          "duration_minutes": 5,
+          "duration_seconds": 299.5,
+          "distance_meters": 416.0,
+          "source": "OpenRouteService"
+        }
+      ],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "natural_history",
+      "destination_activity_id": "wwii_memorial",
+      "estimates": [
+        {
+          "mode": "walking",
+          "duration_minutes": 17,
+          "duration_seconds": 985.9,
+          "distance_meters": 1369.3,
+          "source": "OpenRouteService"
+        }
+      ],
+      "selected_mode": "walking"
+    },
+    {
+      "origin_activity_id": "wwii_memorial",
+      "destination_activity_id": "lincoln_memorial",
+      "estimates": [
+        {
+          "mode": "walking",
+          "duration_minutes": 12,
+          "duration_seconds": 694.1,
+          "distance_meters": 964.0,
+          "source": "OpenRouteService"
+        }
+      ],
+      "selected_mode": "walking"
+    }
+  ],
+  "routing_failures": []
+}
